@@ -1,6 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
 import { initializeApp } from "firebase/app";
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Home from "./features/home/Home";
+import Kisan from "./features/kisan-bill/Kisan-Bill";
+import Vyapari from "./features/vyapari-bill/Vyapari-Bill";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyBI-TlWQnGAD6EzOw-2Td0ScXI8g3LZTgA",
@@ -15,22 +20,23 @@ const app = initializeApp(firebaseConfig);
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div>
+        <nav>
+          <ul>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/kisan-bill">Kisan Bill</Link></li>
+            <li><Link to="/vyapari-bill">Vyapari Bill</Link></li>
+          </ul>
+        </nav>
+
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/kisan-bill" element={<Kisan />} />
+          <Route path="/vyapari-bill" element={<Vyapari />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
