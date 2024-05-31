@@ -157,10 +157,10 @@ function KisanBill() {
           <Grid container spacing={2} justifyContent="flex-end" p={2}>
             <Grid container item xs={12} spacing={2} justifyContent="flex-end">
               <Grid item xs={3}>
-                <TextField id="outlined-basic" label="Outlined" variant="outlined" fullWidth />
+                <TextField id="outlined-basic" label="Kharcha Total" variant="outlined" fullWidth />
               </Grid>
               <Grid item xs={3}>
-                <TextField id="outlined-basic" type="date" variant="outlined" fullWidth />
+                <TextField id="outlined-basic" label="Pakki Bikri" variant="outlined" fullWidth />
               </Grid>
             </Grid>
             <Grid container item xs={12} spacing={2} justifyContent="flex-end">

@@ -60,7 +60,7 @@ function VyapariBill() {
         <Grid container spacing={2} paddingTop={2}>
           <Grid container item xs={12} spacing={2} justifyContent="flex-end">
             <Grid item xs={2}>
-              <TextField id="outlined-basic" type="date" variant="outlined" fullWidth />
+              <TextField id="outlined-basic" label="Total" variant="outlined" fullWidth />
             </Grid>
           </Grid>
           <Grid container item xs={12} spacing={2} justifyContent="flex-end">
