@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { Grid } from "@mui/material";
 import { useForm, Controller } from 'react-hook-form';
-import { TextField, Button } from "@mui/material";
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { TextField, Button, Box } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 function KisanBill() {
@@ -87,7 +83,7 @@ function KisanBill() {
 
   return (
     <div>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} p={3}>
         <Grid item xs={4}>
           <Grid
             container
@@ -108,7 +104,7 @@ function KisanBill() {
                       {...field}
                       label={fieldDef.label}
                       variant="outlined"
-                      margin="normal"
+                      sx={{ mb: 3 }}
                       fullWidth
                       error={!!errors[field.name]}
                       helperText={errors[field.name] ? errors[field.name].message : ''}
@@ -124,14 +120,12 @@ function KisanBill() {
           </Grid>
         </Grid>
         <Grid item xs={8}>
-          <Grid container spacing={7}>
-            <Grid item><TextField id="outlined-basic" label="Outlined" variant="outlined" /></Grid>
-            <Grid item>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer components={['DatePicker']}>
-                  <DatePicker value={value} onChange={(newValue) => setValue(newValue)} />
-                </DemoContainer>
-              </LocalizationProvider>
+          <Grid container paddingBottom={2}>
+            <Grid item xs={6}>
+              <TextField id="outlined-basic" label="Kisan Name" variant="outlined" />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField id="outlined-basic" type='date' variant="outlined" />
             </Grid>
           </Grid>
           <TableContainer component={Paper}>
@@ -160,6 +154,24 @@ function KisanBill() {
               </TableBody>
             </Table>
           </TableContainer>
+          <Grid container spacing={2} justifyContent="flex-end" p={2}>
+            <Grid container item xs={12} spacing={2} justifyContent="flex-end">
+              <Grid item xs={3}>
+                <TextField id="outlined-basic" label="Outlined" variant="outlined" fullWidth />
+              </Grid>
+              <Grid item xs={3}>
+                <TextField id="outlined-basic" type="date" variant="outlined" fullWidth />
+              </Grid>
+            </Grid>
+            <Grid container item xs={12} spacing={2} justifyContent="flex-end">
+              <Grid item xs={3}>
+                <Button variant="contained" color="primary" fullWidth>Save</Button>
+              </Grid>
+              <Grid item xs={3}>
+                <Button variant="contained" color="success" fullWidth>Save And Print</Button>
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     </div>
