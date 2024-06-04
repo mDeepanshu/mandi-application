@@ -1,26 +1,27 @@
 import React, { useState } from 'react';
 import { Grid } from "@mui/material";
 import { useForm, Controller } from 'react-hook-form';
-import { TextField, Button, Box } from "@mui/material";
+import { TextField, Button } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { submitKisanBill } from '../../gateway/kisan-bill-apis';
 
 function KisanBill() {
 
-  const { handleSubmit, control, formState: { errors } } = useForm();
-  const [label, setLabel] = useState('Default Label');
-  const [value, setValue] = React.useState(null);
+  const { register,handleSubmit,control, formState: { errors } } = useForm();
+  // const [label, setLabel] = useState('Default Label');
+  // const [value, setValue] = React.useState(null);
 
   const [fieldDefinitions, setFieldDefinitions] = useState([
     {
       name: 'mandi_kharch',
       label: 'Mandi Kharch',
-      defaultValue: '',
+      defaultValue: '1',
       validation: { required: 'Mandi Kharch is required' },
     },
     {
       name: 'hammali',
       label: 'Hammali',
-      defaultValue: '',
+      defaultValue: '1',
       validation: {
         required: 'Hammali is required',
       },
@@ -28,7 +29,7 @@ function KisanBill() {
     {
       name: 'nagar_palika_tax',
       label: 'Nagar Palika Tax',
-      defaultValue: '',
+      defaultValue: '1',
       validation: {
         required: 'Nagar Palika Tax is required',
       },
@@ -36,7 +37,7 @@ function KisanBill() {
     {
       name: 'bhada',
       label: 'Bhada',
-      defaultValue: '',
+      defaultValue: '1',
       validation: {
         required: 'Bhada is required',
       },
@@ -44,7 +45,7 @@ function KisanBill() {
     {
       name: 'driver_inaam',
       label: 'Driver Inaam',
-      defaultValue: '',
+      defaultValue: '1',
       validation: {
         required: 'Driver Inaam is required',
       },
@@ -52,7 +53,7 @@ function KisanBill() {
     {
       name: 'nagdi',
       label: 'Nagdi',
-      defaultValue: '',
+      defaultValue: '1',
       validation: {
         required: 'Nagdi is required',
       },
@@ -60,7 +61,7 @@ function KisanBill() {
     {
       name: 'commision',
       label: 'Commision',
-      defaultValue: '',
+      defaultValue: '1',
       validation: {
         required: 'Commision is required',
       },
@@ -77,21 +78,27 @@ function KisanBill() {
     { name: 'Gingerbread', calories: 356, fat: 16.0, carbs: 49, protein: 3.9 },
   ];
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    const billDetails = {
+      ...data,
+      rows
+    }
+    console.log(billDetails);
+    let a = await submitKisanBill(billDetails);
+    console.log("a",a);
   };
 
   return (
     <div>
-      <Grid container spacing={2} p={3}>
-        <Grid item xs={4}>
-          <Grid
-            container
-            direction="column"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Grid container spacing={2} p={3}>
+          <Grid item xs={4}>
+            <Grid
+              container
+              direction="column"
+              justifyContent="center"
+              alignItems="center"
+            >
               {fieldDefinitions.map((fieldDef) => (
                 <Controller
                   key={fieldDef.name}
@@ -113,67 +120,81 @@ function KisanBill() {
                   )}
                 />
               ))}
-              <Button type="submit" variant="contained" color="primary" fullWidth>
-                Submit
-              </Button>
-            </form>
-          </Grid>
-        </Grid>
-        <Grid item xs={8}>
-          <Grid container paddingBottom={2}>
-            <Grid item xs={6}>
-              <TextField id="outlined-basic" label="Kisan Name" variant="outlined" />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField id="outlined-basic" type='date' variant="outlined" />
             </Grid>
           </Grid>
-          <TableContainer component={Paper}>
-            <Table aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Item Name</TableCell>
-                  <TableCell align="right">Bag</TableCell>
-                  <TableCell align="right">Rate&nbsp;(g)</TableCell>
-                  <TableCell align="right">Quantity&nbsp;(g)</TableCell>
-                  <TableCell align="right">Item Total&nbsp;(g)</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.name}>
-                    <TableCell component="th" scope="row">
-                      {row.name}
-                    </TableCell>
-                    <TableCell align="right">{row.calories}</TableCell>
-                    <TableCell align="right">{row.fat}</TableCell>
-                    <TableCell align="right">{row.carbs}</TableCell>
-                    <TableCell align="right">{row.protein}</TableCell>
+          <Grid item xs={8}>
+            <Grid container paddingBottom={2}>
+              <Grid item xs={6}>
+                <TextField id="outlined-basic" label="Kisan Name" variant="outlined" />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField id="outlined-basic" type='date' variant="outlined" />
+              </Grid>
+            </Grid>
+            <TableContainer component={Paper}>
+              <Table aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Item Name</TableCell>
+                    <TableCell align="right">Bag</TableCell>
+                    <TableCell align="right">Rate&nbsp;(g)</TableCell>
+                    <TableCell align="right">Quantity&nbsp;(g)</TableCell>
+                    <TableCell align="right">Item Total&nbsp;(g)</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Grid container spacing={2} justifyContent="flex-end" p={2}>
-            <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-              <Grid item xs={3}>
-                <TextField id="outlined-basic" label="Kharcha Total" variant="outlined" fullWidth />
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow key={row.name}>
+                      <TableCell component="th" scope="row">
+                        {row.name}
+                      </TableCell>
+                      <TableCell align="right">{row.calories}</TableCell>
+                      <TableCell align="right">{row.fat}</TableCell>
+                      <TableCell align="right">{row.carbs}</TableCell>
+                      <TableCell align="right">{row.protein}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Grid container spacing={2} justifyContent="flex-end" p={2}>
+              <Grid container item xs={12} spacing={2} justifyContent="flex-end">
+                <Grid item xs={3}>
+                  <TextField
+                    fullWidth
+                    label="Kharcha Total"
+                    variant="outlined"
+                    {...register("kharcha_total", { required: "This field is required" })}
+                    error={!!errors.kharcha_total}
+                    helperText={errors.kharcha_total ? errors.kharcha_total.message : ""}
+                    size="small"
+                    sx={{ mb: 3 }}
+                    defaultValue="1"
+                  />
+                </Grid>
+                <Grid item xs={3}>
+                <TextField
+                    fullWidth
+                    label="Pakki Bikri"
+                    variant="outlined"
+                    {...register("pakki_bikri", { required: "This field is required" })}
+                    error={!!errors.pakki_bikri}
+                    helperText={errors.pakki_bikri ? errors.pakki_bikri.message : ""}
+                    size="small"
+                    sx={{ mb: 3 }}
+                    defaultValue="1"
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={3}>
-                <TextField id="outlined-basic" label="Pakki Bikri" variant="outlined" fullWidth />
-              </Grid>
-            </Grid>
-            <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-              <Grid item xs={3}>
-                <Button variant="contained" color="primary" fullWidth>Save</Button>
-              </Grid>
-              <Grid item xs={3}>
-                <Button variant="contained" color="success" fullWidth>Save And Print</Button>
+              <Grid container item xs={12} spacing={2} justifyContent="flex-end">
+                <Grid item xs={3}>
+                  <Button variant="contained" color="success" type='submit' fullWidth>Save And Print</Button>
+                </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      </form>
     </div>
   );
 }
