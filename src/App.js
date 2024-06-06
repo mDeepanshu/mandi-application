@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import './App.css';
 import { initializeApp } from "firebase/app";
+import { Box } from '@mui/material';
 
 import NavBar from "./features/navbar/Nav-Bar";
 
@@ -20,7 +21,9 @@ function App() {
 	return (
 		<>
 			<NavBar></NavBar>
-			<Outlet/>
+			<Box component="main" sx={{ mt: 8 }}>
+				<Outlet />
+			</Box>
 		</>
 	);
 }
