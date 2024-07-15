@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid } from "@mui/material";
 import { useForm, Controller } from 'react-hook-form';
 import { TextField, Button } from "@mui/material";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { submitKisanBill } from '../../gateway/kisan-bill-apis';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,InputAdornment } from '@mui/material';
+import { submitKisanBill, getKisanBill,getKisanNameList } from '../../gateway/kisan-bill-apis';
+import Autocomplete from '@mui/material/Autocomplete';
+import SearchIcon from '@mui/icons-material/Search';
 
 function KisanBill() {
 
-  const { register,handleSubmit,control, formState: { errors } } = useForm();
+  const { register, handleSubmit, control, formState: { errors }, getValues } = useForm();
   // const [label, setLabel] = useState('Default Label');
   // const [value, setValue] = React.useState(null);
-
+  const [kisanList, setKisanList] = useState([]);
+  const [tableData, setTableData] = useState([]);
   const [fieldDefinitions, setFieldDefinitions] = useState([
     {
       name: 'mandi_kharch',
@@ -70,23 +73,37 @@ function KisanBill() {
   ]);
 
 
-  const rows = [
-    { name: 'Frozen yoghurt', calories: 159, fat: 6.0, carbs: 24, protein: 4.0 },
-    { name: 'Ice cream sandwich', calories: 237, fat: 9.0, carbs: 37, protein: 4.3 },
-    { name: 'Eclair', calories: 262, fat: 16.0, carbs: 24, protein: 6.0 },
-    { name: 'Cupcake', calories: 305, fat: 3.7, carbs: 67, protein: 4.3 },
-    { name: 'Gingerbread', calories: 356, fat: 16.0, carbs: 49, protein: 3.9 },
-  ];
+  // const rows = [
+  //   { itemName: 'Frozen yoghurt', rate: 159, quantity: 6.0, bag: 24, total: 4.0 },
+  // ];
 
   const onSubmit = async (data) => {
     const billDetails = {
       ...data,
-      rows
+      tableData
     }
     console.log(billDetails);
     let a = await submitKisanBill(billDetails);
-    console.log("a",a);
+    console.log("a", a);
   };
+
+  const fetchBill = async () => {
+    const formValues = getValues();
+    console.log("formValues", formValues.kisan.partyId, formValues.date);
+    const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
+    console.log(billData.responseBody);
+    setTableData(billData.responseBody)
+  }
+
+  const getKisanNames = async () => {
+    const allKisan = await getKisanNameList();
+    console.log(allKisan);
+    setKisanList(allKisan.responseBody);
+  }
+
+  useEffect(() => {
+    getKisanNames();
+  }, []);
 
   return (
     <div>
@@ -124,11 +141,53 @@ function KisanBill() {
           </Grid>
           <Grid item xs={8}>
             <Grid container paddingBottom={2}>
-              <Grid item xs={6}>
-                <TextField id="outlined-basic" label="Kisan Name" variant="outlined" />
+              <Grid item xs={5}>
+                <Controller
+                  name="kisan"
+                  control={control}
+                  render={({ field }) => (
+                    <Autocomplete
+                      {...field}
+                      options={kisanList}
+                      getOptionLabel={(option) => option.name}
+                      getOptionKey={(option)=> option.partyId}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Kisan Name"
+                          InputProps={{
+                            ...params.InputProps,
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchIcon />
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      )}
+                      onChange={(event, value) => field.onChange(value)}
+                      disablePortal
+                      id="combo-box-demo"
+                    />
+                  )}
+                />
               </Grid>
-              <Grid item xs={6}>
-                <TextField id="outlined-basic" type='date' variant="outlined" />
+              <Grid item xs={5}>
+                <Controller
+                  name="date"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      variant="outlined"
+                      type='date'
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <Button variant="contained" color="success" onClick={fetchBill} fullWidth>Fetch Bill</Button>
               </Grid>
             </Grid>
             <TableContainer component={Paper}>
@@ -143,15 +202,15 @@ function KisanBill() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row) => (
+                  {tableData.map((row) => (
                     <TableRow key={row.name}>
                       <TableCell component="th" scope="row">
-                        {row.name}
+                        {row.itemName}
                       </TableCell>
-                      <TableCell align="right">{row.calories}</TableCell>
-                      <TableCell align="right">{row.fat}</TableCell>
-                      <TableCell align="right">{row.carbs}</TableCell>
-                      <TableCell align="right">{row.protein}</TableCell>
+                      <TableCell align="right">{row.bag}</TableCell>
+                      <TableCell align="right">{row.rate}</TableCell>
+                      <TableCell align="right">{row.quantity}</TableCell>
+                      <TableCell align="right">{row.total}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -173,7 +232,7 @@ function KisanBill() {
                   />
                 </Grid>
                 <Grid item xs={3}>
-                <TextField
+                  <TextField
                     fullWidth
                     label="Pakki Bikri"
                     variant="outlined"

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { AppBar, Box, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, Toolbar, Typography, Button } from '@mui/material';
+import { AppBar, Box, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, Toolbar, Typography, Button } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 const navItems = [
@@ -28,8 +27,8 @@ function NavBar(props) {
             </Typography>
             <Divider />
             <List>
-                {navItems.map((item) => (
-                    <Link to={item.name}>
+                {navItems.map((item,index) => (
+                    <Link to={item.name} key={index}>
                         <ListItem key={item.name} disablePadding>
                             <ListItemButton sx={{ textAlign: 'center' }}>
                                 <ListItemText primary={item.label} />
@@ -64,8 +63,8 @@ function NavBar(props) {
                         MUI
                     </Typography>
                     <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                        {navItems.map((item) => (
-                            <Link to={item.name}>
+                        {navItems.map((item,index) => (
+                            <Link to={item.name} key={index}>
                                 <Button key={item.name} sx={{ color: '#fff' }}>
                                     {item.label}
                                 </Button>
