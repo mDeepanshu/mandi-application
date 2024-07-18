@@ -24,13 +24,3 @@ export const getKisanBill = async (kisanId,date) => {
     throw error;
   }
 };
-
-export const getKisanNameList = async () => {
-  try {
-    const response = await axiosInstance.get(`/party/listAllParties`);
-    return response.data;
-  } catch (error) {
-    console.error('Error posting data:', error);
-    throw error;
-  }
-};

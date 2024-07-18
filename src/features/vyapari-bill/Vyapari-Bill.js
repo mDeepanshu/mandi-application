@@ -1,32 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid } from "@mui/material";
 import { TextField, Button } from "@mui/material";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { submitVyapariBill } from '../../gateway/Viyapari-bill-apis';
-import { useForm } from 'react-hook-form';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,InputAdornment } from '@mui/material';
+import { submitVyapariBill,getVyapariBill } from '../../gateway/vyapari-bill-apis';
+import { useForm, Controller } from 'react-hook-form';
+import { getAllPartyList } from "../../gateway/comman-apis";
+import Autocomplete from '@mui/material/Autocomplete';
+import SearchIcon from '@mui/icons-material/Search';
 
 function VyapariBill() {
 
-  const rows = [
-    { name: 'Frozen yoghurt', calories: 159, fat: 6.0, carbs: 24, protein: 4.0 },
-    { name: 'Ice cream sandwich', calories: 237, fat: 9.0, carbs: 37, protein: 4.3 },
-    { name: 'Eclair', calories: 262, fat: 16.0, carbs: 24, protein: 6.0 },
-    { name: 'Cupcake', calories: 305, fat: 3.7, carbs: 67, protein: 4.3 },
-    { name: 'Gingerbread', calories: 356, fat: 16.0, carbs: 49, protein: 3.9 },
-  ];
 
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, control,formState: { errors }, getValues } = useForm();
+  const [vyapariList, setVyapariList] = useState([]);
+  const [tableData, setTableData] = useState([]);
 
 
   const onSubmit = async (data) => {
     const billDetails = {
       ...data,
-      rows
+      tableData
     };
     console.log("billDetails",billDetails);    
-    let a = await submitVyapariBill(billDetails);
-    console.log("A",a);
+    // let a = await submitVyapariBill(billDetails);
+    window.print();
   };
+
+  const fetchBill = async () => {
+    const formValues = getValues();
+    console.log("formValues",formValues);
+    const billData = await getVyapariBill(formValues.vyapari_name.partyId, formValues.date);
+    setTableData(billData.responseBody)
+  }
+
+  const getVyapariNames = async () => {
+    const allVyapari = await getAllPartyList();
+    setVyapariList(allVyapari.responseBody);
+  }
+
+  useEffect(() => {
+    getVyapariNames();
+  }, []);
 
   return (
     <div>
@@ -34,31 +48,53 @@ function VyapariBill() {
         <Grid item xs={8} p={3}>
           <Grid container spacing={2} justifyContent="flex-end">
             <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-              <Grid item xs={3}>
-                <TextField
-                  {...register("vyapari_name", { required: "This field is required" })}
-                  error={!!errors.vyapari_name}
-                  helperText={errors.vyapari_name ? errors.vyapari_name.message : ""}
-                  size="small"
-                  sx={{ mb: 3 }}
-                  defaultValue="1"
-                  fullWidth
-                  label="Vyapari Name"
-                  variant="outlined"
+              <Grid item xs={5}>
+                <Controller
+                  name="vyapari_name"
+                  control={control}
+                  render={({ field }) => (
+                    <Autocomplete
+                      {...field}
+                      options={vyapariList}
+                      getOptionLabel={(option) => option.name}
+                      getOptionKey={(option)=> option.partyId}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Vyapari Name"
+                          InputProps={{
+                            ...params.InputProps,
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchIcon />
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      )}
+                      onChange={(event, value) => field.onChange(value)}
+                      disablePortal
+                      id="combo-box-demo"
+                    />
+                  )}
                 />
               </Grid>
-              <Grid item xs={3}>
-                <TextField
-                  {...register("vyapari_name", { required: "This field is required" })}
-                  error={!!errors.vyapari_name}
-                  helperText={errors.vyapari_name ? errors.vyapari_name.message : ""}
-                  size="small"
-                  sx={{ mb: 3 }}
-                  defaultValue="1"
-                  fullWidth
-                  label="Vyapari Name"
-                  variant="outlined"
+              <Grid item xs={5}>
+                <Controller
+                  name="date"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      variant="outlined"
+                      type='date'
+                    />
+                  )}
                 />
+              </Grid>
+              <Grid item xs={2}>
+                <Button variant="contained" color="success" onClick={fetchBill} fullWidth>Fetch Bill</Button>
               </Grid>
             </Grid>
             <Grid item xs={3}>
@@ -87,7 +123,7 @@ function VyapariBill() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
+                {tableData.map((row) => (
                   <TableRow key={row.name}>
                     <TableCell component="th" scope="row">
                       {row.name}

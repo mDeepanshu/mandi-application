@@ -1,17 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Grid } from "@mui/material";
 import { useForm, Controller } from 'react-hook-form';
 import { TextField, Button } from "@mui/material";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,InputAdornment } from '@mui/material';
-import { submitKisanBill, getKisanBill,getKisanNameList } from '../../gateway/kisan-bill-apis';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, InputAdornment } from '@mui/material';
+import { submitKisanBill, getKisanBill } from '../../gateway/kisan-bill-apis';
+import { getAllPartyList } from "../../gateway/comman-apis";
 import Autocomplete from '@mui/material/Autocomplete';
 import SearchIcon from '@mui/icons-material/Search';
+import ReactToPrint from 'react-to-print';
+import KisanBillPrint from "../../dialogs/kisan-bill-print";
 
 function KisanBill() {
 
+  const componentRef = useRef();
+
   const { register, handleSubmit, control, formState: { errors }, getValues } = useForm();
-  // const [label, setLabel] = useState('Default Label');
-  // const [value, setValue] = React.useState(null);
   const [kisanList, setKisanList] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [fieldDefinitions, setFieldDefinitions] = useState([
@@ -72,32 +75,25 @@ function KisanBill() {
 
   ]);
 
-
-  // const rows = [
-  //   { itemName: 'Frozen yoghurt', rate: 159, quantity: 6.0, bag: 24, total: 4.0 },
-  // ];
-
   const onSubmit = async (data) => {
-    const billDetails = {
-      ...data,
-      tableData
-    }
-    console.log(billDetails);
-    let a = await submitKisanBill(billDetails);
-    console.log("a", a);
+    // const billDetails = {
+    //   ...data,
+    //   tableData
+    // }
+    // console.log(billDetails);
+    // let a = await submitKisanBill(billDetails);
+    // console.log("a", a);
+    // window.print();
   };
 
   const fetchBill = async () => {
     const formValues = getValues();
-    console.log("formValues", formValues.kisan.partyId, formValues.date);
     const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
-    console.log(billData.responseBody);
     setTableData(billData.responseBody)
   }
 
   const getKisanNames = async () => {
-    const allKisan = await getKisanNameList();
-    console.log(allKisan);
+    const allKisan = await getAllPartyList();
     setKisanList(allKisan.responseBody);
   }
 
@@ -150,7 +146,7 @@ function KisanBill() {
                       {...field}
                       options={kisanList}
                       getOptionLabel={(option) => option.name}
-                      getOptionKey={(option)=> option.partyId}
+                      getOptionKey={(option) => option.partyId}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -196,14 +192,14 @@ function KisanBill() {
                   <TableRow>
                     <TableCell>Item Name</TableCell>
                     <TableCell align="right">Bag</TableCell>
-                    <TableCell align="right">Rate&nbsp;(g)</TableCell>
-                    <TableCell align="right">Quantity&nbsp;(g)</TableCell>
-                    <TableCell align="right">Item Total&nbsp;(g)</TableCell>
+                    <TableCell align="right">Rate</TableCell>
+                    <TableCell align="right">Quantity</TableCell>
+                    <TableCell align="right">Item Total</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {tableData.map((row) => (
-                    <TableRow key={row.name}>
+                  {tableData.map((row, index) => (
+                    <TableRow key={index}>
                       <TableCell component="th" scope="row">
                         {row.itemName}
                       </TableCell>
@@ -247,13 +243,19 @@ function KisanBill() {
               </Grid>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
                 <Grid item xs={3}>
-                  <Button variant="contained" color="success" type='submit' fullWidth>Save And Print</Button>
+                  <ReactToPrint
+                    trigger={() => <Button variant="contained" color="success" type='submit' fullWidth>Save And Print</Button>}
+                    content={() => componentRef.current}
+                  />
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
       </form>
+      <div style={{ display: 'none' }}>
+        <KisanBillPrint ref={componentRef} props={{ tableData: tableData, formData: getValues() }} />
+      </div>
     </div>
   );
 }
