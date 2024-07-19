@@ -4,7 +4,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
+import PrintIcon from '@mui/icons-material/Print';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import { Grid } from "@mui/material";
@@ -27,7 +27,7 @@ function Home() {
                     key={index}
                     secondaryAction={
                       <IconButton edge="end" aria-label="delete">
-                        <DeleteIcon />
+                        <PrintIcon/>
                       </IconButton>
                     }
                   >
@@ -50,7 +50,7 @@ function Home() {
                     key={index}
                     secondaryAction={
                       <IconButton edge="end" aria-label="delete">
-                        <DeleteIcon />
+                        <PrintIcon />
                       </IconButton>
                     }
                   >
