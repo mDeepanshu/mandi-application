@@ -13,10 +13,13 @@ import KisanBillPrint from "../../dialogs/kisan-bill-print";
 function KisanBill() {
 
   const componentRef = useRef();
+  const triggerRef = useRef();
 
   const { register, handleSubmit, control, formState: { errors }, getValues } = useForm();
   const [kisanList, setKisanList] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [formData, setFormData] = useState();
+
   const [fieldDefinitions, setFieldDefinitions] = useState([
     {
       name: 'mandi_kharch',
@@ -76,15 +79,21 @@ function KisanBill() {
   ]);
 
   const onSubmit = async (data) => {
-    // const billDetails = {
-    //   ...data,
-    //   tableData
+    console.log("here");
+    setFormData(getValues());
+    // if (triggerRef.current) {
+    //   triggerRef.current.click();
     // }
-    // console.log(billDetails);
-    // let a = await submitKisanBill(billDetails);
-    // console.log("a", a);
-    // window.print();
   };
+  // temp();
+  // const billDetails = {
+  //   ...data,
+  //   tableData
+  // }
+  // console.log(billDetails);
+  // let a = await submitKisanBill(billDetails);
+  // console.log("a", a);
+  // window.print();
 
   const fetchBill = async () => {
     const formValues = getValues();
@@ -100,6 +109,14 @@ function KisanBill() {
   useEffect(() => {
     getKisanNames();
   }, []);
+
+  useEffect(() => {
+    if (formData) {
+      if (triggerRef.current) {
+        triggerRef.current.click();
+      }
+    }
+  }, [formData]);
 
   return (
     <div>
@@ -243,9 +260,11 @@ function KisanBill() {
               </Grid>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
                 <Grid item xs={3}>
+                  <Button variant="contained" color="success" type='submit' fullWidth>Save And Print</Button>
                   <ReactToPrint
-                    trigger={() => <Button variant="contained" color="success" type='submit' fullWidth>Save And Print</Button>}
+                    trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
                     content={() => componentRef.current}
+                    // onBeforeGetContent={() => setFormData(getValues())}
                   />
                 </Grid>
               </Grid>
@@ -254,7 +273,7 @@ function KisanBill() {
         </Grid>
       </form>
       <div style={{ display: 'none' }}>
-        <KisanBillPrint ref={componentRef} props={{ tableData: tableData, formData: getValues() }} />
+        <KisanBillPrint ref={componentRef} tableData={tableData} formData={formData} />
       </div>
     </div>
   );

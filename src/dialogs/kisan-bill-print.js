@@ -7,6 +7,7 @@ const KisanBillPrint = forwardRef((props, ref) =>{
     let tableData = [];
 
     useEffect(() => {
+        console.log("props","props");
         console.log(props);
       }, []);
 
@@ -14,13 +15,13 @@ const KisanBillPrint = forwardRef((props, ref) =>{
         <div ref={ref}>
           <h1>Haji Sabzi Mandi Bill</h1>
           <Grid container>
-            <Grid item xs={6}>Mandi Kharch: {props.props.formData.mandi_kharch}</Grid>
-            <Grid item xs={6}>Hammali: {props.props.formData.hammali}</Grid>
-            <Grid item xs={6}>Nagar Palika Tax: {props.props.formData.nagar_palika_tax}</Grid>
-            <Grid item xs={6}>Bhada: {props.props.formData.bhada}</Grid>
-            <Grid item xs={4}>Driver Inaam: {props.props.formData.driver_inaam}</Grid>
-            <Grid item xs={4}>Nagdi: {props.props.formData.nagdi}</Grid>
-            <Grid item xs={4}>Commision: {props.props.formData.commision}</Grid>
+            <Grid item xs={4}>Mandi Kharch: {props.formData?.mandi_kharch}</Grid>
+            <Grid item xs={4}>Nagar Palika Tax: {props.formData?.nagar_palika_tax}</Grid>
+            <Grid item xs={4}>Driver Inaam: {props.formData?.driver_inaam}</Grid>
+            <Grid item xs={3}>Hammali: {props.formData?.hammali}</Grid>
+            <Grid item xs={3}>Bhada: {props.formData?.bhada}</Grid>
+            <Grid item xs={3}>Nagdi: {props.formData?.nagdi}</Grid>
+            <Grid item xs={3}>Commision: {props.formData?.commision}</Grid>
           </Grid>
           <TableContainer>
               <Table aria-label="simple table">
@@ -34,7 +35,7 @@ const KisanBillPrint = forwardRef((props, ref) =>{
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {tableData.map((row,index) => (
+                  {props.tableData.map((row,index) => (
                     <TableRow key={index}>
                       <TableCell component="th" scope="row">
                         {row.itemName}
