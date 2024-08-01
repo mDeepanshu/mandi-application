@@ -153,7 +153,7 @@ function KisanBill() {
             </Grid>
           </Grid>
           <Grid item xs={8}>
-            <Grid container paddingBottom={2}>
+            <Grid container spacing={2} paddingBottom={2}>
               <Grid item xs={5}>
                 <Controller
                   name="kisan"
@@ -185,7 +185,7 @@ function KisanBill() {
                   )}
                 />
               </Grid>
-              <Grid item xs={5}>
+              <Grid item xs={4}>
                 <Controller
                   name="date"
                   control={control}
