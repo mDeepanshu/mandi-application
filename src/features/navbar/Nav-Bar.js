@@ -7,6 +7,8 @@ const navItems = [
     { name: '', label: 'Home' },
     { name: 'vyapari-bill', label: 'vyapari bill' },
     { name: 'kisan-bill', label: 'Kisan Bill' },
+    { name: 'item-master', label: 'Item Master' },
+    { name: 'party-master', label: 'Party Master' },
 ];
 const drawerWidth = 240;
 

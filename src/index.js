@@ -6,6 +6,8 @@ import App from './App';
 import Home from "./features/home/Home";
 import Kisan from "./features/kisan-bill/Kisan-Bill";
 import Vyapari from "./features/vyapari-bill/Vyapari-Bill";
+import ItemMaster from "./features/item-master/Item-Master";
+import PartyMaster from "./features/party-master/Party-Master";
 
 const router = createBrowserRouter([
 	{
@@ -23,6 +25,14 @@ const router = createBrowserRouter([
 			{
 				path: 'vyapari-bill',
 				element: <Vyapari />
+			},
+			{
+				path: 'item-master',
+				element: <ItemMaster />
+			},
+			{
+				path: 'party-master',
+				element: <PartyMaster />
 			},
 		],
 		// errorElement: <Error />
