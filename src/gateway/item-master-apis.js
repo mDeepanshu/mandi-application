@@ -1,27 +1,23 @@
-import axios from 'axios';
-import config from "../constants/config";
-
-
-const axiosInstance = axios.create({
-    baseURL: config.apiBaseUrl,
-});
+import axiosHttp from "../interceptors/error-handling-interceptor";
 
 export const addItemGlobal = async (data) => {
     try {
-        const response = await axiosInstance.post('/', data);
+        const response = await axiosHttp.post('/', data);
         return response.data;
     } catch (error) {
         console.error('Error posting data:', error);
-        throw error;
+            console.error('Not Throwing Error');
+
     }
 };
 
 export const getItem = async () => {
     try {
-        const response = await axiosInstance.get('/items');
+        const response = await axiosHttp.get('/listItems');
         return response.data;
     } catch (error) {
         console.error('Error posting data:', error);
-        throw error;
+            console.error('Not Throwing Error');
+
     }
 };

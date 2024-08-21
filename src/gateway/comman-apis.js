@@ -1,26 +1,23 @@
-import axios from 'axios';
-import config from "../constants/config";
+import axiosHttp from "../interceptors/error-handling-interceptor";
 
-const axiosInstance = axios.create({
-  baseURL: config.apiBaseUrl,
-});
-
-export const getAllPartyList = async () => {
+export const getAllPartyList = async (partyType) => {
     try {
-      const response = await axiosInstance.get(`/party/listAllParties`);
+      const response = await axiosHttp.get(`/party/listAllParties?partyType=${partyType}`);
       return response.data;
     } catch (error) {
       console.error('Error posting data:', error);
-      throw error;
+          console.error('Not Throwing Error');
+
     }
   };
 
   export const getAllPartyListTest = async () => {
     try {
-      const response = await axios.get(`https://mobileqacloud.dalmiabharat.com/csr/list-lever`);
+      const response = await axiosHttp.get(`https://mobileqacloud.dalmiabharat.com/csr/list-lever`);
       return response.data;
     } catch (error) {
       console.error('Error posting data:', error);
-      throw error;
+          console.error('Not Throwing Error');
+
     }
   };

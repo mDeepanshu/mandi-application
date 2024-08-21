@@ -19,7 +19,7 @@ const ItemMaster = () => {
     try {
       const itemsList = await getItem();
       console.log("dbRecords", itemsList);
-      setTableData([...itemsList]);
+      setTableData([...itemsList.responseBody]);
     } catch (error) {
       console.error("Fetch items error:", error);
     }

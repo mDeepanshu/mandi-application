@@ -9,13 +9,14 @@ import Autocomplete from '@mui/material/Autocomplete';
 import SearchIcon from '@mui/icons-material/Search';
 import ReactToPrint from 'react-to-print';
 import KisanBillPrint from "../../dialogs/kisan-bill-print";
+import "./kisan-bill.css";
 
 function KisanBill() {
 
   const componentRef = useRef();
   const triggerRef = useRef();
 
-  const { register, handleSubmit, control, formState: { errors }, getValues } = useForm();
+  const { register, handleSubmit, control, formState: { errors }, getValues, trigger } = useForm();
   const [kisanList, setKisanList] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
@@ -96,14 +97,17 @@ function KisanBill() {
   // window.print();
 
   const fetchBill = async () => {
-    const formValues = getValues();
-    const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
-    setTableData(billData.responseBody)
+    const isValid = await trigger(['kisan', 'date']);
+    if (isValid) {
+      const formValues = getValues();
+      const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
+      setTableData(billData?.responseBody)
+    }
   }
 
   const getKisanNames = async () => {
-    const allKisan = await getAllPartyList();
-    setKisanList(allKisan.responseBody);
+    const allKisan = await getAllPartyList("KISAN");
+    setKisanList(allKisan?.responseBody);
   }
 
   useEffect(() => {
@@ -158,6 +162,7 @@ function KisanBill() {
                 <Controller
                   name="kisan"
                   control={control}
+                  rules={{ required: "Enter Kisan Name" }}
                   render={({ field }) => (
                     <Autocomplete
                       {...field}
@@ -184,11 +189,13 @@ function KisanBill() {
                     />
                   )}
                 />
+                <p className='err-msg'>{errors.kisan?.message}</p>
               </Grid>
               <Grid item xs={4}>
                 <Controller
                   name="date"
                   control={control}
+                  rules={{ required: "Enter Date" }}
                   defaultValue=""
                   render={({ field }) => (
                     <TextField
@@ -198,12 +205,13 @@ function KisanBill() {
                     />
                   )}
                 />
+                <p className='err-msg'>{errors.date?.message}</p>
               </Grid>
               <Grid item xs={2}>
                 <Button variant="contained" color="success" onClick={fetchBill} fullWidth>Fetch Bill</Button>
               </Grid>
             </Grid>
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} className='bill-table'>
               <Table aria-label="simple table">
                 <TableHead>
                   <TableRow>
@@ -264,7 +272,7 @@ function KisanBill() {
                   <ReactToPrint
                     trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
                     content={() => componentRef.current}
-                    // onBeforeGetContent={() => setFormData(getValues())}
+                  // onBeforeGetContent={() => setFormData(getValues())}
                   />
                 </Grid>
               </Grid>

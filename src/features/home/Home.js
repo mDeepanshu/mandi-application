@@ -8,6 +8,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import { Grid } from "@mui/material";
+import "./home.css";
 
 function Home() {
 
@@ -19,7 +20,7 @@ function Home() {
       <Grid container>
         <Grid item xs={6}>
           <Box sx={{ flexGrow: 1, maxWidth: 700 }} p={3}>
-          <Paper elevation={3}><div p={2}>TODAY`S PENDING VYAPARI BILLS</div></Paper>
+          <Paper elevation={3} className='paper-heading'><div p={2}>TODAY`S PENDING VYAPARI BILLS</div></Paper>
             <Paper elevation={3}>
               <List>
                 {vyapari_bills.map((row, index) => (
@@ -42,7 +43,7 @@ function Home() {
         </Grid>
         <Grid item xs={6}>
           <Box sx={{ flexGrow: 1, maxWidth: 700 }} p={3}>
-          <Paper elevation={3}>TODAY`S PENDING KISAN BILLS</Paper>
+          <Paper elevation={3} className='paper-heading'>TODAY`S PENDING KISAN BILLS</Paper>
             <Paper elevation={3}>
               <List>
                 {kisan_bills.map((row, index) => (
