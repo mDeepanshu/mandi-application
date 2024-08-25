@@ -13,7 +13,7 @@ export const addPartyGlobal = async (data) => {
 
 export const getPartyGlobal = async () => {
     try {
-        const response = await axiosHttp.post('/parties');
+        const response = await axiosHttp.get('party/listAllParties');
         return response.data;
     } catch (error) {
         console.error('Error posting data:', error);

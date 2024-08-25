@@ -22,7 +22,7 @@ const PartyMaster = () => {
   const fetchItems = async () => {
     try {
       const partiesList = await getPartyGlobal();
-      setTableData([...partiesList]);
+      setTableData([...partiesList.responseBody]);
     } catch (error) {
       console.error("Fetch items error:", error);
     }
