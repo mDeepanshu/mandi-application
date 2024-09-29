@@ -7,19 +7,25 @@ import AddIcon from '@mui/icons-material/Add';
 import { addItemGlobal, getItem } from "../../gateway/item-master-apis";
 // import SearchIcon from '@mui/icons-material/Search';
 // import { addItem, deleteItem, getAllItems, getItem } from "../../gateway/curdDB";
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 import "./item-master.css"
-import {Delete,AddCircleOutline} from '@mui/icons-material';
+import { Delete, AddCircleOutline } from '@mui/icons-material';
+import Snackbar from '@mui/material/Snackbar';
 
 const ItemMaster = () => {
+  const [open, setOpen] = useState(false);
   const { handleSubmit, control, getValues, formState: { errors } } = useForm();
 
   const [tableData, setTableData] = useState([]);
+  const [tableDataFiltered, setTableDataFiltered] = useState([]);
 
   const fetchItems = async () => {
     try {
       const itemsList = await getItem();
       console.log("dbRecords", itemsList);
       setTableData([...itemsList.responseBody]);
+      setTableDataFiltered([...itemsList.responseBody]);
     } catch (error) {
       console.error("Fetch items error:", error);
     }
@@ -29,6 +35,11 @@ const ItemMaster = () => {
     fetchItems();
   }, []);
 
+  const onItemInput = (event, field) => {
+    field.onChange(event);  // Update the value in react-hook-form
+    setTableDataFiltered(tableData.filter(elem => elem.name.includes(event.target.value)));
+  }
+
   const deleteFromTable = (index) => {
     const newRows = [...tableData];
     newRows.splice(index, 1);
@@ -37,6 +48,11 @@ const ItemMaster = () => {
 
   const onSubmit = async () => {
     const values = getValues();
+    if (tableData.some(elem => elem.name == values.itemName)) {
+      setOpen(true);
+      return;
+    }
+
     let newTableData = [
       {
         itemId: Date.now().toString(16),
@@ -45,13 +61,34 @@ const ItemMaster = () => {
     ];
     try {
       const result = await addItemGlobal(newTableData);
-      if (result.responseCode==200) {
+      if (result.responseCode == 200) {
         setTableData([...tableData, newTableData[0]]);
+        setTableDataFiltered([...tableDataFiltered, newTableData[0]]);
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
+
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={handleClose}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -66,9 +103,10 @@ const ItemMaster = () => {
           <Controller
             name="itemName"
             control={control}
-            rules={{required:"Enter Item Name"}}
+            rules={{ required: "Enter Item Name" }}
             defaultValue=""
-            render={({ field }) => <TextField {...field} fullWidth label="ITEM NAME" variant="outlined" />}
+            render={({ field }) => <TextField {...field} fullWidth label="ITEM NAME" variant="outlined" onChange={(e) => onItemInput(e, field)} />}
+
           />
           <p className='err-msg'>{errors.itemName?.message}</p>
         </Grid>
@@ -85,22 +123,31 @@ const ItemMaster = () => {
                 <TableRow>
                   <TableCell>INDEX</TableCell>
                   <TableCell>ITEM NAME</TableCell>
-                  <TableCell>DELETE</TableCell>
+                  {/* <TableCell>DELETE</TableCell> */}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {tableData.map((row, index) => (
+                {tableDataFiltered.map((row, index) => (
                   <TableRow key={index}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{row.name}</TableCell>
-                    <TableCell onClick={() => deleteFromTable(index)}><Button><Delete /></Button></TableCell>
-                    </TableRow>
+                    {/* <TableCell onClick={() => deleteFromTable(index)}><Button><Delete /></Button></TableCell> */}
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>
           </div>
         </Grid>
       </Grid>
+      <div>
+        <Snackbar
+          open={open}
+          autoHideDuration={4000}
+          message="ITEM ALREADY EXISTS"
+          action={action}
+          onClose={handleClose}
+        />
+      </div>
     </form>
   );
 };

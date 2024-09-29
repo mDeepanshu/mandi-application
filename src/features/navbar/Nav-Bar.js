@@ -4,9 +4,9 @@ import { AppBar, Box, Divider, Drawer, IconButton, List, ListItem, ListItemButto
 import MenuIcon from '@mui/icons-material/Menu';
 
 const navItems = [
-    { name: '', label: 'Home' },
-    { name: 'vyapari-bill', label: 'vyapari bill' },
+    // { name: '', label: 'Home' },
     { name: 'kisan-bill', label: 'Kisan Bill' },
+    { name: 'vyapari-bill', label: 'vyapari bill' },
     { name: 'item-master', label: 'Item Master' },
     { name: 'party-master', label: 'Party Master' },
 ];
