@@ -95,13 +95,14 @@ function KisanBill() {
       setTableData(billData?.responseBody?.bills);
       const billConstant = billData?.responseBody;
       delete billConstant.bills;
-      reset({...getValues(),...billConstant});
+      reset({ ...getValues(), ...billConstant });
     }
   }
 
   const getKisanNames = async () => {
     const allKisan = await getAllPartyList("KISAN");
-    setKisanList(allKisan?.responseBody);
+    if (allKisan?.responseBody) setKisanList(allKisan?.responseBody);
+
   }
 
   useEffect(() => {
@@ -239,7 +240,7 @@ function KisanBill() {
                     name="kharchaTotal"
                     control={control}
                     defaultValue=""
-                    rules={{validation:"Kharcha Total is Required"}}
+                    rules={{ validation: "Kharcha Total is Required" }}
                     render={({ field }) => (
                       <TextField
                         {...field}
@@ -260,7 +261,7 @@ function KisanBill() {
                     name="totalBikri"
                     control={control}
                     defaultValue=""
-                    rules={{required:"Toal Bikri is Required"}}
+                    rules={{ required: "Toal Bikri is Required" }}
                     render={({ field }) => (
                       <TextField
                         {...field}

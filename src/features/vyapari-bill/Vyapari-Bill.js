@@ -45,7 +45,7 @@ function VyapariBill() {
 
   const getVyapariNames = async () => {
     const allVyapari = await getAllPartyList("VYAPARI");
-    setVyapariList(allVyapari?.responseBody);
+    if(allVyapari?.responseBody) setVyapariList(allVyapari?.responseBody);
   }
 
   useEffect(() => {
