@@ -1,0 +1,13 @@
+.heading{
+    display: flex;
+    justify-content: center; 
+}
+
+.constants{
+    display: grid;
+    grid-template-columns: repeat(4, auto); /* 4 columns, each taking equal space */
+    grid-template-rows: repeat(2, auto);   /* 2 rows, height will adjust based on content */
+    gap: 10px; /* Optional: Adds space between grid items */
+    justify-items: start;
+    padding: 0 10px;
+}

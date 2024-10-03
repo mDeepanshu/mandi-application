@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Grid } from "@mui/material";
 import { TextField, Button } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, InputAdornment } from '@mui/material';
@@ -7,13 +7,19 @@ import { useForm, Controller } from 'react-hook-form';
 import { getAllPartyList } from "../../gateway/comman-apis";
 import Autocomplete from '@mui/material/Autocomplete';
 import SearchIcon from '@mui/icons-material/Search';
+import VyapariBillPrint from "../../dialogs/vyapari-bill/vyapari-bill-print";
 import "./vyapari-bill.css";
+import ReactToPrint from 'react-to-print';
+
 function VyapariBill() {
 
+  const componentRef = useRef();
+  const triggerRef = useRef();
 
-  const { register, handleSubmit, control, formState: { errors }, getValues, trigger } = useForm();
+  const { register, handleSubmit, control, formState: { errors }, getValues, trigger,setValue } = useForm();
   const [vyapariList, setVyapariList] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [formData, setFormData] = useState();
 
 
   const onSubmit = async (data) => {
@@ -22,8 +28,8 @@ function VyapariBill() {
       tableData
     };
     console.log("billDetails", billDetails);
-    // let a = await submitVyapariBill(billDetails);
-    window.print();
+    setFormData(billDetails);
+
   };
 
   const fetchBill = async () => {
@@ -31,7 +37,9 @@ function VyapariBill() {
     if (isValid) {
       const formValues = getValues();
       const billData = await getVyapariBill(formValues.vyapari_name.partyId, formValues.date);
-      setTableData(billData?.responseBody);
+      setTableData(billData?.responseBody?.billList);
+      setValue("previous_remaining", billData?.responseBody?.currentOutstanding);
+      setValue("total", billData?.responseBody?.billTotal);
     }
   }
 
@@ -43,6 +51,14 @@ function VyapariBill() {
   useEffect(() => {
     getVyapariNames();
   }, []);
+
+  useEffect(() => {
+    if (formData) {
+      if (triggerRef.current) {
+        triggerRef.current.click();
+      }
+    }
+  }, [formData]);
 
   return (
     <div>
@@ -112,7 +128,7 @@ function VyapariBill() {
                 sx={{ mb: 3 }}
                 defaultValue="1"
                 fullWidth
-                label="Previous Remaining"
+                label="Current Outstanding"
                 variant="outlined"
               />
             </Grid>
@@ -162,11 +178,19 @@ function VyapariBill() {
             <Grid container item xs={12} spacing={2} justifyContent="flex-end">
               <Grid item xs={2}>
                 <Button variant="contained" color="success" type='submit' fullWidth>Save And Print</Button>
+                <ReactToPrint
+                    trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
+                    content={() => componentRef.current}
+                  // onBeforeGetContent={() => setFormData(getValues())}
+                  />
               </Grid>
             </Grid>
           </Grid>
         </Grid>
       </form>
+      <div style={{ display: 'none' }}>
+        <VyapariBillPrint ref={componentRef} tableData={tableData} formData={formData} />
+      </div>
     </div>
   );
 }

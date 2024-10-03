@@ -8,7 +8,7 @@ import { getAllPartyList } from "../../gateway/comman-apis";
 import Autocomplete from '@mui/material/Autocomplete';
 import SearchIcon from '@mui/icons-material/Search';
 import ReactToPrint from 'react-to-print';
-import KisanBillPrint from "../../dialogs/kisan-bill-print";
+import KisanBillPrint from "../../dialogs/kisan-bill/kisan-bill-print";
 import "./kisan-bill.css";
 
 function KisanBill() {
@@ -16,30 +16,30 @@ function KisanBill() {
   const componentRef = useRef();
   const triggerRef = useRef();
 
-  const { register, handleSubmit, control, formState: { errors }, getValues, trigger } = useForm();
+  const { register, handleSubmit, control, formState: { errors }, getValues, trigger, reset } = useForm();
   const [kisanList, setKisanList] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
 
   const [fieldDefinitions, setFieldDefinitions] = useState([
     {
-      name: 'mandi_kharch',
+      name: 'mandiKharcha',
       label: 'Mandi Kharch',
-      defaultValue: '1',
+      defaultValue: '',
       validation: { required: 'Mandi Kharch is required' },
     },
     {
       name: 'hammali',
       label: 'Hammali',
-      defaultValue: '1',
+      defaultValue: '',
       validation: {
         required: 'Hammali is required',
       },
     },
     {
-      name: 'nagar_palika_tax',
+      name: 'nagarPalikaTax',
       label: 'Nagar Palika Tax',
-      defaultValue: '1',
+      defaultValue: '',
       validation: {
         required: 'Nagar Palika Tax is required',
       },
@@ -47,15 +47,15 @@ function KisanBill() {
     {
       name: 'bhada',
       label: 'Bhada',
-      defaultValue: '1',
+      defaultValue: '',
       validation: {
         required: 'Bhada is required',
       },
     },
     {
-      name: 'driver_inaam',
+      name: 'driver',
       label: 'Driver Inaam',
-      defaultValue: '1',
+      defaultValue: '',
       validation: {
         required: 'Driver Inaam is required',
       },
@@ -63,17 +63,17 @@ function KisanBill() {
     {
       name: 'nagdi',
       label: 'Nagdi',
-      defaultValue: '1',
+      defaultValue: '',
       validation: {
         required: 'Nagdi is required',
       },
     },
     {
-      name: 'commision',
-      label: 'Commision',
-      defaultValue: '1',
+      name: 'commission',
+      label: 'Commission',
+      defaultValue: '',
       validation: {
-        required: 'Commision is required',
+        required: 'Commission is required',
       },
     },
 
@@ -86,22 +86,16 @@ function KisanBill() {
     //   triggerRef.current.click();
     // }
   };
-  // temp();
-  // const billDetails = {
-  //   ...data,
-  //   tableData
-  // }
-  // console.log(billDetails);
-  // let a = await submitKisanBill(billDetails);
-  // console.log("a", a);
-  // window.print();
 
   const fetchBill = async () => {
     const isValid = await trigger(['kisan', 'date']);
     if (isValid) {
-      const formValues = getValues();
+      let formValues = getValues();
       const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
-      setTableData(billData?.responseBody)
+      setTableData(billData?.responseBody?.bills);
+      const billConstant = billData?.responseBody;
+      delete billConstant.bills;
+      reset({...getValues(),...billConstant});
     }
   }
 
@@ -240,29 +234,45 @@ function KisanBill() {
             <Grid container spacing={2} justifyContent="flex-end" p={2}>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
                 <Grid item xs={3}>
-                  <TextField
-                    fullWidth
-                    label="Kharcha Total"
-                    variant="outlined"
-                    {...register("kharcha_total", { required: "This field is required" })}
-                    error={!!errors.kharcha_total}
-                    helperText={errors.kharcha_total ? errors.kharcha_total.message : ""}
-                    size="small"
-                    sx={{ mb: 3 }}
-                    defaultValue="1"
+                  <Controller
+                    key="kharchaTotal"
+                    name="kharchaTotal"
+                    control={control}
+                    defaultValue=""
+                    rules={{validation:"Kharcha Total is Required"}}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Kharcha Total"
+                        variant="outlined"
+                        sx={{ mb: 3 }}
+                        fullWidth
+                        error={!!errors.kharcha_total}
+                        helperText={errors.kharcha_total ? errors.kharcha_total.message : ""}
+                        size="small"
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={3}>
-                  <TextField
-                    fullWidth
-                    label="Pakki Bikri"
-                    variant="outlined"
-                    {...register("pakki_bikri", { required: "This field is required" })}
-                    error={!!errors.pakki_bikri}
-                    helperText={errors.pakki_bikri ? errors.pakki_bikri.message : ""}
-                    size="small"
-                    sx={{ mb: 3 }}
-                    defaultValue="1"
+                  <Controller
+                    key="totalBikri"
+                    name="totalBikri"
+                    control={control}
+                    defaultValue=""
+                    rules={{required:"Toal Bikri is Required"}}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Pakki Bikri"
+                        variant="outlined"
+                        sx={{ mb: 3 }}
+                        fullWidth
+                        error={!!errors.totalBikri}
+                        helperText={errors.totalBikri ? errors.totalBikri.message : ""}
+                        size="small"
+                      />
+                    )}
                   />
                 </Grid>
               </Grid>

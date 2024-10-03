@@ -1,28 +1,27 @@
 import React, { forwardRef,useEffect  } from 'react';
 import { Grid } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
-
+import "./kisan-bill-print.css";
 const KisanBillPrint = forwardRef((props, ref) =>{
 
     let tableData = [];
 
     useEffect(() => {
-        console.log("props","props");
         console.log(props);
       }, []);
 
     return (
         <div ref={ref}>
-          <h1>Haji Sabzi Mandi Bill</h1>
-          <Grid container>
-            <Grid item xs={4}>Mandi Kharch: {props.formData?.mandi_kharch}</Grid>
-            <Grid item xs={4}>Nagar Palika Tax: {props.formData?.nagar_palika_tax}</Grid>
-            <Grid item xs={4}>Driver Inaam: {props.formData?.driver_inaam}</Grid>
-            <Grid item xs={3}>Hammali: {props.formData?.hammali}</Grid>
-            <Grid item xs={3}>Bhada: {props.formData?.bhada}</Grid>
-            <Grid item xs={3}>Nagdi: {props.formData?.nagdi}</Grid>
-            <Grid item xs={3}>Commision: {props.formData?.commision}</Grid>
-          </Grid>
+          <h1 className='heading'>Haji Sabzi Mandi Bill</h1>
+          <div className='constants'>
+            <div>Mandi Kharch: {props.formData?.mandiKharcha}</div>
+            <div>Driver Inaam: {props.formData?.driver}</div>
+            <div>Hammali: {props.formData?.hammali}</div>
+            <div>Bhada: {props.formData?.bhada}</div>
+            <div>Nagar Palika Tax: {props.formData?.nagarPalikaTax}</div>
+            <div>Nagdi: {props.formData?.nagdi}</div>
+            <div>Commision: {props.formData?.commission}</div>
+          </div>
           <TableContainer>
               <Table aria-label="simple table">
                 <TableHead>
