@@ -1,29 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import './App.css';
-import { initializeApp } from "firebase/app";
 import { Box } from '@mui/material';
-
+import Login from "./features/login/login";
 import NavBar from "./features/navbar/Nav-Bar";
 
-const firebaseConfig = {
-	apiKey: "AIzaSyBI-TlWQnGAD6EzOw-2Td0ScXI8g3LZTgA",
-	authDomain: "mandi-application.firebaseapp.com",
-	projectId: "mandi-application",
-	storageBucket: "mandi-application.appspot.com",
-	messagingSenderId: "491088522122",
-	appId: "1:491088522122:web:163ef9fe2e8f05f0def673"
-};
-
-const app = initializeApp(firebaseConfig);
-
 function App() {
+const [loginStatus, setLoginStatus] = useState(true);
+
+const changeLoginState = (value) => {
+	console.log(value);
+	
+	setLoginStatus(value)
+}
+
 	return (
 		<>
-			<NavBar></NavBar>
-			<Box component="main" sx={{ mt: 8 }}>
-				<Outlet />
-			</Box>
+			{
+				loginStatus ? (<Login changeLoginState={changeLoginState} />) : (
+					<>
+						<NavBar></NavBar>
+						<Box component="main" sx={{ mt: 8 }}>
+							<Outlet />
+						</Box>
+					</>
+				)
+			}
 		</>
 	);
 }

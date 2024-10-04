@@ -3,7 +3,7 @@ import { Grid } from "@mui/material";
 import { useForm, Controller } from 'react-hook-form';
 import { TextField, Button } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, InputAdornment } from '@mui/material';
-import { submitKisanBill, getKisanBill } from '../../gateway/kisan-bill-apis';
+import { getKisanBill } from '../../gateway/kisan-bill-apis';
 import { getAllPartyList } from "../../gateway/comman-apis";
 import Autocomplete from '@mui/material/Autocomplete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -16,12 +16,12 @@ function KisanBill() {
   const componentRef = useRef();
   const triggerRef = useRef();
 
-  const { register, handleSubmit, control, formState: { errors }, getValues, trigger, reset } = useForm();
+  const { handleSubmit, control, formState: { errors }, getValues, trigger, reset } = useForm();
   const [kisanList, setKisanList] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
 
-  const [fieldDefinitions, setFieldDefinitions] = useState([
+  const [fieldDefinitions] = useState([
     {
       name: 'mandiKharcha',
       label: 'Mandi Kharch',
