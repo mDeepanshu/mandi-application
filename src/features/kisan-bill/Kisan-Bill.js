@@ -80,7 +80,6 @@ function KisanBill() {
   ]);
 
   const onSubmit = async (data) => {
-    console.log("here");
     setFormData(getValues());
     // if (triggerRef.current) {
     //   triggerRef.current.click();
@@ -279,7 +278,7 @@ function KisanBill() {
               </Grid>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
                 <Grid item xs={3}>
-                  <Button variant="contained" color="success" type='submit' fullWidth>Save And Print</Button>
+                  <Button variant="contained" color="success" type='submit' fullWidth>Print</Button>
                   <ReactToPrint
                     trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
                     content={() => componentRef.current}

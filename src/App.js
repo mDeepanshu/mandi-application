@@ -6,11 +6,10 @@ import Login from "./features/login/login";
 import NavBar from "./features/navbar/Nav-Bar";
 
 function App() {
+	
 const [loginStatus, setLoginStatus] = useState(true);
 
 const changeLoginState = (value) => {
-	console.log(value);
-	
 	setLoginStatus(value)
 }
 

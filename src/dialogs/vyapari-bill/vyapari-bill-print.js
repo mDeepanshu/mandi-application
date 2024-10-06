@@ -4,12 +4,6 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from
 import "./vyapari-bill-print.css";
 const VyapariBillPrint = forwardRef((props, ref) => {
 
-  let tableData = [];
-
-  useEffect(() => {
-    console.log(props);
-  }, []);
-
   return (
     <div ref={ref}>
       <h1 className='heading'>Haji Sabzi Mandi Bill</h1>

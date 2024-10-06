@@ -10,7 +10,6 @@ function Login({ changeLoginState }) {
     const OnPasswordInput = (value) => {
         setPassword(value.target.value);
         if (value.target.value==="9876") {
-            console.log(value.target.value);
             setTimeout(() => {                
                 changeLoginState(false);
             }, 100);

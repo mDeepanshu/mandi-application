@@ -23,7 +23,6 @@ const ItemMaster = () => {
   const fetchItems = async () => {
     try {
       const itemsList = await getItem();
-      console.log("dbRecords", itemsList);
       setTableData([...itemsList.responseBody]);
       setTableDataFiltered([...itemsList.responseBody]);
     } catch (error) {

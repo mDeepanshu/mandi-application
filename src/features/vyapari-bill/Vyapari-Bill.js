@@ -27,7 +27,6 @@ function VyapariBill() {
       ...data,
       tableData
     };
-    console.log("billDetails", billDetails);
     setFormData(billDetails);
 
   };
@@ -177,7 +176,7 @@ function VyapariBill() {
             </Grid>
             <Grid container item xs={12} spacing={2} justifyContent="flex-end">
               <Grid item xs={2}>
-                <Button variant="contained" color="success" type='submit' fullWidth>Save And Print</Button>
+                <Button variant="contained" color="success" type='submit' fullWidth>Print</Button>
                 <ReactToPrint
                     trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
                     content={() => componentRef.current}
