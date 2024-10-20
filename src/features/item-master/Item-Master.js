@@ -9,7 +9,7 @@ import { addItemGlobal, getItem } from "../../gateway/item-master-apis";
 // import { addItem, deleteItem, getAllItems, getItem } from "../../gateway/curdDB";
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import "./item-master.css"
+import "./item-master.module.css"
 import { Delete, AddCircleOutline } from '@mui/icons-material';
 import Snackbar from '@mui/material/Snackbar';
 

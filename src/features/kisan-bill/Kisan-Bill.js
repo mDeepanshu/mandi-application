@@ -9,7 +9,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import SearchIcon from '@mui/icons-material/Search';
 import ReactToPrint from 'react-to-print';
 import KisanBillPrint from "../../dialogs/kisan-bill/kisan-bill-print";
-import "./kisan-bill.css";
+import "./kisan-bill.module.css";
 
 function KisanBill() {
 
@@ -91,10 +91,13 @@ function KisanBill() {
     if (isValid) {
       let formValues = getValues();
       const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
-      setTableData(billData?.responseBody?.bills);
-      const billConstant = billData?.responseBody;
-      delete billConstant.bills;
-      reset({ ...getValues(), ...billConstant });
+      console.log(billData);
+      if (billData) {
+        setTableData(billData?.responseBody?.bills);
+        const billConstant = billData?.responseBody;
+        delete billConstant.bills;
+        reset({ ...getValues(), ...billConstant });
+      }
     }
   }
 

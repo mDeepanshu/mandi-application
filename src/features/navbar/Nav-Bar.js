@@ -9,6 +9,7 @@ const navItems = [
     { name: 'vyapari-bill', label: 'vyapari bill' },
     { name: 'item-master', label: 'Item Master' },
     { name: 'party-master', label: 'Party Master' },
+    { name: 'ledger', label: 'Ledger' },
 ];
 const drawerWidth = 240;
 

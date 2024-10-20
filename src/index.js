@@ -8,6 +8,7 @@ import Kisan from "./features/kisan-bill/Kisan-Bill";
 import Vyapari from "./features/vyapari-bill/Vyapari-Bill";
 import ItemMaster from "./features/item-master/Item-Master";
 import PartyMaster from "./features/party-master/Party-Master";
+import Ledger from "./features/ledger/ledger";
 
 const router = createBrowserRouter([
 	{
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
 			{
 				path: 'party-master',
 				element: <PartyMaster />
+			},
+			{
+				path: 'ledger',
+				element: <Ledger />
 			},
 		],
 		// errorElement: <Error />

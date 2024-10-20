@@ -1,6 +1,6 @@
 import React, {useState,useRef,useEffect} from 'react';
 
-import "./login.css"
+import styles from "./login.module.css"
 
 function Login({ changeLoginState }) {
 
@@ -25,9 +25,9 @@ function Login({ changeLoginState }) {
 
     return (
         <>
-            <div className='container'>
-                <h3 className='login-text'>LOGIN</h3>
-                <input ref={inputRef}  onChange={OnPasswordInput} value={password} className='password-input' type='password' maxLength={4}></input>
+            <div className={styles.container}>
+                <h3 className={styles.loginText}>LOGIN</h3>
+                <input ref={inputRef}  onChange={OnPasswordInput} value={password} className={styles.passwordInput} type='password' maxLength={4}></input>
             </div>
         </>
     );
