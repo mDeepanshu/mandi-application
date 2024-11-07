@@ -2,14 +2,17 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Grid } from "@mui/material";
 import { useForm, Controller } from 'react-hook-form';
 import { TextField, Button } from "@mui/material";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, InputAdornment } from '@mui/material';
 import { getLedger } from '../../gateway/ledger-apis';
+import SharedTable from "../../shared/ui/table";
 
 import styles from "./ledger.module.css";
 
 function Ledger() {
 
   const [tableData, setTableData] = useState([]);
+  const [ledgerColumns, setledgerColumns] = useState(["INDEX","PARTY NAME","OPENING AMOUNT","DAY BILL","CLOSING AMOUNT"]);
+  const [keyArray, setKeyArray] = useState(["index","partyName","openingAmount","dayBill","closingAmount"]);
+  
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const fetch_ledger = async (data) => {
@@ -22,10 +25,10 @@ function Ledger() {
     let data;
     if (toDate) {
       data = {
-        startDate:fromDate,
-        endDate:toDate,
+        startDate: fromDate,
+        endDate: toDate,
       }
-    }else data={startDate:fromDate}
+    } else data = { startDate: fromDate }
 
     const ledger = await getLedger(data);
     if (ledger) {
@@ -46,46 +49,27 @@ function Ledger() {
     init();
   }, []);
 
+  const printLedger = () => {
+    console.log("Hey Print");
+    
+  }
+
   return (
     <>
       <div className={styles.container}>
         <h1>LEDGER</h1>
-        {/* <div className={styles.dateFields}> */}
         <form className={styles.dateFields} onSubmit={handleSubmit(fetch_ledger)}>
           <div className={styles.date}>
-            FROM: <input type='date'{...register('fromDate', { required: 'From date is required' })} /><br/>
+            FROM: <input type='date'{...register('fromDate', { required: 'From date is required' })} /><br />
             {errors.fromDate && <span className="error">{errors.fromDate.message}</span>}
           </div>
           <div className={styles.date}>TO: <input type='date'  {...register('toDate')} /></div>
-          <div><Button variant="contained" color="success" type='submit' >Fetch Ledger</Button></div>
+          <div>
+            <Button variant="contained" color="success" type='submit' >Fetch Ledger</Button>
+            <Button variant="contained" color="success" onClick={()=> printLedger()} className={styles.printBtn}>PRINT LEDGER</Button>
+          </div>
         </form>
-        {/* </div> */}
-        <div className={styles.tableContainer}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>INDEX</TableCell>
-                <TableCell>PARTY NAME</TableCell>
-                <TableCell>OPENING AMOUNT</TableCell>
-                <TableCell>DAY BILL</TableCell>
-                <TableCell>CLOSING AMOUNT</TableCell>
-                {/* <TableCell>DELETE</TableCell> */}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {tableData.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{row.partyName}</TableCell>
-                  <TableCell>{row.openingAmount}</TableCell>
-                  <TableCell>{row.dayBill}</TableCell>
-                  <TableCell>{row.closingAmount}</TableCell>
-                  {/* <TableCell onClick={() => deleteFromTable(index)}><Button><Delete /></Button></TableCell> */}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <SharedTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray}/>
       </div>
     </>
   );

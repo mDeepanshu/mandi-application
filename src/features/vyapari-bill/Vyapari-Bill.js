@@ -10,16 +10,21 @@ import SearchIcon from '@mui/icons-material/Search';
 import VyapariBillPrint from "../../dialogs/vyapari-bill/vyapari-bill-print";
 import "./vyapari-bill.css";
 import ReactToPrint from 'react-to-print';
+import { Delete, Edit } from '@mui/icons-material';
+import SharedTable from "../../shared/ui/table";
 
 function VyapariBill() {
 
   const componentRef = useRef();
   const triggerRef = useRef();
 
-  const { register, handleSubmit, control, formState: { errors }, getValues, trigger,setValue } = useForm();
+  const { register, handleSubmit, control, formState: { errors }, getValues, trigger, setValue } = useForm();
   const [vyapariList, setVyapariList] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [vyapariTableColumns, setVyapariTableColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Edit", "Delete"]);
   const [formData, setFormData] = useState();
+  const [keyArray, setKeyArray] = useState(["itemName","bag","rate","quantity",'itemTotal', "edit", "delete"]);
+
 
 
   const onSubmit = async (data) => {
@@ -44,7 +49,19 @@ function VyapariBill() {
 
   const getVyapariNames = async () => {
     const allVyapari = await getAllPartyList("VYAPARI");
-    if(allVyapari?.responseBody) setVyapariList(allVyapari?.responseBody);
+    if (allVyapari?.responseBody) setVyapariList(allVyapari?.responseBody);
+  }
+
+  const editFromTable = (index) => {
+    // const newRows = [...buyItemsArr];
+    // newRows.splice(index, 1);
+    // setTableData(newRows);
+  }
+
+  const deleteFromTable = (index) => {
+    // const newRows = [...buyItemsArr];
+    // newRows.splice(index, 1);
+    // setTableData(newRows);
   }
 
   useEffect(() => {
@@ -132,32 +149,7 @@ function VyapariBill() {
               />
             </Grid>
           </Grid>
-          <TableContainer component={Paper} className='bill-table'>
-            <Table aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Item Name</TableCell>
-                  <TableCell align="right">Bag</TableCell>
-                  <TableCell align="right">Rate&nbsp;(g)</TableCell>
-                  <TableCell align="right">Quantity&nbsp;(g)</TableCell>
-                  <TableCell align="right">Item Total&nbsp;(g)</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {tableData.map((row) => (
-                  <TableRow key={row.name}>
-                    <TableCell component="th" scope="row">
-                      {row.itemName}
-                    </TableCell>
-                    <TableCell align="right">{row.bag}</TableCell>
-                    <TableCell align="right">{row.rate}</TableCell>
-                    <TableCell align="right">{row.quantity}</TableCell>
-                    <TableCell align="right">{row.rate * row.quantity}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <SharedTable columns={vyapariTableColumns} tableData={tableData} keyArray={keyArray}/>
           <Grid container spacing={2} paddingTop={2}>
             <Grid container item xs={12} spacing={2} justifyContent="flex-end">
               <Grid item xs={2}>
@@ -178,10 +170,10 @@ function VyapariBill() {
               <Grid item xs={2}>
                 <Button variant="contained" color="success" type='submit' fullWidth>Print</Button>
                 <ReactToPrint
-                    trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
-                    content={() => componentRef.current}
-                  // onBeforeGetContent={() => setFormData(getValues())}
-                  />
+                  trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
+                  content={() => componentRef.current}
+                // onBeforeGetContent={() => setFormData(getValues())}
+                />
               </Grid>
             </Grid>
           </Grid>

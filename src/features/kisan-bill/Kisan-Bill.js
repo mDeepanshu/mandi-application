@@ -10,6 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ReactToPrint from 'react-to-print';
 import KisanBillPrint from "../../dialogs/kisan-bill/kisan-bill-print";
 import "./kisan-bill.module.css";
+import SharedTable from "../../shared/ui/table";
 
 function KisanBill() {
 
@@ -20,6 +21,10 @@ function KisanBill() {
   const [kisanList, setKisanList] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
+
+  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Edit", "Delete"]);
+  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "total", "edit", "delete"]);
+
 
   const [fieldDefinitions] = useState([
     {
@@ -119,6 +124,18 @@ function KisanBill() {
     }
   }, [formData]);
 
+  const editFromTable = (index) => {
+    // const newRows = [...buyItemsArr];
+    // newRows.splice(index, 1);
+    // setTableData(newRows);
+  }
+
+  const deleteFromTable = (index) => {
+    // const newRows = [...buyItemsArr];
+    // newRows.splice(index, 1);
+    // setTableData(newRows);
+  }
+
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -209,30 +226,7 @@ function KisanBill() {
               </Grid>
             </Grid>
             <TableContainer component={Paper} className='bill-table'>
-              <Table aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Item Name</TableCell>
-                    <TableCell align="right">Bag</TableCell>
-                    <TableCell align="right">Rate</TableCell>
-                    <TableCell align="right">Quantity</TableCell>
-                    <TableCell align="right">Item Total</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {tableData.map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell component="th" scope="row">
-                        {row.itemName}
-                      </TableCell>
-                      <TableCell align="right">{row.bag}</TableCell>
-                      <TableCell align="right">{row.rate}</TableCell>
-                      <TableCell align="right">{row.quantity}</TableCell>
-                      <TableCell align="right">{row.total}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <SharedTable columns={kisanBillColumnsColumns} tableData={tableData} keyArray={keyArray} />
             </TableContainer>
             <Grid container spacing={2} justifyContent="flex-end" p={2}>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
@@ -285,7 +279,6 @@ function KisanBill() {
                   <ReactToPrint
                     trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
                     content={() => componentRef.current}
-                  // onBeforeGetContent={() => setFormData(getValues())}
                   />
                 </Grid>
               </Grid>

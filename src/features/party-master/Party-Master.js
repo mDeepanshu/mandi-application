@@ -11,6 +11,9 @@ import { Delete, AddCircleOutline } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Snackbar from '@mui/material/Snackbar';
+import SharedTable from "../../shared/ui/table";
+import styles from "./party-master.module.css";
+
 
 const PartyMaster = () => {
   // const { handleSubmit, control, getValues } = useForm();
@@ -23,6 +26,8 @@ const PartyMaster = () => {
   const [tableData, setTableData] = useState([]);
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
 
+  const [partyColumns, setPartyColumns] = useState(["INDEX", "PARTY NAME", "PARTY TYPE"]);
+  const [keyArray, setKeyArray] = useState(["index", "name", "partyType"]);
 
   const fetchItems = async () => {
     try {
@@ -160,26 +165,7 @@ const PartyMaster = () => {
         </Grid>
 
         <Grid item xs={12}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>INDEX</TableCell>
-                <TableCell>PARTY NAME</TableCell>
-                <TableCell>PARTY TYPE</TableCell>
-                {/* <TableCell>DELETE</TableCell> */}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {tableDataFiltered.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell>{row.partyType}</TableCell>
-                  {/* <TableCell onClick={() => deleteFromTable(index)}><Button><Delete /></Button></TableCell> */}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <SharedTable columns={partyColumns} tableData={tableData} keyArray={keyArray} className={styles.sharedTable}/>
         </Grid>
       </Grid>
       <div>

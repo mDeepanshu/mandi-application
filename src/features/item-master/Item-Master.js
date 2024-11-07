@@ -12,6 +12,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import "./item-master.module.css"
 import { Delete, AddCircleOutline } from '@mui/icons-material';
 import Snackbar from '@mui/material/Snackbar';
+import SharedTable from "../../shared/ui/table";
 
 const ItemMaster = () => {
   const [open, setOpen] = useState(false);
@@ -19,6 +20,9 @@ const ItemMaster = () => {
 
   const [tableData, setTableData] = useState([]);
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
+
+  const [itemsColumns, setItemsColumns] = useState(["INDEX", "ITEM NAME"]);
+  const [keyArray, setKeyArray] = useState(["index", "name"]);
 
   const fetchItems = async () => {
     try {
@@ -117,24 +121,7 @@ const ItemMaster = () => {
 
         <Grid item xs={12}>
           <div className='table-container'>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>INDEX</TableCell>
-                  <TableCell>ITEM NAME</TableCell>
-                  {/* <TableCell>DELETE</TableCell> */}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {tableDataFiltered.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>{row.name}</TableCell>
-                    {/* <TableCell onClick={() => deleteFromTable(index)}><Button><Delete /></Button></TableCell> */}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <SharedTable columns={itemsColumns} tableData={tableData} keyArray={keyArray} />
           </div>
         </Grid>
       </Grid>

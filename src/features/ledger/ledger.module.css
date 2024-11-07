@@ -21,3 +21,9 @@ h1{
     display: flex;
     align-items: center;
 }
+
+.printBtn {
+    /* padding-left: 5px; */
+    margin-left: 5px;
+    /* padding-left: 30px; */
+}
