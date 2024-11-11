@@ -3,14 +3,16 @@ import { Grid } from "@mui/material";
 import { useForm, Controller } from 'react-hook-form';
 import { TextField, Button } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, InputAdornment } from '@mui/material';
-import { getKisanBill } from '../../gateway/kisan-bill-apis';
+import { getKisanBill, saveKisanBill } from '../../gateway/kisan-bill-apis';
 import { getAllPartyList } from "../../gateway/comman-apis";
 import Autocomplete from '@mui/material/Autocomplete';
 import SearchIcon from '@mui/icons-material/Search';
 import ReactToPrint from 'react-to-print';
 import KisanBillPrint from "../../dialogs/kisan-bill/kisan-bill-print";
 import "./kisan-bill.module.css";
-import SharedTable from "../../shared/ui/table";
+import SharedTable from "../../shared/ui/table/table";
+import PreviousBills from "../../shared/ui/previous-bill/previousBill";
+
 
 function KisanBill() {
 
@@ -22,8 +24,8 @@ function KisanBill() {
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
 
-  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Edit", "Delete"]);
-  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "total", "edit", "delete"]);
+  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Edit", "Delete","Previuos Edits"]);
+  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "total", "edit", "delete","navigation"]);
 
 
   const [fieldDefinitions] = useState([
@@ -39,6 +41,14 @@ function KisanBill() {
       defaultValue: '',
       validation: {
         required: 'Hammali is required',
+      },
+    },
+    {
+      name: 'nagarPalikaTaxRate',
+      label: 'Nagar Palika Tax Rate',
+      defaultValue: '',
+      validation: {
+        required: 'Nagar Palika Tax is required',
       },
     },
     {
@@ -71,6 +81,14 @@ function KisanBill() {
       defaultValue: '',
       validation: {
         required: 'Nagdi is required',
+      },
+    },
+    {
+      name: 'commissionRate',
+      label: 'Commission Rate',
+      defaultValue: '',
+      validation: {
+        required: 'Commission is required',
       },
     },
     {
@@ -134,6 +152,13 @@ function KisanBill() {
     // const newRows = [...buyItemsArr];
     // newRows.splice(index, 1);
     // setTableData(newRows);
+  }
+
+  const saveBill = async () => {
+    // const saveRes = saveKisanBill();
+    console.log(getValues(),tableData);
+
+    
   }
 
   return (
@@ -225,6 +250,11 @@ function KisanBill() {
                 <Button variant="contained" color="success" onClick={fetchBill} fullWidth>Fetch Bill</Button>
               </Grid>
             </Grid>
+            <Grid container spacing={2} paddingBottom={2}>
+              <Grid item xs={11}>
+                <PreviousBills />
+              </Grid>
+            </Grid>
             <TableContainer component={Paper} className='bill-table'>
               <SharedTable columns={kisanBillColumnsColumns} tableData={tableData} keyArray={keyArray} />
             </TableContainer>
@@ -274,6 +304,9 @@ function KisanBill() {
                 </Grid>
               </Grid>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
+              <Grid item xs={3}>
+                <Button variant="contained" color="primary" fullWidth onClick={saveBill}>Save Bill</Button>
+              </Grid>
                 <Grid item xs={3}>
                   <Button variant="contained" color="success" type='submit' fullWidth>Print</Button>
                   <ReactToPrint

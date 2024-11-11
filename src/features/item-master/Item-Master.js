@@ -12,7 +12,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import "./item-master.module.css"
 import { Delete, AddCircleOutline } from '@mui/icons-material';
 import Snackbar from '@mui/material/Snackbar';
-import SharedTable from "../../shared/ui/table";
+import SharedTable from "../../shared/ui/table/table";
+import MasterTable from "../../shared/ui/master-table/master-table";
+
 
 const ItemMaster = () => {
   const [open, setOpen] = useState(false);
@@ -121,7 +123,7 @@ const ItemMaster = () => {
 
         <Grid item xs={12}>
           <div className='table-container'>
-            <SharedTable columns={itemsColumns} tableData={tableData} keyArray={keyArray} />
+            <MasterTable columns={itemsColumns} tableData={tableData} keyArray={keyArray} />
           </div>
         </Grid>
       </Grid>

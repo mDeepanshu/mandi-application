@@ -19,3 +19,14 @@ export const getKisanBill = async (kisanId, date) => {
     console.error('Not Throwing Error');
   }
 };
+
+export const saveKisanBill = async (bill) => {
+  try {
+    const response = await axiosHttp.post(`/kisan/saveKisanBill`,bill);
+    return response.data;
+  } catch (error) {
+    console.error('Error posting data:', error);
+    console.error('Not Throwing Error');
+  }
+};
+

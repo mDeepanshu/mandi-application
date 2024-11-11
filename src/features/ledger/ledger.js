@@ -3,7 +3,7 @@ import { Grid } from "@mui/material";
 import { useForm, Controller } from 'react-hook-form';
 import { TextField, Button } from "@mui/material";
 import { getLedger } from '../../gateway/ledger-apis';
-import SharedTable from "../../shared/ui/table";
+import MasterTable from "../../shared/ui/master-table/master-table";
 
 import styles from "./ledger.module.css";
 
@@ -66,10 +66,10 @@ function Ledger() {
           <div className={styles.date}>TO: <input type='date'  {...register('toDate')} /></div>
           <div>
             <Button variant="contained" color="success" type='submit' >Fetch Ledger</Button>
-            <Button variant="contained" color="success" onClick={()=> printLedger()} className={styles.printBtn}>PRINT LEDGER</Button>
+            <Button variant="contained" color="success" onClick={()=> printLedger()} className={styles.print_btn}>PRINT LEDGER</Button>
           </div>
         </form>
-        <SharedTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray}/>
+        <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray}/>
       </div>
     </>
   );

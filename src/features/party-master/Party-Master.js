@@ -11,9 +11,9 @@ import { Delete, AddCircleOutline } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Snackbar from '@mui/material/Snackbar';
-import SharedTable from "../../shared/ui/table";
+import SharedTable from "../../shared/ui/table/table";
+import MasterTable from "../../shared/ui/master-table/master-table";
 import styles from "./party-master.module.css";
-
 
 const PartyMaster = () => {
   // const { handleSubmit, control, getValues } = useForm();
@@ -26,8 +26,8 @@ const PartyMaster = () => {
   const [tableData, setTableData] = useState([]);
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
 
-  const [partyColumns, setPartyColumns] = useState(["INDEX", "PARTY NAME", "PARTY TYPE"]);
-  const [keyArray, setKeyArray] = useState(["index", "name", "partyType"]);
+  const [partyColumns, setPartyColumns] = useState(["INDEX", "CONTACT", "ID NO", "PARTY NAME", "OWED AMOUNT", "PARTY ID", "PARTY TYPE"]);
+  const [keyArray, setKeyArray] = useState(["index","contact", "idNo", "name", "owedAmount", "partyId", "partyType"]);
 
   const fetchItems = async () => {
     try {
@@ -126,7 +126,7 @@ const PartyMaster = () => {
           />
           <p className='err-msg'>{errors.name?.message}</p>
         </Grid>
-        <Grid item xs={6} sm={3}>
+        <Grid item xs={6} sm={2}>
           <Controller
             name="partyType"
             control={control}
@@ -137,7 +137,7 @@ const PartyMaster = () => {
                 <InputLabel>PARTY TYPE</InputLabel>
                 <Select
                   {...field}
-                  label="Party Type"
+                  label="PARTY TYPE"
                 >
                   <MenuItem value="KISAN">KISAAN</MenuItem>
                   <MenuItem value="VYAPARI">VYAPARI</MenuItem>
@@ -147,14 +147,23 @@ const PartyMaster = () => {
           />
           <p className='err-msg'>{errors.partyType?.message}</p>
         </Grid>
-        <Grid item xs={6} sm={3}>
+        <Grid item xs={6} sm={2}>
+          <Controller
+            name="vasuliDayLimit"
+            control={control}
+            rules={{ required: "Enter Vasuli Day Limit" }}
+            defaultValue=""
+            render={({ field }) => <TextField {...field} fullWidth label="VASULI DAY LIMIT" variant="outlined"/>}
+          />
+          <p className='err-msg'>{errors.vasuliDayLimit?.message}</p>
+        </Grid>
+        <Grid item xs={6} sm={2}>
           <Controller
             name="contact"
             control={control}
             rules={{ required: "Enter Contact" }}
             defaultValue=""
-            render={({ field }) => <TextField {...field} fullWidth label="CONTACT" variant="outlined" InputProps={{
-            }} />}
+            render={({ field }) => <TextField {...field} fullWidth label="CONTACT" variant="outlined" />}
           />
           <p className='err-msg'>{errors.contact?.message}</p>
         </Grid>
@@ -165,7 +174,7 @@ const PartyMaster = () => {
         </Grid>
 
         <Grid item xs={12}>
-          <SharedTable columns={partyColumns} tableData={tableData} keyArray={keyArray} className={styles.sharedTable}/>
+          <MasterTable columns={partyColumns} tableData={tableData} keyArray={keyArray} className={styles.sharedTable}/>
         </Grid>
       </Grid>
       <div>

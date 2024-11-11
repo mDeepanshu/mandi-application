@@ -1,13 +1,14 @@
 import axiosHttp from "../interceptors/error-handling-interceptor";
 
-export const submitVyapariBill = async (post) => {
-    try {
-        const response = await axiosHttp.post('https://jsonplaceholder.typicode.com/posts', post);
-        return response.data;
-      } catch (error) {
-        console.error('Error:', error);
-      }    
-  };
+export const saveVyapariBill = async (bill) => {
+  try {
+    const response = await axiosHttp.post(`/vyapari/saveVyapariBill`,bill);
+    return response.data;
+  } catch (error) {
+    console.error('Error posting data:', error);
+    console.error('Not Throwing Error');
+  }
+};
 
   
 export const getVyapariBill = async (vyapariId,date) => {

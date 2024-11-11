@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Grid } from "@mui/material";
 import { TextField, Button } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, InputAdornment } from '@mui/material';
-import { submitVyapariBill, getVyapariBill } from '../../gateway/vyapari-bill-apis';
+import { saveVyapariBill, getVyapariBill } from '../../gateway/vyapari-bill-apis';
 import { useForm, Controller } from 'react-hook-form';
 import { getAllPartyList } from "../../gateway/comman-apis";
 import Autocomplete from '@mui/material/Autocomplete';
@@ -11,7 +11,8 @@ import VyapariBillPrint from "../../dialogs/vyapari-bill/vyapari-bill-print";
 import "./vyapari-bill.css";
 import ReactToPrint from 'react-to-print';
 import { Delete, Edit } from '@mui/icons-material';
-import SharedTable from "../../shared/ui/table";
+import SharedTable from "../../shared/ui/table/table";
+import PreviousBills from "../../shared/ui/previous-bill/previousBill";
 
 function VyapariBill() {
 
@@ -21,9 +22,9 @@ function VyapariBill() {
   const { register, handleSubmit, control, formState: { errors }, getValues, trigger, setValue } = useForm();
   const [vyapariList, setVyapariList] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const [vyapariTableColumns, setVyapariTableColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Edit", "Delete"]);
+  const [vyapariTableColumns, setVyapariTableColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Edit", "Delete", "Updated Tran."]);
   const [formData, setFormData] = useState();
-  const [keyArray, setKeyArray] = useState(["itemName","bag","rate","quantity",'itemTotal', "edit", "delete"]);
+  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", 'itemTotal', "edit", "delete", "navigation"]);
 
 
 
@@ -76,11 +77,17 @@ function VyapariBill() {
     }
   }, [formData]);
 
+  const saveBill = async () => {
+    // const saveRes = saveVyapariBill();
+    console.log(getValues(),tableData);
+    
+  }
+
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid item xs={8} p={3}>
-          <Grid container spacing={2} justifyContent="flex-end">
+          <Grid container spacing={2} justifyContent="space-between">
             <Grid container item xs={12} spacing={2} justifyContent="flex-end">
               <Grid item xs={5}>
                 <Controller
@@ -135,6 +142,9 @@ function VyapariBill() {
                 <Button variant="contained" color="success" onClick={fetchBill} fullWidth>Fetch Bill</Button>
               </Grid>
             </Grid>
+            <Grid item xs={7}>
+              <PreviousBills />
+            </Grid>
             <Grid item xs={3}>
               <TextField
                 {...register("previous_remaining", { required: "This field is required" })}
@@ -149,7 +159,7 @@ function VyapariBill() {
               />
             </Grid>
           </Grid>
-          <SharedTable columns={vyapariTableColumns} tableData={tableData} keyArray={keyArray}/>
+          <SharedTable columns={vyapariTableColumns} tableData={tableData} keyArray={keyArray} />
           <Grid container spacing={2} paddingTop={2}>
             <Grid container item xs={12} spacing={2} justifyContent="flex-end">
               <Grid item xs={2}>
@@ -167,6 +177,9 @@ function VyapariBill() {
               </Grid>
             </Grid>
             <Grid container item xs={12} spacing={2} justifyContent="flex-end">
+              <Grid item xs={2}>
+                <Button variant="contained" color="primary" fullWidth onClick={saveBill}>Save Bill</Button>
+              </Grid>
               <Grid item xs={2}>
                 <Button variant="contained" color="success" type='submit' fullWidth>Print</Button>
                 <ReactToPrint
