@@ -42,6 +42,8 @@ function VyapariBill() {
     if (isValid) {
       const formValues = getValues();
       const billData = await getVyapariBill(formValues.vyapari_name.partyId, formValues.date);
+      console.log(billData);
+      
       setTableData(billData?.responseBody?.billList);
       setValue("previous_remaining", billData?.responseBody?.currentOutstanding);
       setValue("total", billData?.responseBody?.billTotal);
@@ -80,6 +82,19 @@ function VyapariBill() {
   const saveBill = async () => {
     // const saveRes = saveVyapariBill();
     console.log(getValues(),tableData);
+    
+  }
+
+  const refreshBill = async () => {
+    let formValues = getValues();
+    const billData = await getVyapariBill(formValues.vyapari_name.partyId, formValues.date);
+    console.log(billData);
+    if (billData) {
+      setTableData(billData?.responseBody?.billList);
+      const billConstant = billData?.responseBody;
+      setValue("previous_remaining", billData?.responseBody?.currentOutstanding);
+      setValue("total", billData?.responseBody?.billTotal);
+    }
     
   }
 
@@ -143,7 +158,7 @@ function VyapariBill() {
               </Grid>
             </Grid>
             <Grid item xs={7}>
-              <PreviousBills />
+              <PreviousBills billData={{id:getValues()?.vyapari_name?.partyId,date:getValues()?.date}} />
             </Grid>
             <Grid item xs={3}>
               <TextField
@@ -159,7 +174,7 @@ function VyapariBill() {
               />
             </Grid>
           </Grid>
-          <SharedTable columns={vyapariTableColumns} tableData={tableData} keyArray={keyArray} />
+          <SharedTable columns={vyapariTableColumns} tableData={tableData} keyArray={keyArray} refreshBill={refreshBill}/>
           <Grid container spacing={2} paddingTop={2}>
             <Grid container item xs={12} spacing={2} justifyContent="flex-end">
               <Grid item xs={2}>

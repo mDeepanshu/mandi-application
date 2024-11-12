@@ -13,3 +13,7 @@ select{
 label{
     font-size: 1.2rem;
 }
+
+.noBills{
+    padding: 10px 20px;
+}

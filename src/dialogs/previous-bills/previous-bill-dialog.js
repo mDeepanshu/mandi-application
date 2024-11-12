@@ -14,10 +14,12 @@ function PreviousBillsDialog(props) {
 
     useEffect(() => {
         // setTableData(props)
-        console.log(props.billData[0]);
-        setTableData(props?.billData[0]?.kisanBillItems);
-        const { kisanBillItems, ...newObj } = props?.billData[0];
-        setFormData(newObj);
+        setTableData(props?.billData?.[0]?.kisanBillItems);
+        console.log(props);
+        if (props?.billData?.[0]) {
+            const { kisanBillItems, ...newObj } = props?.billData[0];
+            setFormData(newObj);
+        }
 
         
       }, [props]);

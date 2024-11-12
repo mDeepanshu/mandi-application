@@ -264,7 +264,7 @@ function KisanBill() {
             </Grid>
             <Grid container spacing={2} paddingBottom={2}>
               <Grid item xs={11}>
-                <PreviousBills billOf="kisan" id={getValues()?.kisan?.partyId}/>
+                <PreviousBills billData={{id:getValues()?.kisan?.partyId,date:getValues()?.date}}/>
               </Grid>
             </Grid>
             <TableContainer component={Paper} className='bill-table'>

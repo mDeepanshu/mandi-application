@@ -1,12 +1,12 @@
 import React, { forwardRef,useEffect  } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
-import "./kisan-bill-print.css";
+import styles from "./kisan-bill-print.module.css";
 const KisanBillPrint = forwardRef((props, ref) =>{
 
     return (
         <div ref={ref}>
-          <h1 className='heading'>Haji Sabzi Mandi Bill</h1>
-          <div className='constants'>
+          <h1 className={styles.heading}>Haji Sabzi Mandi Bill</h1>
+          <div className={styles.constants}>
             <div>Bhada: {props.formData?.bhada}</div>
             <div>Bill Date: {props.formData?.billDate}</div>
             <div>Bill Id: {props.formData?.billId}</div>

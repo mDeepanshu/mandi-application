@@ -12,6 +12,7 @@ function PreviousBills(props) {
     const fetchBill = () => {}
 
     const [open, setOpen] = useState(false);
+    const [openErr, setOpenErr] = useState(false);
     const [billData, setBillData] = useState(false);
 
     useEffect(() => {
@@ -20,14 +21,21 @@ function PreviousBills(props) {
       }, [props]);
 
     const handleClickToOpen = async () => {
-        setOpen(true);
         // getBillVersions(props.id,"2024-11-07",0);
-        const billDetails = await getBillVersions("string","2024-11-07",0);
-        setBillData(billDetails.responseBody.content);
+        console.log(props.billData?.id,props.billData?.date);
+        
+        const billDetails = await getBillVersions(props.billData?.id,props.billData?.date,0);
+        if (billDetails.responseBody) {
+            setOpen(true);
+            setBillData(billDetails.responseBody?.content);
+        } else {
+            setOpenErr(true);
+        }
     };
 
     const handleToClose = () => {
         setOpen(false);
+        setOpenErr(false);
     };
 
     return (
@@ -41,6 +49,9 @@ function PreviousBills(props) {
             <div>
                 <Dialog open={open} onClose={handleToClose}>
                     <PreviousBillsDialog billData={billData}/>
+                </Dialog>
+                <Dialog open={openErr} onClose={handleToClose}>
+                    <div className={styles.noBills}>No Previous Bills</div>
                 </Dialog>
             </div>
         </div>

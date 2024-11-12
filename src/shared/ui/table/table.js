@@ -57,25 +57,29 @@ function SharedTable(props) {
 
 
     useEffect(() => {
-        setColumns(props.columns);
-        setRowVariables(Array(props.keyArray.length).fill(0));
-        setTableData(props.tableData.slice(0, 10));
-        setAllTableData(props.tableData);
-        setTotalPages(Math.floor(props.tableData.length / 10));
-        setKeyArray(props.keyArray);
+        if (props.tableData.length) {
+            console.log(props);
 
-        let fields = [];
-        for (let int = 0; int < props.keyArray.length; int++) {
-            if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) {
-                fields.push({
-                    name: props.keyArray[int],
-                    label: columns[int],
-                    defaultValue: '',
-                    validation: { required: `${columns[int]} is required` },
-                })
+            setColumns(props.columns);
+            setRowVariables(Array(props.tableData.length).fill(0));
+            setTableData(props.tableData.slice(0, 10));
+            setAllTableData(props.tableData);
+            setTotalPages(Math.floor(props.tableData.length / 10));
+            setKeyArray(props.keyArray);
+
+            let fields = [];
+            for (let int = 0; int < props.keyArray.length; int++) {
+                if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) {
+                    fields.push({
+                        name: props.keyArray[int],
+                        label: columns[int],
+                        defaultValue: '',
+                        validation: { required: `${columns[int]} is required` },
+                    })
+                }
             }
+            setFieldDefinitions(fields);
         }
-        setFieldDefinitions(fields);
     }, [props]);
 
 
@@ -89,7 +93,11 @@ function SharedTable(props) {
 
         if (saveAndReflect) {
             let changedValues = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues() };
+            console.log(changedValues);
+            
             const updateRes = await updateAuctionTransaction(changedValues);
+            console.log(updateRes);
+            
             props.refreshBill();
 
         } else {
@@ -116,7 +124,7 @@ function SharedTable(props) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {tableData.map((rowData, index) => {
+                        {tableData?.map((rowData, index) => {
                             return (<TableRow key={index}>
                                 {keyArray.map((key, i) =>
                                     <TableCell key={i} align="left">
@@ -147,10 +155,10 @@ function SharedTable(props) {
                         })}
                     </TableBody>
                 </Table>
-                <div className={styles.paninator}>
-                    <Pagination count={totalPages} page={page} onChange={handleChange} />
-                </div>
             </TableContainer>
+            <div className={styles.paninator}>
+                <Pagination count={totalPages} page={page} onChange={handleChange} />
+            </div>
             <div>
                 <Dialog open={open} onClose={handleClose}>
                     <DialogTitle>EDIT DATA</DialogTitle>
