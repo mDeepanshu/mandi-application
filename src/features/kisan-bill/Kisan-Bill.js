@@ -24,8 +24,8 @@ function KisanBill() {
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
 
-  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Edit", "Delete","Previuos Edits"]);
-  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "total", "edit", "delete","navigation"]);
+  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Edit", "Previuos Edits"]);
+  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "total", "edit", "navigation"]);
 
 
   const [fieldDefinitions] = useState([
@@ -156,8 +156,20 @@ function KisanBill() {
 
   const saveBill = async () => {
     // const saveRes = saveKisanBill();
-    console.log(getValues(),tableData);
+    console.log(getValues(), tableData);
+  }
 
+  const refreshBill = async () => {
+    console.log("Pop");
+    let formValues = getValues();
+    const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
+    console.log(billData);
+    if (billData) {
+      setTableData(billData?.responseBody?.bills);
+      const billConstant = billData?.responseBody;
+      delete billConstant.bills;
+      reset({ ...getValues(), ...billConstant });
+    }
     
   }
 
@@ -252,11 +264,11 @@ function KisanBill() {
             </Grid>
             <Grid container spacing={2} paddingBottom={2}>
               <Grid item xs={11}>
-                <PreviousBills />
+                <PreviousBills billOf="kisan" id={getValues()?.kisan?.partyId}/>
               </Grid>
             </Grid>
             <TableContainer component={Paper} className='bill-table'>
-              <SharedTable columns={kisanBillColumnsColumns} tableData={tableData} keyArray={keyArray} />
+              <SharedTable columns={kisanBillColumnsColumns} tableData={tableData} keyArray={keyArray}  refreshBill={refreshBill}/>
             </TableContainer>
             <Grid container spacing={2} justifyContent="flex-end" p={2}>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
@@ -304,9 +316,9 @@ function KisanBill() {
                 </Grid>
               </Grid>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-              <Grid item xs={3}>
-                <Button variant="contained" color="primary" fullWidth onClick={saveBill}>Save Bill</Button>
-              </Grid>
+                <Grid item xs={3}>
+                  <Button variant="contained" color="primary" fullWidth onClick={saveBill}>Save Bill</Button>
+                </Grid>
                 <Grid item xs={3}>
                   <Button variant="contained" color="success" type='submit' fullWidth>Print</Button>
                   <ReactToPrint

@@ -11,11 +11,19 @@ function PreviousBills(props) {
 
     const fetchBill = () => {}
 
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
+    const [billData, setBillData] = useState(false);
 
-    const handleClickToOpen = () => {
+    useEffect(() => {
+        console.log(props);
+        
+      }, [props]);
+
+    const handleClickToOpen = async () => {
         setOpen(true);
-        getBillVersions("string","2024-11-07",0);
+        // getBillVersions(props.id,"2024-11-07",0);
+        const billDetails = await getBillVersions("string","2024-11-07",0);
+        setBillData(billDetails.responseBody.content);
     };
 
     const handleToClose = () => {
@@ -32,7 +40,7 @@ function PreviousBills(props) {
             </div>
             <div>
                 <Dialog open={open} onClose={handleToClose}>
-                    <PreviousBillsDialog/>
+                    <PreviousBillsDialog billData={billData}/>
                 </Dialog>
             </div>
         </div>

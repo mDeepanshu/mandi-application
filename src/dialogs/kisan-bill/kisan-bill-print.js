@@ -1,5 +1,4 @@
 import React, { forwardRef,useEffect  } from 'react';
-import { Grid } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
 import "./kisan-bill-print.css";
 const KisanBillPrint = forwardRef((props, ref) =>{
@@ -8,13 +7,18 @@ const KisanBillPrint = forwardRef((props, ref) =>{
         <div ref={ref}>
           <h1 className='heading'>Haji Sabzi Mandi Bill</h1>
           <div className='constants'>
-            <div>Mandi Kharch: {props.formData?.mandiKharcha}</div>
-            <div>Driver Inaam: {props.formData?.driver}</div>
-            <div>Hammali: {props.formData?.hammali}</div>
             <div>Bhada: {props.formData?.bhada}</div>
+            <div>Bill Date: {props.formData?.billDate}</div>
+            <div>Bill Id: {props.formData?.billId}</div>
+            <div>Commission: {props.formData?.commission}</div>
+            <div>Driver Inaam: {props.formData?.driverInaam}</div>
+            <div>Hammali: {props.formData?.hammali}</div>
+            <div>Kharcha Total: {props.formData?.kharchaTotal}</div>
+            <div>Kisan Name: {props.formData?.kisanName}</div>
+            <div>Mandi Kharcha: {props.formData?.mandiKharcha}</div>
             <div>Nagar Palika Tax: {props.formData?.nagarPalikaTax}</div>
             <div>Nagdi: {props.formData?.nagdi}</div>
-            <div>Commision: {props.formData?.commission}</div>
+            <div>Pakki Bikri: {props.formData?.pakkiBikri}</div>
           </div>
           <TableContainer>
               <Table aria-label="simple table">
@@ -28,7 +32,7 @@ const KisanBillPrint = forwardRef((props, ref) =>{
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {props.tableData.map((row,index) => (
+                  {props.tableData?.map((row,index) => (
                     <TableRow key={index}>
                       <TableCell component="th" scope="row">
                         {row.itemName}

@@ -6,11 +6,12 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, T
 import styles from "./table.module.css";
 import Pagination from '@mui/material/Pagination';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { updateAuctionTransaction } from "../../../gateway/comman-apis";
 
 function SharedTable(props) {
 
     const [open, setOpen] = useState(false);
-    // const [editingIndex, setEditingIndex] = useState(0);
+    const [editingIndex, setEditingIndex] = useState(0);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
@@ -39,10 +40,10 @@ function SharedTable(props) {
     };
 
     const editFromTable = (index) => {
-        // setEditingIndex(index);
+        setEditingIndex(index);
         setOpen(true);
         for (let int = 0; int < props.keyArray.length; int++) {
-            if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) 
+            if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation"))
                 setValue(keyArray[int], tableData[index]?.[rowVariables[index]]?.[keyArray[int]]);
         }
 
@@ -84,7 +85,23 @@ function SharedTable(props) {
         setTableData(allTableData.slice(value * 10, value * 10 + 10));
     };
 
-    const updateRecord = (event, value) => {
+    const updateRecord = async (saveAndReflect) => {
+
+        if (saveAndReflect) {
+            let changedValues = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues() };
+            const updateRes = await updateAuctionTransaction(changedValues);
+            props.refreshBill();
+
+        } else {
+            const updatedObject = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues() };
+            let previousTableData = tableData;
+            previousTableData[editingIndex][tableData[editingIndex].length - 1] = updatedObject;
+            setTableData(previousTableData);
+
+
+        }
+
+
     };
 
     return (
@@ -140,25 +157,6 @@ function SharedTable(props) {
                     <DialogContent>
                         <DialogContentText></DialogContentText>
                         <div className={styles.editForm}>
-                            {/* {fields.map((field, i) => (
-                                <div className={styles.formControl} key={field.id}>
-                                    <label>{columns[i]}</label>
-                                    <Controller
-                                        // name={`fields.${i}.itemName`}
-                                        name={`fields.${i}.${keyArray[i]}`}
-                                        control={control}
-                                        render={({ field }) => (
-                                            <TextField
-                                                {...field}
-                                                label={`Field ${i + 1}`}
-                                                // label={fields[0]}
-                                                variant="outlined"
-                                                fullWidth
-                                            />
-                                        )}
-                                    />
-                                </div>
-                            ))} */}
                             {fieldDefinitions.map((fieldDef) => (
                                 <Controller
                                     key={fieldDef.name}
@@ -184,7 +182,8 @@ function SharedTable(props) {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Cancel</Button>
-                        <Button onClick={updateRecord}>Save</Button>
+                        <Button onClick={() => updateRecord(false)}>Save</Button>
+                        <Button onClick={() => updateRecord(true)}>Save And Reflect</Button>
                     </DialogActions>
                 </Dialog>
             </div>

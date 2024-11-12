@@ -6,7 +6,6 @@ export const submitKisanBill = async (post) => {
     return response.data;
   } catch (error) {
     console.error('Error:', error);
-    console.error('Not Throwing Error');
   }
 };
 
@@ -16,7 +15,6 @@ export const getKisanBill = async (kisanId, date) => {
     return response.data;
   } catch (error) {
     console.error('Error posting data:', error);
-    console.error('Not Throwing Error');
   }
 };
 
@@ -26,7 +24,6 @@ export const saveKisanBill = async (bill) => {
     return response.data;
   } catch (error) {
     console.error('Error posting data:', error);
-    console.error('Not Throwing Error');
   }
 };
 

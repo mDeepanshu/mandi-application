@@ -17,3 +17,12 @@ export const getAllPartyListTest = async () => {
     console.error('Error posting data:', error);
   }
 };
+
+export const updateAuctionTransaction = async (updateObject) => {
+  try {
+    const response = await axiosHttp.post(`/auction/edit-auction-transaction`,updateObject);
+    return response.data;
+  } catch (error) {
+    console.error('Error posting data:', error);
+  }
+};
