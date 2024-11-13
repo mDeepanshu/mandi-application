@@ -20,7 +20,7 @@ export const getKisanBill = async (kisanId, date) => {
 
 export const saveKisanBill = async (bill) => {
   try {
-    const response = await axiosHttp.post(`/kisan/saveKisanBill`,bill);
+    const response = await axiosHttp.post(`/kisan-bill`,bill);
     return response.data;
   } catch (error) {
     console.error('Error posting data:', error);

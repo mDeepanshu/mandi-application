@@ -7,6 +7,8 @@ import styles from "./table.module.css";
 import Pagination from '@mui/material/Pagination';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { updateAuctionTransaction } from "../../../gateway/comman-apis";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 function SharedTable(props) {
 
@@ -20,6 +22,8 @@ function SharedTable(props) {
     const [allTableData, setAllTableData] = useState([]);
     const [keyArray, setKeyArray] = useState([]);
     const [fieldDefinitions, setFieldDefinitions] = useState([]);
+    const [sync, setSync] = useState({});
+    const [openSync, setOpenSync] = useState(false);
 
     const { control, handleSubmit, register, reset, formState: { errors }, setValue, getValues } = useForm();
     const [rowVariables, setRowVariables] = useState([]);
@@ -93,23 +97,27 @@ function SharedTable(props) {
 
         if (saveAndReflect) {
             let changedValues = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues() };
-            console.log(changedValues);
-            
             const updateRes = await updateAuctionTransaction(changedValues);
-            console.log(updateRes);
-            
             props.refreshBill();
+            handleClose();
+            setSync({
+                syncSeverity: true ? 'success' : 'error',
+                syncStatus: true ? 'EDIT SUCCESSFUL' : 'EDIT UNSUCCESSFUL'
+            });
+            setOpenSync(true);
 
         } else {
             const updatedObject = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues() };
             let previousTableData = tableData;
             previousTableData[editingIndex][tableData[editingIndex].length - 1] = updatedObject;
             setTableData(previousTableData);
-
-
+            handleClose();
         }
 
+    };
 
+    const closeSnackbar = (event, reason) => {
+        setOpenSync(false);
     };
 
     return (
@@ -195,7 +203,24 @@ function SharedTable(props) {
                     </DialogActions>
                 </Dialog>
             </div>
+            <div>
+                <Snackbar
+                    open={openSync}
+                    autoHideDuration={5000}
+                    onClose={closeSnackbar}
+                >
+                    <Alert
+                        onClose={closeSnackbar}
+                        severity={sync.syncSeverity}
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {sync.syncStatus}
+                    </Alert>
+                </Snackbar>
+            </div>
         </div>
+
     );
 }
 

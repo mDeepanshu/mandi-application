@@ -26,8 +26,9 @@ function PreviousBills(props) {
         
         const billDetails = await getBillVersions(props.billData?.id,props.billData?.date,0);
         if (billDetails.responseBody) {
+            console.log(billDetails);
             setOpen(true);
-            setBillData(billDetails.responseBody?.content);
+            setBillData(billDetails.responseBody);
         } else {
             setOpenErr(true);
         }

@@ -156,7 +156,15 @@ function KisanBill() {
 
   const saveBill = async () => {
     // const saveRes = saveKisanBill();
-    console.log(getValues(), tableData);
+    let tableSnapshot=[];
+    tableData.forEach(element => {
+      tableSnapshot.push(element[0]);
+    });
+    const bill = {...getValues(), kisanBillItems:tableSnapshot,kisanId:getValues().kisan.partyId,kisanName:getValues().kisan.name,billDate:getValues().date};
+    delete bill.kisan;
+    delete bill.date;
+    saveKisanBill(bill);
+    console.log(bill);
   }
 
   const refreshBill = async () => {
@@ -320,7 +328,7 @@ function KisanBill() {
                   <Button variant="contained" color="primary" fullWidth onClick={saveBill}>Save Bill</Button>
                 </Grid>
                 <Grid item xs={3}>
-                  <Button variant="contained" color="success" type='submit' fullWidth>Print</Button>
+                  <Button variant="contained" color="success" type='submit' fullWidth>Save & Print</Button>
                   <ReactToPrint
                     trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
                     content={() => componentRef.current}
