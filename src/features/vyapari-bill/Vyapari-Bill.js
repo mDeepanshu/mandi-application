@@ -80,9 +80,17 @@ function VyapariBill() {
   }, [formData]);
 
   const saveBill = async () => {
-    // const saveRes = saveVyapariBill();
-    console.log(getValues(),tableData);
+    let tableSnapshot=[];
+    tableData.forEach(element => {
+      tableSnapshot.push(element[0]);
+    });
+    console.log(getValues());
     
+    const bill = {...getValues(), kisanBillItems:tableSnapshot,vyapariId:getValues()?.vyapari_name?.partyId,vyapariName:getValues().vyapari_name?.name,billDate:getValues()?.date};
+    delete bill.kisan;
+    delete bill.date;
+    saveVyapariBill(bill);
+    console.log(bill);
   }
 
   const refreshBill = async () => {

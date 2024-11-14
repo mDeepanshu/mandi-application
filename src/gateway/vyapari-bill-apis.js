@@ -2,7 +2,7 @@ import axiosHttp from "../interceptors/error-handling-interceptor";
 
 export const saveVyapariBill = async (bill) => {
   try {
-    const response = await axiosHttp.post(`/vyapari/saveVyapariBill`,bill);
+    const response = await axiosHttp.post(`/vyapari-bill`,bill);
     return response.data;
   } catch (error) {
     console.error('Error posting data:', error);

@@ -5,6 +5,7 @@ import styles from "./previousBillsDialog.module.css";
 import { Delete, Edit, ArrowForwardIos, ArrowBackIos } from '@mui/icons-material';
 import Pagination from '@mui/material/Pagination';
 import  KisanBillPrint  from "../../dialogs/kisan-bill/kisan-bill-print";
+import  VyapariBillPrint  from "../../dialogs/vyapari-bill/vyapari-bill-print";
 import {getBillVersions} from "../../gateway/previous-bills-apis";
 
 function PreviousBillsDialog(props) {
@@ -17,16 +18,29 @@ function PreviousBillsDialog(props) {
     const navigateBill = async(direction) => {
         const billDetails = await getBillVersions(props.billData?.id,props.billData?.date,totalBills-billIndex+direction);
         setBillIndex(billIndex+direction);
-        PrintBill();
+        // PrintBill();
     }
 
     useEffect(() => {
-        PrintBill();
+        // PrintBill();
+        console.log(props);
+        
         setBillIndex(0);
       }, [props]);
 
 
-    const PrintBill = () => {
+    const PrintKisanBill = () => {
+        
+        setTableData(props?.billData?.content?.[0]?.kisanBillItems);
+        setTotalBills(props?.billData?.size);
+
+        if (props?.billData?.content?.[0]) {
+            const { kisanBillItems, ...newObj } = props?.billData?.content?.[0];
+            setFormData(newObj);
+        }
+    }
+
+    const PrintVyapariBill = () => {
         
         setTableData(props?.billData?.content?.[0]?.kisanBillItems);
         setTotalBills(props?.billData?.size);
@@ -46,6 +60,7 @@ function PreviousBillsDialog(props) {
             </div>
             <div>
                 <KisanBillPrint formData={formData} tableData={tableData}/>
+                <VyapariBillPrint/>
             </div>
             <div></div>
         </div>

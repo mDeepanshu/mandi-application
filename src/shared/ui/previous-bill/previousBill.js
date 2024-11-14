@@ -22,9 +22,13 @@ function PreviousBills(props) {
 
     const handleClickToOpen = async () => {
         // getBillVersions(props.id,"2024-11-07",0);
+        console.log(props);
+        
         console.log(props.billData?.id,props.billData?.date);
         
         const billDetails = await getBillVersions(props.billData?.id,props.billData?.date,0);
+        console.log(billDetails);
+        
         if (billDetails.responseBody) {
             console.log(billDetails);
             setOpen(true);
