@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Grid } from "@mui/material";
 import { TextField, Button } from "@mui/material";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, InputAdornment } from '@mui/material';
+import { InputAdornment } from '@mui/material';
 import { saveVyapariBill, getVyapariBill } from '../../gateway/vyapari-bill-apis';
 import { useForm, Controller } from 'react-hook-form';
 import { getAllPartyList } from "../../gateway/comman-apis";
@@ -10,7 +10,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import VyapariBillPrint from "../../dialogs/vyapari-bill/vyapari-bill-print";
 import "./vyapari-bill.css";
 import ReactToPrint from 'react-to-print';
-import { Delete, Edit } from '@mui/icons-material';
 import SharedTable from "../../shared/ui/table/table";
 import PreviousBills from "../../shared/ui/previous-bill/previousBill";
 
@@ -55,17 +54,11 @@ function VyapariBill() {
     if (allVyapari?.responseBody) setVyapariList(allVyapari?.responseBody);
   }
 
-  const editFromTable = (index) => {
-    // const newRows = [...buyItemsArr];
-    // newRows.splice(index, 1);
-    // setTableData(newRows);
-  }
+  // const editFromTable = (index) => {
+  // }
 
-  const deleteFromTable = (index) => {
-    // const newRows = [...buyItemsArr];
-    // newRows.splice(index, 1);
-    // setTableData(newRows);
-  }
+  // const deleteFromTable = (index) => {
+  // }
 
   useEffect(() => {
     getVyapariNames();
@@ -86,8 +79,8 @@ function VyapariBill() {
     });
     console.log(getValues());
     
-    const bill = {...getValues(), kisanBillItems:tableSnapshot,vyapariId:getValues()?.vyapari_name?.partyId,vyapariName:getValues().vyapari_name?.name,billDate:getValues()?.date};
-    delete bill.kisan;
+    const bill = {...getValues(), vyapariBillItems:tableSnapshot,vyapariId:getValues()?.vyapari_name?.partyId,vyapariName:getValues().vyapari_name?.name,billDate:getValues()?.date};
+    delete bill.vyapari_name;
     delete bill.date;
     saveVyapariBill(bill);
     console.log(bill);
@@ -166,7 +159,7 @@ function VyapariBill() {
               </Grid>
             </Grid>
             <Grid item xs={7}>
-              <PreviousBills billData={{id:getValues()?.vyapari_name?.partyId,date:getValues()?.date}} />
+              <PreviousBills billData={{id:getValues()?.vyapari_name?.partyId,date:getValues()?.date}} partyType={"vyapari"}/>
             </Grid>
             <Grid item xs={3}>
               <TextField
@@ -208,7 +201,6 @@ function VyapariBill() {
                 <ReactToPrint
                   trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
                   content={() => componentRef.current}
-                // onBeforeGetContent={() => setFormData(getValues())}
                 />
               </Grid>
             </Grid>

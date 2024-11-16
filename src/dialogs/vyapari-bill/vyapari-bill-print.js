@@ -23,7 +23,7 @@ const VyapariBillPrint = forwardRef((props, ref) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {props.tableData.map((row, index) => (
+            {props.tableData?.map((row, index) => (
               <TableRow key={index}>
                 <TableCell component="th" scope="row">
                   {row.itemName}

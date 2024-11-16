@@ -26,8 +26,8 @@ const PartyMaster = () => {
   const [tableData, setTableData] = useState([]);
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
 
-  const [partyColumns, setPartyColumns] = useState(["INDEX", "CONTACT", "ID NO", "PARTY NAME", "OWED AMOUNT", "PARTY ID", "PARTY TYPE"]);
-  const [keyArray, setKeyArray] = useState(["index","contact", "idNo", "name", "owedAmount", "partyId", "partyType"]);
+  const [partyColumns, setPartyColumns] = useState(["INDEX", "CONTACT", "ID NO", "PARTY NAME", "OWED AMOUNT", "PARTY ID","MAX LOAN DAYS", "PARTY TYPE"]);
+  const [keyArray, setKeyArray] = useState(["index","contact", "idNo", "name", "owedAmount", "partyId","maxLoanDays", "partyType"]);
 
   const fetchItems = async () => {
     try {
@@ -156,6 +156,16 @@ const PartyMaster = () => {
             render={({ field }) => <TextField {...field} fullWidth label="VASULI DAY LIMIT" variant="outlined"/>}
           />
           <p className='err-msg'>{errors.vasuliDayLimit?.message}</p>
+        </Grid>
+        <Grid item xs={6} sm={2}>
+          <Controller
+            name="maxLoanDays"
+            control={control}
+            rules={{ required: "Max Loan Days" }}
+            defaultValue=""
+            render={({ field }) => <TextField {...field} fullWidth label="MAX LOAN DAYS" variant="outlined" />}
+          />
+          <p className='err-msg'>{errors.contact?.message}</p>
         </Grid>
         <Grid item xs={6} sm={2}>
           <Controller

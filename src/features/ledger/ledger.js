@@ -4,16 +4,21 @@ import { useForm, Controller } from 'react-hook-form';
 import { TextField, Button } from "@mui/material";
 import { getLedger } from '../../gateway/ledger-apis';
 import MasterTable from "../../shared/ui/master-table/master-table";
+import LedgerPrint from "../../dialogs/ledger-print/ledger-print-dialog";
+import ReactToPrint from 'react-to-print';
 
 import styles from "./ledger.module.css";
 
 function Ledger() {
 
+  const componentRef = useRef();
+  const triggerRef = useRef();
+
   const [tableData, setTableData] = useState([]);
-  const [ledgerColumns, setledgerColumns] = useState(["INDEX","PARTY NAME","OPENING AMOUNT","DAY BILL","CLOSING AMOUNT"]);
-  const [keyArray, setKeyArray] = useState(["index","partyName","openingAmount","dayBill","closingAmount"]);
-  
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const [ledgerColumns, setledgerColumns] = useState(["INDEX", "PARTY NAME", "OPENING AMOUNT", "DAY BILL", "CLOSING AMOUNT"]);
+  const [keyArray, setKeyArray] = useState(["index", "partyName", "openingAmount", "dayBill", "closingAmount"]);
+
+  const { register, handleSubmit, formState: { errors }, getValues } = useForm();
 
   const fetch_ledger = async (data) => {
     const { fromDate, toDate } = data;
@@ -50,8 +55,9 @@ function Ledger() {
   }, []);
 
   const printLedger = () => {
-    console.log("Hey Print");
+    console.log(getValues());
     
+    triggerRef.current.click();
   }
 
   return (
@@ -66,10 +72,17 @@ function Ledger() {
           <div className={styles.date}>TO: <input type='date'  {...register('toDate')} /></div>
           <div>
             <Button variant="contained" color="success" type='submit' >Fetch Ledger</Button>
-            <Button variant="contained" color="success" onClick={()=> printLedger()} className={styles.print_btn}>PRINT LEDGER</Button>
+            <Button variant="contained" color="success" onClick={() => printLedger()} className={styles.print_btn}>PRINT LEDGER</Button>
+            <ReactToPrint
+              trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
+              content={() => componentRef.current}
+            />
           </div>
         </form>
-        <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray}/>
+        <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} />
+      </div>
+      <div style={{ display: 'none' }}>
+        <LedgerPrint ref={componentRef} tableData={tableData} formData={getValues()} />
       </div>
     </>
   );

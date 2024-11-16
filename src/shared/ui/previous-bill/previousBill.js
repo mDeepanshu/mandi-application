@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Delete, Edit } from '@mui/icons-material';
 import { Button } from "@mui/material";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Dialog } from '@mui/material';
 import styles from "./previousBill.module.css";
-import Pagination from '@mui/material/Pagination';
 import PreviousBillsDialog from "../../../dialogs/previous-bills/previous-bill-dialog";
-import {getBillVersions} from "../../../gateway/previous-bills-apis";
+import { getKisanBillVersions, getVyapariBillVersions } from "../../../gateway/previous-bills-apis";
 
 function PreviousBills(props) {
 
-    const fetchBill = () => {}
+    // const fetchBill = () => {}
 
     const [open, setOpen] = useState(false);
     const [openErr, setOpenErr] = useState(false);
@@ -17,18 +15,22 @@ function PreviousBills(props) {
 
     useEffect(() => {
         console.log(props);
-        
-      }, [props]);
+
+    }, [props]);
 
     const handleClickToOpen = async () => {
         // getBillVersions(props.id,"2024-11-07",0);
         console.log(props);
+
+        console.log(props.billData?.id, props.billData?.date);
+        let billDetails;
+        if (props.partyType == "kisan") billDetails = await getKisanBillVersions(props.billData?.id, props.billData?.date, 0);
+        else billDetails = await getVyapariBillVersions(props.billData?.id, props.billData?.date, 0);
+
         
-        console.log(props.billData?.id,props.billData?.date);
-        
-        const billDetails = await getBillVersions(props.billData?.id,props.billData?.date,0);
+
         console.log(billDetails);
-        
+
         if (billDetails.responseBody) {
             console.log(billDetails);
             setOpen(true);
@@ -53,7 +55,7 @@ function PreviousBills(props) {
             </div>
             <div>
                 <Dialog open={open} onClose={handleToClose}>
-                    <PreviousBillsDialog billData={billData}/>
+                    <PreviousBillsDialog billData={billData} partyType={props.partyType}/>
                 </Dialog>
                 <Dialog open={openErr} onClose={handleToClose}>
                     <div className={styles.noBills}>No Previous Bills</div>
