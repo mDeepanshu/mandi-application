@@ -1,9 +1,24 @@
-import React, { forwardRef, useEffect } from 'react';
+import React, { forwardRef, useEffect,useState } from 'react';
 import { Grid } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import "./vyapari-bill-print.css";
 const VyapariBillPrint = forwardRef((props, ref) => {
 
+  const [printTable,setPrintTable] = useState([]);
+  
+  useEffect(() => {
+
+    if(props.restructureTable){
+      
+      let arr=[];
+      props.tableData.forEach(element => {
+        arr.push(element[0]);
+      });
+      setPrintTable(arr);
+    }else{
+      setPrintTable(props.tableData);
+    } 
+  }, [props]);
   return (
     <div ref={ref}>
       <h1 className='heading'>Haji Sabzi Mandi Bill</h1>
@@ -23,7 +38,7 @@ const VyapariBillPrint = forwardRef((props, ref) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {props.tableData?.map((row, index) => (
+            {printTable?.map((row, index) => (
               <TableRow key={index}>
                 <TableCell component="th" scope="row">
                   {row.itemName}

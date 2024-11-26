@@ -96,7 +96,7 @@ function SharedTable(props) {
     const updateRecord = async (saveAndReflect) => {
 
         if (saveAndReflect) {
-            let changedValues = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues() };
+            let changedValues = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues(), auctionDate:new Date() };
             const updateRes = await updateAuctionTransaction(changedValues);
             props.refreshBill();
             handleClose();
@@ -107,10 +107,26 @@ function SharedTable(props) {
             setOpenSync(true);
 
         } else {
-            const updatedObject = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues() };
-            let previousTableData = tableData;
-            previousTableData[editingIndex][tableData[editingIndex].length - 1] = updatedObject;
-            setTableData(previousTableData);
+            let editedData = getValues();
+            let finalEdit;
+            if (editedData.itemTotal) {
+                finalEdit = {
+                    ...editedData,
+                    itemTotal:Number(editedData.rate)*Number(editedData.quantity),
+                }
+            } else {
+                finalEdit = {
+                    ...editedData,
+                    total:Number(editedData.rate)*Number(editedData.quantity),
+                }
+            }
+            
+            const updatedObject = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...finalEdit };
+            console.log(updatedObject);
+            let previousTableData = tableData[editingIndex].push(updatedObject);
+            // previousTableData[editingIndex][tableData[editingIndex].length - 1] = updatedObject;
+            console.log(previousTableData);
+            // setTableData(previousTableData);
             handleClose();
         }
 

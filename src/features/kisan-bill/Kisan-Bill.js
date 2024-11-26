@@ -24,8 +24,8 @@ function KisanBill() {
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
 
-  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Edit", "Previuos Edits"]);
-  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "total", "edit", "navigation"]);
+  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total","Date","Vyapari Name", "Edit", "Previuos Edits"]);
+  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "itemTotal","auctionDate","partyName", "edit", "navigation"]);
 
 
   const [fieldDefinitions] = useState([
@@ -104,9 +104,9 @@ function KisanBill() {
 
   const onSubmit = async (data) => {
     setFormData(getValues());
-    // if (triggerRef.current) {
-    //   triggerRef.current.click();
-    // }
+    if (triggerRef.current) {
+      triggerRef.current.click();
+    }
   };
 
   const fetchBill = async () => {
@@ -114,7 +114,6 @@ function KisanBill() {
     if (isValid) {
       let formValues = getValues();
       const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
-      console.log(billData);
       if (billData) {
         setTableData(billData?.responseBody?.bills);
         const billConstant = billData?.responseBody;
@@ -135,6 +134,8 @@ function KisanBill() {
   }, []);
 
   useEffect(() => {
+    console.log("formData",formData);
+    
     if (formData) {
       if (triggerRef.current) {
         triggerRef.current.click();
@@ -158,13 +159,15 @@ function KisanBill() {
     // const saveRes = saveKisanBill();
     let tableSnapshot=[];
     tableData.forEach(element => {
+      console.log(element);
+      
       tableSnapshot.push(element[0]);
     });
     const bill = {...getValues(), kisanBillItems:tableSnapshot,kisanId:getValues().kisan.partyId,kisanName:getValues().kisan.name,billDate:getValues().date};
     delete bill.kisan;
     delete bill.date;
-    saveKisanBill(bill);
     console.log(bill);
+    saveKisanBill(bill);
   }
 
   const refreshBill = async () => {
@@ -185,7 +188,7 @@ function KisanBill() {
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={2} p={3}>
-          <Grid item xs={4}>
+          <Grid item xs={2}>
             <Grid
               container
               direction="column"
@@ -215,7 +218,7 @@ function KisanBill() {
               ))}
             </Grid>
           </Grid>
-          <Grid item xs={8}>
+          <Grid item xs={10}>
             <Grid container spacing={2} paddingBottom={2}>
               <Grid item xs={5}>
                 <Controller
@@ -340,7 +343,7 @@ function KisanBill() {
         </Grid>
       </form>
       <div style={{ display: 'none' }}>
-        <KisanBillPrint ref={componentRef} tableData={tableData} formData={formData} />
+        <KisanBillPrint ref={componentRef} tableData={tableData} restructureTable={true} formData={formData} />
       </div>
     </div>
   );

@@ -63,7 +63,7 @@ function Ledger() {
   return (
     <>
       <div className={styles.container}>
-        <h1>LEDGER</h1>
+        <h1>VASULI SHEET</h1>
         <form className={styles.dateFields} onSubmit={handleSubmit(fetch_ledger)}>
           <div className={styles.date}>
             FROM: <input type='date'{...register('fromDate', { required: 'From date is required' })} /><br />
@@ -71,8 +71,8 @@ function Ledger() {
           </div>
           <div className={styles.date}>TO: <input type='date'  {...register('toDate')} /></div>
           <div>
-            <Button variant="contained" color="success" type='submit' >Fetch Ledger</Button>
-            <Button variant="contained" color="success" onClick={() => printLedger()} className={styles.print_btn}>PRINT LEDGER</Button>
+            <Button variant="contained" color="success" type='submit' >Fetch Vasuli Sheet</Button>
+            <Button variant="contained" color="success" onClick={() => printLedger()} className={styles.print_btn}>PRINT VASULI SHEET</Button>
             <ReactToPrint
               trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
               content={() => componentRef.current}

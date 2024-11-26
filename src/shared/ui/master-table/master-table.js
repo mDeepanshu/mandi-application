@@ -34,9 +34,9 @@ function MasterTable(props) {
         // setEditingIndex(index);
         setOpen(true);
         for (let int = 0; int < props.keyArray.length; int++) {
-            if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) {  
-                console.log(keyArray[int],tableData[index]?.[0]?.[keyArray[int]]);
-                setValue(keyArray[int],tableData[index]?.[0]?.[keyArray[int]]);
+            if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) {
+                console.log(keyArray[int], tableData[index]?.[0]?.[keyArray[int]]);
+                setValue(keyArray[int], tableData[index]?.[0]?.[keyArray[int]]);
             }
         }
 
@@ -95,13 +95,19 @@ function MasterTable(props) {
                         {tableData.map((rowData, index) => (
                             <TableRow key={index}>
                                 {keyArray.map((key, i) =>
-                                    <TableCell key={i} align="left">
+                                    <TableCell key={i} align="left" sx={{borderBottom: "none"}}>
                                         {(() => {
                                             switch (key) {
                                                 case "edit":
                                                     return <Button onClick={() => editFromTable(index)}><Edit /></Button>;
                                                 case "delete":
                                                     return <Button onClick={() => deleteFromTable(index)}><Delete /></Button>;
+                                                case "daysExceded":
+                                                    return (
+                                                        <div className={`${styles.myClass} ${rowData[key] > 0 ? styles.daysExceded : styles.daysNotExceded}`}>
+                                                            {rowData[key]}
+                                                        </div>
+                                                    );
                                                 case "index":
                                                     return (page - 1) * 10 + index + 1;
                                                 case "navigation":
@@ -121,31 +127,54 @@ function MasterTable(props) {
                     <Pagination count={totalPages} page={page} onChange={handleChange} />
                 </div>
             </TableContainer>
+            {/* <div >
+                <table className={styles.table}>
+                    <thead>
+                        <tr>
+                            {columns.map((row, index) => (
+                                <th align="left" key={index}>{row}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {tableData.map((rowData, index) => (
+                            <tr key={index}>
+                                {keyArray.map((key, i) =>
+                                    <td key={i} align="left" style={{ borderBottom: "none" }}>
+                                        {(() => {
+                                            switch (key) {
+                                                case "edit":
+                                                    return <button onClick={() => editFromTable(index)}>Edit</button>;
+                                                case "delete":
+                                                    return <button onClick={() => deleteFromTable(index)}>Delete</button>;
+                                                case "daysExceded":
+                                                    return (
+                                                        <div className={`${styles.myClass} ${rowData[key] > 0 ? styles.daysExceded : styles.daysNotExceded}`}>
+                                                            {rowData[key]}
+                                                        </div>
+                                                    );
+                                                case "index":
+                                                    return (page - 1) * 10 + index + 1;
+                                                default:
+                                                    return rowData[key];
+                                            }
+                                        })()}
+                                    </td>
+                                )}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <div className={styles.paginator}>
+                    <Pagination count={totalPages} page={page} onChange={handleChange} />
+                </div>
+            </div> */}
             <div>
                 <Dialog open={open} onClose={handleClose}>
                     <DialogTitle>EDIT DATA</DialogTitle>
                     <DialogContent>
                         <DialogContentText></DialogContentText>
                         <div className={styles.editForm}>
-                            {/* {fields.map((field, i) => (
-                                <div className={styles.formControl} key={field.id}>
-                                    <label>{columns[i]}</label>
-                                    <Controller
-                                        // name={`fields.${i}.itemName`}
-                                        name={`fields.${i}.${keyArray[i]}`}
-                                        control={control}
-                                        render={({ field }) => (
-                                            <TextField
-                                                {...field}
-                                                label={`Field ${i + 1}`}
-                                                // label={fields[0]}
-                                                variant="outlined"
-                                                fullWidth
-                                            />
-                                        )}
-                                    />
-                                </div>
-                            ))} */}
                             {fieldDefinitions.map((fieldDef) => (
                                 <Controller
                                     key={fieldDef.name}

@@ -4,21 +4,19 @@ import { useForm, Controller } from 'react-hook-form';
 import { TextField, Button } from "@mui/material";
 import { Table, Typography, TableBody, TableCell, TableHead, TableRow, InputAdornment, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { addPartyGlobal, getPartyGlobal } from "../../gateway/party-master-apis";
 import SearchIcon from '@mui/icons-material/Search';
-// import { addItem, deleteItem, getAllItems, getItem } from "../../gateway/curdDB";
 import { Delete, AddCircleOutline } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Snackbar from '@mui/material/Snackbar';
-import SharedTable from "../../shared/ui/table/table";
+import { addPartyGlobal, getPartyGlobal } from "../../gateway/party-master-apis";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import styles from "./party-master.module.css";
 
 const PartyMaster = () => {
   // const { handleSubmit, control, getValues } = useForm();
   const [open, setOpen] = useState(false);
-  const { handleSubmit, control, getValues, formState: { errors } } = useForm({
+  const { handleSubmit, control,watch , getValues, formState: { errors } } = useForm({
     defaultValues: {
       partyType: 'KISAN', // Ensure this matches one of the MenuItem values
     },
@@ -26,8 +24,19 @@ const PartyMaster = () => {
   const [tableData, setTableData] = useState([]);
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
 
-  const [partyColumns, setPartyColumns] = useState(["INDEX", "CONTACT", "ID NO", "PARTY NAME", "OWED AMOUNT", "PARTY ID","MAX LOAN DAYS", "PARTY TYPE"]);
-  const [keyArray, setKeyArray] = useState(["index","contact", "idNo", "name", "owedAmount", "partyId","maxLoanDays", "partyType"]);
+  const [partyColumns, setPartyColumns] = useState(["INDEX", "CONTACT", "ID NO", "PARTY NAME", "OWED AMOUNT", "PARTY ID", "MAX LOAN DAYS", "Last Vasuli Date", "Days Exceded", "PARTY TYPE"]);
+  const [keyArray, setKeyArray] = useState(["index", "contact", "idNo", "name", "owedAmount", "partyId", "maxLoanDays", "lastVasuliDate", "daysExceded", "partyType"]);
+  const currentPartyType = watch("partyType", "KISAN");
+
+  const sortOnId = () => {
+    const sortedData = [...tableData].sort((a, b) => a.idNo - b.idNo);
+    setTableData(sortedData); // Update the state with the sorted array
+  };
+
+  const sortOnDaysExceded = () => {
+    const sortedData = [...tableData].sort((a, b) => b.daysExceded - a.daysExceded);
+    setTableData(sortedData); // Update the state with the sorted array
+  };
 
   const fetchItems = async () => {
     try {
@@ -47,6 +56,17 @@ const PartyMaster = () => {
   useEffect(() => {
     fetchItems();
   }, []);
+
+  useEffect(() => {
+    tableData.map((elem) => {
+      const newLastVasuliDate = new Date(elem.lastVasuliDate);
+      const todayDate = new Date();
+      const diffInMs = Math.abs(todayDate - newLastVasuliDate);
+      // Convert milliseconds to days
+      const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24)) - elem.maxLoanDays;
+      elem.daysExceded = diffInDays;
+    })
+  }, [tableData]);
 
   const onSubmit = async (data) => {
     const values = getValues();
@@ -83,6 +103,10 @@ const PartyMaster = () => {
       return;
     }
     setOpen(false);
+  };
+
+  const print = () => {
+   
   };
 
   const action = (
@@ -153,7 +177,7 @@ const PartyMaster = () => {
             control={control}
             rules={{ required: "Enter Vasuli Day Limit" }}
             defaultValue=""
-            render={({ field }) => <TextField {...field} fullWidth label="VASULI DAY LIMIT" variant="outlined"/>}
+            render={({ field }) => <TextField {...field} fullWidth label="VASULI DAY LIMIT" variant="outlined" disabled={currentPartyType == "KISAN"}/>}
           />
           <p className='err-msg'>{errors.vasuliDayLimit?.message}</p>
         </Grid>
@@ -182,9 +206,27 @@ const PartyMaster = () => {
             <AddCircleOutline /> ADD
           </Button>
         </Grid>
-
+        <Grid item xs={0} md={12}>
+          <Grid container spacing={2}>
+            <Grid item xs={0} md={2}>
+              <Button variant="contained" color="primary" fullWidth sx={{ height: '2.438rem' }} onClick={sortOnId}>
+                Sort By Id
+              </Button>
+            </Grid>
+            <Grid item xs={0} md={2}>
+              <Button variant="contained" color="primary" fullWidth sx={{ height: '2.438rem' }} onClick={sortOnDaysExceded}>
+                Sort By Days Exceded
+              </Button>
+            </Grid>
+            <Grid item xs={0} md={2}>
+              <Button variant="contained" color="primary" fullWidth sx={{ height: '2.438rem' }} onClick={print}>
+                Print
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
         <Grid item xs={12}>
-          <MasterTable columns={partyColumns} tableData={tableData} keyArray={keyArray} className={styles.sharedTable}/>
+          <MasterTable columns={partyColumns} tableData={tableData} keyArray={keyArray} className={styles.sharedTable} />
         </Grid>
       </Grid>
       <div>

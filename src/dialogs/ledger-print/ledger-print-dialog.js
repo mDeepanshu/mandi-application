@@ -6,8 +6,8 @@ const LedgerPrint = forwardRef((props, ref) => {
 
     useEffect(() => {
         console.log(props);
-        
-      }, []);
+
+    }, []);
 
     return (
         <div ref={ref}>
@@ -16,32 +16,30 @@ const LedgerPrint = forwardRef((props, ref) => {
                 <div>From Date: {props.formData?.fromDate}</div>
                 <div>To Date: {props.formData?.toDate}</div>
             </div>
-            <TableContainer>
-                <Table aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>INDEX	</TableCell>
-                            <TableCell align="right">PARTY NAME	</TableCell>
-                            <TableCell align="right">OPENING AMOUNT	</TableCell>
-                            <TableCell align="right">DAY BILL	</TableCell>
-                            <TableCell align="right">CLOSING AMOUNT</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {props.tableData?.map((row, index) => (
-                            <TableRow key={index}>
-                                <TableCell component="th" scope="row">
-                                    {index+1}
-                                </TableCell>
-                                <TableCell align="right">{row.partyName}</TableCell>
-                                <TableCell align="right">{row.openingAmount}</TableCell>
-                                <TableCell align="right">{row.dayBill}</TableCell>
-                                <TableCell align="right">{row.closingAmount}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>INDEX</th>
+                        <th>PARTY NAME</th>
+                        <th>OPENING AMOUNT</th>
+                        <th>DAY BILL</th>
+                        <th>CLOSING AMOUNT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {props.tableData?.map((row, index) => (
+                        <tr key={index}>
+                            <td component="th" scope="row">
+                                {index + 1}
+                            </td>
+                            <td align="right">{row.partyName}</td>
+                            <td align="right">{row.openingAmount}</td>
+                            <td align="right">{row.dayBill}</td>
+                            <td align="right">{row.closingAmount}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 });

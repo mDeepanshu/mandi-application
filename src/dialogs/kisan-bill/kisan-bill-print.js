@@ -1,7 +1,31 @@
-import React, { forwardRef,useEffect  } from 'react';
+import React, { forwardRef,useEffect,useState  } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
 import styles from "./kisan-bill-print.module.css";
 const KisanBillPrint = forwardRef((props, ref) =>{
+
+  const [printTable,setPrintTable] = useState([]);
+  
+  useEffect(() => {
+    
+    
+    if(props.restructureTable){
+      let arr=[];
+      props.tableData.forEach(element => {
+        arr.push(element[0]);
+      });
+      for (let index = 1; index < arr.length; index++) {
+        if (arr[index-1].rate==arr[index].rate) {
+          arr[index].quantity+=arr[index-1].quantity;
+          arr[index].itemTotal+=arr[index-1].itemTotal;
+          arr[index].bag+=arr[index-1].bag;
+          arr.slice(index-1,1);
+        }
+      }
+      setPrintTable(arr);
+    }else{
+      setPrintTable(props.tableData);
+    } 
+  }, [props]);
 
     return (
         <div ref={ref}>
@@ -32,7 +56,7 @@ const KisanBillPrint = forwardRef((props, ref) =>{
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {props.tableData?.map((row,index) => (
+                  {printTable?.map((row,index) => (
                     <TableRow key={index}>
                       <TableCell component="th" scope="row">
                         {row.itemName}
@@ -40,7 +64,7 @@ const KisanBillPrint = forwardRef((props, ref) =>{
                       <TableCell align="right">{row.bag}</TableCell>
                       <TableCell align="right">{row.rate}</TableCell>
                       <TableCell align="right">{row.quantity}</TableCell>
-                      <TableCell align="right">{row.total}</TableCell>
+                      <TableCell align="right">{row.itemTotal}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

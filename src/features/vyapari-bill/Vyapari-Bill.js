@@ -21,9 +21,9 @@ function VyapariBill() {
   const { register, handleSubmit, control, formState: { errors }, getValues, trigger, setValue } = useForm();
   const [vyapariList, setVyapariList] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const [vyapariTableColumns, setVyapariTableColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Edit", "Delete", "Updated Tran."]);
+  const [vyapariTableColumns, setVyapariTableColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total","Date","Kisan Name", "Edit", "Delete", "Updated Tran."]);
   const [formData, setFormData] = useState();
-  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", 'itemTotal', "edit", "delete", "navigation"]);
+  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", 'itemTotal',"auctionDate","partyName", "edit", "delete", "navigation"]);
 
 
 
@@ -64,13 +64,18 @@ function VyapariBill() {
     getVyapariNames();
   }, []);
 
-  useEffect(() => {
-    if (formData) {
-      if (triggerRef.current) {
-        triggerRef.current.click();
-      }
-    }
-  }, [formData]);
+  // useEffect(() => {
+  //   if (formData) {
+  //     if (triggerRef.current) {
+  //       triggerRef.current.click();
+  //     }
+  //   }
+  // }, [formData]);
+
+  const printBill = () => {
+    triggerRef.current.click();
+
+  }
 
   const saveBill = async () => {
     let tableSnapshot=[];
@@ -197,7 +202,7 @@ function VyapariBill() {
                 <Button variant="contained" color="primary" fullWidth onClick={saveBill}>Save Bill</Button>
               </Grid>
               <Grid item xs={2}>
-                <Button variant="contained" color="success" type='submit' fullWidth>Print</Button>
+                <Button variant="contained" color="success" type='button' onClick={()=>printBill()} fullWidth>Print</Button>
                 <ReactToPrint
                   trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
                   content={() => componentRef.current}
@@ -208,7 +213,7 @@ function VyapariBill() {
         </Grid>
       </form>
       <div style={{ display: 'none' }}>
-        <VyapariBillPrint ref={componentRef} tableData={tableData} formData={formData} />
+        <VyapariBillPrint ref={componentRef} tableData={tableData} formData={formData} restructureTable={true}/>
       </div>
     </div>
   );

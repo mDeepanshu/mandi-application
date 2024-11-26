@@ -1,4 +1,7 @@
-.table {}
+.table {
+    width: 100%;
+    padding-top: 15px;
+}
 
 .editForm {
     display: flex;
@@ -26,4 +29,22 @@
     display: flex;
     justify-content: right;
     padding-right: 1rem;
+}
+
+.daysExceded{
+    display: block;
+    width: 40px;
+    background-color: rgb(211, 78, 78);
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.daysNotExceded{
+    display: block;
+    width: 40px;
+    background-color: rgb(86, 182, 98);
+    color: white;
+    text-align: center;
+    border-radius: 5px;
 }
