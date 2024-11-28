@@ -21,7 +21,7 @@ function MasterTable(props) {
     const [fieldDefinitions, setFieldDefinitions] = useState([]);
 
     const { control, handleSubmit, register, reset, formState: { errors }, setValue, getValues } = useForm();
-
+    let tableHeight = "";
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -82,12 +82,12 @@ function MasterTable(props) {
 
     return (
         <div>
-            <TableContainer component={Paper} className={styles.table}>
-                <Table aria-label="simple table">
+            <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
+                <Table stickyHeader aria-label="simple table">
                     <TableHead>
                         <TableRow>
                             {columns.map((row, index) => (
-                                <TableCell align="left" key={index}>{row}</TableCell>
+                                <TableCell align="left" key={index}><b>{row}</b></TableCell>
                             ))}
                         </TableRow>
                     </TableHead>
@@ -95,7 +95,7 @@ function MasterTable(props) {
                         {tableData.map((rowData, index) => (
                             <TableRow key={index}>
                                 {keyArray.map((key, i) =>
-                                    <TableCell key={i} align="left" sx={{borderBottom: "none"}}>
+                                    <TableCell key={i} align="left" sx={{ borderBottom: "none" }}>
                                         {(() => {
                                             switch (key) {
                                                 case "edit":
@@ -123,10 +123,10 @@ function MasterTable(props) {
                         ))}
                     </TableBody>
                 </Table>
-                <div className={styles.paninator}>
-                    <Pagination count={totalPages} page={page} onChange={handleChange} />
-                </div>
             </TableContainer>
+            <div className={styles.paninator}>
+                <Pagination count={totalPages} page={page} onChange={handleChange} />
+            </div>
             {/* <div >
                 <table className={styles.table}>
                     <thead>
@@ -136,7 +136,7 @@ function MasterTable(props) {
                             ))}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className={styles.tableBody}>
                         {tableData.map((rowData, index) => (
                             <tr key={index}>
                                 {keyArray.map((key, i) =>

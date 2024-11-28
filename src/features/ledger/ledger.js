@@ -55,8 +55,6 @@ function Ledger() {
   }, []);
 
   const printLedger = () => {
-    console.log(getValues());
-    
     triggerRef.current.click();
   }
 

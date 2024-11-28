@@ -1,8 +1,3 @@
-.table {
-    width: 100%;
-    padding-top: 15px;
-}
-
 .editForm {
     display: flex;
     flex-wrap: wrap;
@@ -29,6 +24,7 @@
     display: flex;
     justify-content: right;
     padding-right: 1rem;
+    padding-top: 5px;
 }
 
 .daysExceded{
@@ -48,3 +44,4 @@
     text-align: center;
     border-radius: 5px;
 }
+
