@@ -115,7 +115,9 @@ function KisanBill() {
       let formValues = getValues();
       const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
       if (billData) {
-        setTableData(billData?.responseBody?.bills);
+        const auctionList = billData?.responseBody?.bills;
+        console.log("auctionList",auctionList);
+        setTableData(auctionList);
         const billConstant = billData?.responseBody;
         delete billConstant.bills;
         reset({ ...getValues(), ...billConstant });
@@ -144,15 +146,9 @@ function KisanBill() {
   }, [formData]);
 
   const editFromTable = (index) => {
-    // const newRows = [...buyItemsArr];
-    // newRows.splice(index, 1);
-    // setTableData(newRows);
   }
 
   const deleteFromTable = (index) => {
-    // const newRows = [...buyItemsArr];
-    // newRows.splice(index, 1);
-    // setTableData(newRows);
   }
 
   const saveBill = async () => {
@@ -181,7 +177,6 @@ function KisanBill() {
       delete billConstant.bills;
       reset({ ...getValues(), ...billConstant });
     }
-    
   }
 
   return (
@@ -279,7 +274,7 @@ function KisanBill() {
               </Grid>
             </Grid>
             <TableContainer component={Paper} className='bill-table'>
-              <SharedTable columns={kisanBillColumnsColumns} tableData={tableData} keyArray={keyArray}  refreshBill={refreshBill}/>
+              <SharedTable columns={kisanBillColumnsColumns} tableData={structuredClone(tableData)} keyArray={keyArray}  refreshBill={refreshBill}/>
             </TableContainer>
             <Grid container spacing={2} justifyContent="flex-end" p={2}>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
@@ -331,7 +326,7 @@ function KisanBill() {
                   <Button variant="contained" color="primary" fullWidth onClick={saveBill}>Save Bill</Button>
                 </Grid>
                 <Grid item xs={3}>
-                  <Button variant="contained" color="success" type='submit' fullWidth>Save & Print</Button>
+                  <Button variant="contained" color="success" type='submit' fullWidth>Print</Button>
                   <ReactToPrint
                     trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
                     content={() => componentRef.current}
@@ -343,7 +338,7 @@ function KisanBill() {
         </Grid>
       </form>
       <div style={{ display: 'none' }}>
-        <KisanBillPrint ref={componentRef} tableData={tableData} restructureTable={true} formData={formData} />
+        <KisanBillPrint ref={componentRef} tableDataPrint={structuredClone(tableData)} restructureTable={true} formData={formData} />
       </div>
     </div>
   );

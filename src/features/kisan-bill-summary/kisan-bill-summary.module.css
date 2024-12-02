@@ -1,0 +1,36 @@
+.container{
+    padding: 5px 15px;
+    display: flex;
+    flex-direction: column; 
+}
+
+h1{
+    width: 100%;
+}
+
+.date{
+    width: 30%;
+}
+
+.tableContainer {
+    width: 100%;
+}
+
+.dateFields {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.print_btn {
+    /* padding-left: 5px; */
+    margin-left: 5px;
+    /* padding-left: 30px; */
+}
+
+.totals{
+    display: flex;
+    gap: 5px;
+    justify-content: center; /* Align items horizontally */
+    padding-bottom: 5px;
+}

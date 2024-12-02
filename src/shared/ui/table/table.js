@@ -61,6 +61,8 @@ function SharedTable(props) {
 
 
     useEffect(() => {
+        console.log(props);
+
         if (props.tableData.length) {
             console.log(props);
 
@@ -96,7 +98,7 @@ function SharedTable(props) {
     const updateRecord = async (saveAndReflect) => {
 
         if (saveAndReflect) {
-            let changedValues = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues(), auctionDate:new Date() };
+            let changedValues = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues(), auctionDate: new Date() };
             const updateRes = await updateAuctionTransaction(changedValues);
             props.refreshBill();
             handleClose();
@@ -112,15 +114,15 @@ function SharedTable(props) {
             if (editedData.itemTotal) {
                 finalEdit = {
                     ...editedData,
-                    itemTotal:Number(editedData.rate)*Number(editedData.quantity),
+                    itemTotal: Number(editedData.rate) * Number(editedData.quantity),
                 }
             } else {
                 finalEdit = {
                     ...editedData,
-                    total:Number(editedData.rate)*Number(editedData.quantity),
+                    total: Number(editedData.rate) * Number(editedData.quantity),
                 }
             }
-            
+
             const updatedObject = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...finalEdit };
             console.log(updatedObject);
             let previousTableData = tableData[editingIndex].push(updatedObject);
@@ -138,48 +140,48 @@ function SharedTable(props) {
 
     return (
         <div>
-            <TableContainer component={Paper} className={styles.table}>
-                <Table aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            {columns.map((row, index) => (
-                                <TableCell align="left" key={index}>{row}</TableCell>
-                            ))}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {tableData?.map((rowData, index) => {
-                            return (<TableRow key={index}>
-                                {keyArray.map((key, i) =>
-                                    <TableCell key={i} align="left">
-                                        {(() => {
-                                            switch (key) {
-                                                case "edit":
-                                                    return <Button onClick={() => editFromTable(index)}><Edit /></Button>;
-                                                case "delete":
-                                                    return <Button onClick={() => deleteFromTable(index)}><Delete /></Button>;
-                                                case "index":
-                                                    return (page - 1) * 10 + index + 1;
-                                                case "navigation":
-                                                    if (rowData.length > 1) {
-                                                        return <>
-                                                            <Button disabled={rowVariables[index] === 0} onClick={() => handleNavigationClick(index, -1)}><ArrowBackIos /></Button>
-                                                            <Button disabled={rowVariables[index] === rowData.length - 1} onClick={() => handleNavigationClick(index, +1)}><ArrowForwardIos /></Button>
-                                                        </>;
-                                                    } else {
-                                                        return "No Edit History";
-                                                    }
-                                                default:
-                                                    return rowData[rowVariables[index]][key];
-                                            }
-                                        })()}
-                                    </TableCell>
-                                )}
-                            </TableRow>)
-                        })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            {/* <TableContainer component={Paper} sx={{ maxHeight: 280 }}> */}
+            <Table stickyHeader aria-label="simple table">
+                <TableHead>
+                    <TableRow>
+                        {columns.map((row, index) => (
+                            <TableCell align="left" key={index}>{row}</TableCell>
+                        ))}
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {tableData?.map((rowData, index) => {
+                        return (<TableRow key={index}>
+                            {keyArray.map((key, i) =>
+                                <TableCell key={i} align="left">
+                                    {(() => {
+                                        switch (key) {
+                                            case "edit":
+                                                return <Button onClick={() => editFromTable(index)}><Edit /></Button>;
+                                            case "delete":
+                                                return <Button onClick={() => deleteFromTable(index)}><Delete /></Button>;
+                                            case "index":
+                                                return (page - 1) * 10 + index + 1;
+                                            case "navigation":
+                                                if (rowData.length > 1) {
+                                                    return <>
+                                                        <Button disabled={rowVariables[index] === 0} onClick={() => handleNavigationClick(index, -1)}><ArrowBackIos /></Button>
+                                                        <Button disabled={rowVariables[index] === rowData.length - 1} onClick={() => handleNavigationClick(index, +1)}><ArrowForwardIos /></Button>
+                                                    </>;
+                                                } else {
+                                                    return "No Edit History";
+                                                }
+                                            default:
+                                                return rowData[rowVariables[index]][key];
+                                        }
+                                    })()}
+                                </TableCell>
+                            )}
+                        </TableRow>)
+                    })}
+                </TableBody>
+            </Table>
+            {/* </TableContainer> */}
             <div className={styles.paninator}>
                 <Pagination count={totalPages} page={page} onChange={handleChange} />
             </div>

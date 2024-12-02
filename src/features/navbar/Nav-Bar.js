@@ -10,6 +10,7 @@ const navItems = [
     { name: 'item-master', label: 'Item Master' },
     { name: 'party-master', label: 'Party Master' },
     { name: 'ledger', label: 'Ledger' },
+    { name: 'kisan-bill-summry', label: 'Kisan Bill Summry' },
 ];
 const drawerWidth = 240;
 

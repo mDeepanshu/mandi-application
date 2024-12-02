@@ -4,28 +4,38 @@ import styles from "./kisan-bill-print.module.css";
 const KisanBillPrint = forwardRef((props, ref) =>{
 
   const [printTable,setPrintTable] = useState([]);
+  const [localTable,setLocalTable] = useState([]);
   
   useEffect(() => {
-    
-    
+    setLocalTable(props.tableDataPrint);
+  }, [props]);
+
+  useEffect(() => {
     if(props.restructureTable){
       let arr=[];
-      props.tableData.forEach(element => {
-        arr.push(element[0]);
-      });
+      if (props.fromPreviousBill) {
+        arr=localTable;
+      } else {
+        localTable?.forEach(element => {
+          arr.push(element[0]);
+        });
+      }
       for (let index = 1; index < arr.length; index++) {
-        if (arr[index-1].rate==arr[index].rate) {
+        if (arr[index-1].rate==arr[index].rate && arr[index-1].itemName==arr[index].itemName) {
+          
           arr[index].quantity+=arr[index-1].quantity;
           arr[index].itemTotal+=arr[index-1].itemTotal;
           arr[index].bag+=arr[index-1].bag;
-          arr.slice(index-1,1);
+          arr.splice(index-1,1);
+          index--;
         }
       }
       setPrintTable(arr);
     }else{
-      setPrintTable(props.tableData);
+      setPrintTable(props.tableDataPrint);
     } 
-  }, [props]);
+  }, [localTable]);
+
 
     return (
         <div ref={ref}>

@@ -12,6 +12,8 @@ export const submitKisanBill = async (post) => {
 export const getKisanBill = async (kisanId, date) => {
   try {
     const response = await axiosHttp.get(`/kisan/generateBill?kisanId=${kisanId}&date=${date}`);
+    console.log('response',response);
+    
     return response.data;
   } catch (error) {
     console.error('Error posting data:', error);
@@ -21,6 +23,15 @@ export const getKisanBill = async (kisanId, date) => {
 export const saveKisanBill = async (bill) => {
   try {
     const response = await axiosHttp.post(`/kisan-bill`,bill);
+    return response.data;
+  } catch (error) {
+    console.error('Error posting data:', error);
+  }
+};
+
+export const kisanBillSummary = async (startDate,endDate) => {
+  try {
+    const response = await axiosHttp.get(`/kisan/kisanBillPaymentSummary?startDate=${startDate}&endDate=${endDate}`);
     return response.data;
   } catch (error) {
     console.error('Error posting data:', error);

@@ -34,7 +34,8 @@ function PreviousBillsDialog(props) {
 
 
     const PrintKisanBill = () => {
-
+        console.log(props);
+        
         setTableData(props?.billData?.content?.[0]?.kisanBillItems);
         setTotalBills(props?.billData?.size);
 
@@ -64,7 +65,7 @@ function PreviousBillsDialog(props) {
             </div>
             <div>
                 {partyType === "kisan" ? (
-                    <KisanBillPrint formData={formData} tableData={tableData} />
+                    <KisanBillPrint formData={formData} tableDataPrint={tableData} restructureTable={true} fromPreviousBill={true}/>
                 ) : (
                     <VyapariBillPrint tableData={tableData} formData={formData}/>
                 )}
