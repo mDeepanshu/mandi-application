@@ -116,7 +116,6 @@ function KisanBill() {
       const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
       if (billData) {
         const auctionList = billData?.responseBody?.bills;
-        console.log("auctionList",auctionList);
         setTableData(auctionList);
         const billConstant = billData?.responseBody;
         delete billConstant.bills;
@@ -136,8 +135,6 @@ function KisanBill() {
   }, []);
 
   useEffect(() => {
-    console.log("formData",formData);
-    
     if (formData) {
       if (triggerRef.current) {
         triggerRef.current.click();
@@ -155,22 +152,18 @@ function KisanBill() {
     // const saveRes = saveKisanBill();
     let tableSnapshot=[];
     tableData.forEach(element => {
-      console.log(element);
       
       tableSnapshot.push(element[0]);
     });
     const bill = {...getValues(), kisanBillItems:tableSnapshot,kisanId:getValues().kisan.partyId,kisanName:getValues().kisan.name,billDate:getValues().date};
     delete bill.kisan;
     delete bill.date;
-    console.log(bill);
     saveKisanBill(bill);
   }
 
   const refreshBill = async () => {
-    console.log("Pop");
     let formValues = getValues();
     const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
-    console.log(billData);
     if (billData) {
       setTableData(billData?.responseBody?.bills);
       const billConstant = billData?.responseBody;

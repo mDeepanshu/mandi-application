@@ -12,27 +12,21 @@ function PreviousBills(props) {
     const [open, setOpen] = useState(false);
     const [openErr, setOpenErr] = useState(false);
     const [billData, setBillData] = useState(false);
-
-    useEffect(() => {
-        console.log(props);
-
-    }, [props]);
+    const [totalPreviousBills, setTotalPreviousBills] = useState(0);
 
     const handleClickToOpen = async () => {
         // getBillVersions(props.id,"2024-11-07",0);
-        console.log(props);
 
-        console.log(props.billData?.id, props.billData?.date);
         let billDetails;
-        if (props.partyType == "kisan") billDetails = await getKisanBillVersions(props.billData?.id, props.billData?.date, 0);
-        else billDetails = await getVyapariBillVersions(props.billData?.id, props.billData?.date, 0);
-
-        
-
-        console.log(billDetails);
+        if (props.partyType == "kisan") {
+            billDetails = await getKisanBillVersions(props.billData?.id, props.billData?.date, 0);
+        }
+        else {
+            billDetails = await getVyapariBillVersions(props.billData?.id, props.billData?.date, 0);
+        }
 
         if (billDetails.responseBody) {
-            console.log(billDetails);
+            setTotalPreviousBills(billDetails?.responseBody?.totalPages);
             setOpen(true);
             setBillData(billDetails.responseBody);
         } else {
@@ -55,7 +49,7 @@ function PreviousBills(props) {
             </div>
             <div>
                 <Dialog open={open} onClose={handleToClose}>
-                    <PreviousBillsDialog billData={billData} partyType={props.partyType}/>
+                    <PreviousBillsDialog billData={billData} partyType={props.partyType} totalPreviousBills={totalPreviousBills}/>
                 </Dialog>
                 <Dialog open={openErr} onClose={handleToClose}>
                     <div className={styles.noBills}>No Previous Bills</div>

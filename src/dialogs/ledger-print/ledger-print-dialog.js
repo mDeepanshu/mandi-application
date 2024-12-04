@@ -2,11 +2,6 @@ import React, { forwardRef, useEffect } from 'react';
 import "./ledgerPrint.module.css";
 const LedgerPrint = forwardRef((props, ref) => {
 
-    useEffect(() => {
-        console.log(props);
-
-    }, []);
-
     return (
         <div ref={ref}>
             <h1 className='heading'>Ledger</h1>

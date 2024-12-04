@@ -3,11 +3,6 @@ import "./partyPrint.module.css";
 
 const PartyPrint = forwardRef((props, ref) => {
 
-
-    useEffect(() => {
-        console.log("table");
-    }, [props]);
-
     return (
         <div ref={ref}>
             <h1 className='heading'>Party Print</h1>

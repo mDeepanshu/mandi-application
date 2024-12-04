@@ -41,7 +41,6 @@ function VyapariBill() {
     if (isValid) {
       const formValues = getValues();
       const billData = await getVyapariBill(formValues.vyapari_name.partyId, formValues.date);
-      console.log(billData);
       
       setTableData(billData?.responseBody?.billList);
       setValue("previous_remaining", billData?.responseBody?.currentOutstanding);
@@ -82,19 +81,15 @@ function VyapariBill() {
     tableData.forEach(element => {
       tableSnapshot.push(element[0]);
     });
-    console.log(getValues());
-    
     const bill = {...getValues(), vyapariBillItems:tableSnapshot,vyapariId:getValues()?.vyapari_name?.partyId,vyapariName:getValues().vyapari_name?.name,billDate:getValues()?.date};
     delete bill.vyapari_name;
     delete bill.date;
     saveVyapariBill(bill);
-    console.log(bill);
   }
 
   const refreshBill = async () => {
     let formValues = getValues();
     const billData = await getVyapariBill(formValues.vyapari_name.partyId, formValues.date);
-    console.log(billData);
     if (billData) {
       setTableData(billData?.responseBody?.billList);
       const billConstant = billData?.responseBody;

@@ -26,7 +26,6 @@ function Ledger() {
   }
 
   const getLedgerData = async (fromDate, toDate = null) => {
-    console.log(fromDate, toDate);
     let data;
     if (toDate) {
       data = {
@@ -37,7 +36,6 @@ function Ledger() {
 
     const ledger = await getLedger(data);
     if (ledger) {
-      console.log(ledger);
       setTableData(ledger.responseBody);
     }
 
@@ -48,7 +46,6 @@ function Ledger() {
       const date = new Date();
       const formattedDate = date.toISOString().slice(0, 10);
       const ledgerData = await getLedgerData(formattedDate);
-      console.log(ledgerData);
     };
 
     init();
@@ -69,7 +66,7 @@ function Ledger() {
           </div>
           <div className={styles.date}>TO: <input type='date'  {...register('toDate')} /></div>
           <div>
-            <Button variant="contained" color="success" type='submit' >Fetch Vasuli Sheet</Button>
+            <Button variant="contained" color="success" type='submit' >Fetch Vasuli Sheet</Button>&nbsp;
             <Button variant="contained" color="success" onClick={() => printLedger()} className={styles.print_btn}>PRINT VASULI SHEET</Button>
             <ReactToPrint
               trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}

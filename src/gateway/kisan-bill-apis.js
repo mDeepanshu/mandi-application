@@ -12,8 +12,6 @@ export const submitKisanBill = async (post) => {
 export const getKisanBill = async (kisanId, date) => {
   try {
     const response = await axiosHttp.get(`/kisan/generateBill?kisanId=${kisanId}&date=${date}`);
-    console.log('response',response);
-    
     return response.data;
   } catch (error) {
     console.error('Error posting data:', error);

@@ -61,10 +61,8 @@ function SharedTable(props) {
 
 
     useEffect(() => {
-        console.log(props);
 
         if (props.tableData.length) {
-            console.log(props);
 
             setColumns(props.columns);
             setRowVariables(Array(props.tableData.length).fill(0));
@@ -91,7 +89,6 @@ function SharedTable(props) {
 
     const handleChange = (event, value) => {
         setPage(value);
-        console.log(value);
         setTableData(allTableData.slice(value * 10, value * 10 + 10));
     };
 
@@ -124,10 +121,8 @@ function SharedTable(props) {
             }
 
             const updatedObject = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...finalEdit };
-            console.log(updatedObject);
             let previousTableData = tableData[editingIndex].push(updatedObject);
             // previousTableData[editingIndex][tableData[editingIndex].length - 1] = updatedObject;
-            console.log(previousTableData);
             // setTableData(previousTableData);
             handleClose();
         }
