@@ -1,0 +1,87 @@
+import React, { useEffect, useState, useRef } from 'react';
+import { Grid } from "@mui/material";
+import { useForm, Controller } from 'react-hook-form';
+import { TextField, Button } from "@mui/material";
+import ReactToPrint from 'react-to-print';
+
+import { getVyapariVasuliSheet } from '../../gateway/vyapari-vasuli-sheet-apis';
+import MasterTable from "../../shared/ui/master-table/master-table";
+import VyapariVasuliPrint from "../../dialogs/vyapari-vasuli-print/vyapari-vasuli-print";
+
+import styles from "./vyapari-vasuli-sheet.module.css";
+
+function VyapariVasuliSheet() {
+
+  const componentRef = useRef();
+  const triggerRef = useRef();
+
+  const [tableData, setTableData] = useState([]);
+  const [ledgerColumns, setledgerColumns] = useState(["INDEX", "PARTY NAME", "OPENING AMOUNT", "DAY BILL", "CLOSING AMOUNT"]);
+  const [keyArray, setKeyArray] = useState(["index", "partyName", "openingAmount", "dayBill", "closingAmount"]);
+
+  const { register, handleSubmit, formState: { errors }, getValues } = useForm();
+
+  const fetch_ledger = async (data) => {
+    const { fromDate, toDate } = data;
+    getLedgerData(fromDate, toDate);
+  }
+
+
+  const getLedgerData = async (fromDate, toDate = null) => {
+    let data;
+    if (toDate) {
+      data = {
+        startDate: fromDate,
+        endDate: toDate,
+      }
+    } else data = { startDate: fromDate }
+
+    const ledger = await getVyapariVasuliSheet(data);
+    if (ledger) {
+      setTableData(ledger.responseBody);
+    }
+
+  }
+
+  useEffect(() => {
+    const init = async () => {
+      const date = new Date();
+      const formattedDate = date.toISOString().slice(0, 10);
+      const ledgerData = await getLedgerData(formattedDate);
+    };
+
+    init();
+  }, []);
+
+  const printLedger = () => {
+    triggerRef.current.click();
+  }
+
+  return (
+    <>
+      <div className={styles.container}>
+        <h1>VASULI SHEET</h1>
+        <form className={styles.dateFields} onSubmit={handleSubmit(fetch_ledger)}>
+          <div className={styles.date}>
+            FROM: <input type='date'{...register('fromDate', { required: 'From date is required' })} /><br />
+            {errors.fromDate && <span className="error">{errors.fromDate.message}</span>}
+          </div>
+          <div>
+            <Button variant="contained" color="success" type='submit' >Fetch Vasuli Sheet</Button>&nbsp;
+            <Button variant="contained" color="success" type="button" onClick={() => printLedger()} className={styles.print_btn}>PRINT VASULI SHEET</Button>
+            <ReactToPrint
+              trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
+              content={() => componentRef.current}
+            />
+          </div>
+        </form>
+        <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} />
+      </div>
+      <div style={{ display: 'none' }}>
+        <VyapariVasuliPrint ref={componentRef} tableData={tableData} formData={getValues()} />
+      </div>
+    </>
+  );
+}
+
+export default VyapariVasuliSheet;

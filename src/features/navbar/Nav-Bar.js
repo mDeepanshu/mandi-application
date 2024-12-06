@@ -11,6 +11,7 @@ const navItems = [
     { name: 'party-master', label: 'Party Master' },
     { name: 'ledger', label: 'Ledger' },
     { name: 'kisan-bill-summry', label: 'Kisan Bill Summry' },
+    { name: 'vyapari-vasuli-sheet', label: 'Vyapari Vasuli Sheet' },
 ];
 const drawerWidth = 240;
 

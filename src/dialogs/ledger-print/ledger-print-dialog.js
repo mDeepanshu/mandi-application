@@ -13,10 +13,10 @@ const LedgerPrint = forwardRef((props, ref) => {
                 <thead>
                     <tr>
                         <th>INDEX</th>
-                        <th>PARTY NAME</th>
-                        <th>OPENING AMOUNT</th>
-                        <th>DAY BILL</th>
-                        <th>CLOSING AMOUNT</th>
+                        <th>DATE</th>
+                        <th>ITEM NAME</th>
+                        <th>CREDIT</th>
+                        <th>DEBIT</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,10 +25,10 @@ const LedgerPrint = forwardRef((props, ref) => {
                             <td component="th" scope="row">
                                 {index + 1}
                             </td>
-                            <td align="right">{row.partyName}</td>
-                            <td align="right">{row.openingAmount}</td>
-                            <td align="right">{row.dayBill}</td>
-                            <td align="right">{row.closingAmount}</td>
+                            <td align="right">{row.date}</td>
+                            <td align="right">{row.itemName}</td>
+                            <td align="right">{row.cr}</td>
+                            <td align="right">{row.dr}</td>
                         </tr>
                     ))}
                 </tbody>

@@ -25,7 +25,9 @@ function VyapariBill() {
   const [formData, setFormData] = useState();
   const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", 'itemTotal',"auctionDate","partyName", "edit", "delete", "navigation"]);
 
-
+  useEffect(() => {
+    getVyapariNames();
+  }, []);
 
   const onSubmit = async (data) => {
     const billDetails = {
@@ -59,9 +61,7 @@ function VyapariBill() {
   // const deleteFromTable = (index) => {
   // }
 
-  useEffect(() => {
-    getVyapariNames();
-  }, []);
+
 
   // useEffect(() => {
   //   if (formData) {

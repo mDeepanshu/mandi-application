@@ -42,9 +42,8 @@ const ItemMaster = () => {
 
   const onItemInput = (event, field) => {
     field.onChange(event);  // Update the value in react-hook-form
-    setTableDataFiltered(tableData.filter(elem => elem.name.includes(event.target.value)));
+    setTableDataFiltered(tableData.filter(elem => elem.name.toLowerCase().includes((event.target.value).toLowerCase())));
   }
-
   const deleteFromTable = (index) => {
     const newRows = [...tableData];
     newRows.splice(index, 1);
@@ -123,7 +122,7 @@ const ItemMaster = () => {
 
         <Grid item xs={12}>
           <div className='table-container'>
-            <MasterTable columns={itemsColumns} tableData={tableData} keyArray={keyArray} />
+            <MasterTable columns={itemsColumns} tableData={tableDataFiltered} keyArray={keyArray} />
           </div>
         </Grid>
       </Grid>

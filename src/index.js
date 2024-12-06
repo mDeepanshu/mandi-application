@@ -10,6 +10,7 @@ import ItemMaster from "./features/item-master/Item-Master";
 import PartyMaster from "./features/party-master/Party-Master";
 import Ledger from "./features/ledger/ledger";
 import KisanBillSummary from "./features/kisan-bill-summary/kisanBillSummary";
+import VyapariVasuliSheet  from "./features/vyapari-vasuli-sheet/Vyapari-Vasuli-Sheet";
 
 const router = createBrowserRouter([
 	{
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
 			{
 				path: 'kisan-bill-summry',
 				element: <KisanBillSummary />
+			},
+			{
+				path: 'vyapari-vasuli-sheet',
+				element: <VyapariVasuliSheet />
 			},
 		],
 		// errorElement: <Error />

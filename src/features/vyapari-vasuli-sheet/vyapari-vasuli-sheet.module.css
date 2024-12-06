@@ -7,28 +7,23 @@
 h1{
     width: 100%;
 }
-.dateFields {
-    width: 100%;
-    display: flex;
-    align-items: center;
-}
 
 .date{
-    width: 15%;
+    width: 30%;
 }
 
 .tableContainer {
     width: 100%;
 }
 
+.dateFields {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
 
 .print_btn {
     /* padding-left: 5px; */
     margin-left: 5px;
     /* padding-left: 30px; */
-}
-
-.vyapariName{
-    width: 25%;
-    padding-right: 15px;
 }

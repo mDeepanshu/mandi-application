@@ -67,7 +67,7 @@ const PartyMaster = () => {
 
   const onPartyInput = (event, field) => {
     field.onChange(event);  // Update the value in react-hook-form
-    setTableDataFiltered(tableData.filter(elem => elem.name.toLowerCase().includes(event.target.value.toLowerCase())));
+    setTableDataFiltered(tableData.filter(elem => elem.name.toLowerCase().includes(event.target.value)));
   }
 
   useEffect(() => {
