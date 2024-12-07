@@ -44,14 +44,7 @@ function Ledger() {
   }
 
   useEffect(() => {
-    const init = async () => {
       getVyapariNames();
-      const date = new Date();
-      const formattedDate = date.toISOString().slice(0, 10);
-      const ledgerData = await getLedgerData(formattedDate);
-    };
-
-    init();
   }, []);
 
   const printLedger = () => {
@@ -62,7 +55,7 @@ function Ledger() {
     <>
       <div className={styles.container}>
         <h1>LEDGER</h1>
-        <form className={styles.dateFields} onSubmit={handleSubmit(fetch_ledger)}>
+        <form className={styles.dateFields} onSubmit={(e) => e.preventDefault()}>
           <div className={styles.vyapariName}>
             <div>
               <Controller
@@ -107,8 +100,8 @@ function Ledger() {
             {errors.fromDate && <span className="error">{errors.toDate.message}</span>}
           </div>
           <div>
-            <Button variant="contained" color="success" type='submit' >FETCH LEDGER</Button>&nbsp;
-            <Button variant="contained" color="success" onClick={() => printLedger()} className={styles.print_btn}>PRINT LEDGER</Button>
+            <Button variant="contained" color="success" type='button' onClick={() => fetch_ledger(getValues())} >FETCH LEDGER</Button>&nbsp;
+            <Button variant="contained" color="success" type='button' onClick={() => printLedger()} className={styles.print_btn}>PRINT LEDGER</Button>
             <ReactToPrint
               trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
               content={() => componentRef.current}

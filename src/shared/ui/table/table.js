@@ -25,8 +25,10 @@ function SharedTable(props) {
     const [sync, setSync] = useState({});
     const [openSync, setOpenSync] = useState(false);
 
-    const { control, handleSubmit, register, reset, formState: { errors }, setValue, getValues } = useForm();
+    const { control, formState: { errors }, setValue, getValues } = useForm();
     const [rowVariables, setRowVariables] = useState([]);
+
+    const excludeArr = ["edit", "delete", "index", "navigation", "auctionDate","partyName"];
 
     const handleNavigationClick = (rowIndex, direction) => {
         setRowVariables(prev => {
@@ -43,12 +45,13 @@ function SharedTable(props) {
         setOpen(false);
     };
 
-    const editFromTable = (index) => {
+    const editFromTable = (index,tranIdx) => {
         setEditingIndex(index);
         setOpen(true);
         for (let int = 0; int < props.keyArray.length; int++) {
-            if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation"))
-                setValue(keyArray[int], tableData[index]?.[rowVariables[index]]?.[keyArray[int]]);
+            // if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation"))
+            if (!excludeArr.includes(props.keyArray[int]))
+                setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
         }
 
     }
@@ -63,7 +66,6 @@ function SharedTable(props) {
     useEffect(() => {
 
         if (props.tableData.length) {
-
             setColumns(props.columns);
             setRowVariables(Array(props.tableData.length).fill(0));
             setTableData(props.tableData.slice(0, 10));
@@ -73,7 +75,8 @@ function SharedTable(props) {
 
             let fields = [];
             for (let int = 0; int < props.keyArray.length; int++) {
-                if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) {
+                // if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) {
+                if (!excludeArr.includes(props.keyArray[int])) {
                     fields.push({
                         name: props.keyArray[int],
                         label: columns[int],
@@ -133,9 +136,21 @@ function SharedTable(props) {
         setOpenSync(false);
     };
 
+    const handleConvertDate = (specificDate) => {
+        const date = new Date(specificDate);
+        // console.log(specificDate.toISOString());
+        // return specificDate.toISOString();
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+      };
+
     return (
         <div>
-            {/* <TableContainer component={Paper} sx={{ maxHeight: 280 }}> */}
             <Table stickyHeader aria-label="simple table">
                 <TableHead>
                     <TableRow>
@@ -152,7 +167,7 @@ function SharedTable(props) {
                                     {(() => {
                                         switch (key) {
                                             case "edit":
-                                                return <Button onClick={() => editFromTable(index)}><Edit /></Button>;
+                                                return <Button onClick={() => editFromTable(index,rowData.length - 1)}><Edit /></Button>;
                                             case "delete":
                                                 return <Button onClick={() => deleteFromTable(index)}><Delete /></Button>;
                                             case "index":
@@ -166,8 +181,10 @@ function SharedTable(props) {
                                                 } else {
                                                     return "No Edit History";
                                                 }
+                                            case "auctionDate":
+                                                return handleConvertDate(rowData?.[rowData.length - 1 - rowVariables?.[index]]?.[key]);
                                             default:
-                                                return rowData[rowVariables[index]][key];
+                                                return rowData?.[rowData.length - 1 - rowVariables?.[index]]?.[key];
                                         }
                                     })()}
                                 </TableCell>
@@ -176,7 +193,6 @@ function SharedTable(props) {
                     })}
                 </TableBody>
             </Table>
-            {/* </TableContainer> */}
             <div className={styles.paninator}>
                 <Pagination count={totalPages} page={page} onChange={handleChange} />
             </div>

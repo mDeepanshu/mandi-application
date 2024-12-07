@@ -19,7 +19,7 @@ function KisanBillSummary() {
   // const [ledgerColumns, setledgerColumns] = useState(["INDEX", "PARTY NAME", "OPENING AMOUNT", "DAY BILL", "CLOSING AMOUNT"]);
   // const [keyArray, setKeyArray] = useState(["index", "partyName", "openingAmount", "dayBill", "closingAmount"]);
 
-  const { register, handleSubmit, formState: { errors }, getValues } = useForm();
+  const { register, formState: { errors }, getValues } = useForm();
 
   const fetch_ledger = async (data) => {
     const { fromDate, toDate } = data;
@@ -43,16 +43,6 @@ function KisanBillSummary() {
 
   }
 
-  useEffect(() => {
-    const init = async () => {
-      const date = new Date();
-      const formattedDate = date.toISOString().slice(0, 10);
-      const billsData = await getSummaryData(formattedDate);
-    };
-
-    init();
-  }, []);
-
   const printLedger = () => {
     triggerRef.current.click();
   }
@@ -61,15 +51,15 @@ function KisanBillSummary() {
     <>
       <div className={styles.container}>
         <h1>Kisan Bill Payment Summry</h1>
-        <form className={styles.dateFields} onSubmit={handleSubmit(fetch_ledger)}>
+        <form className={styles.dateFields} onSubmit={(e) => e.preventDefault()}>
           <div className={styles.date}>
             FROM: <input type='date'{...register('fromDate', { required: 'From date is required' })} /><br />
             {errors.fromDate && <span className="error">{errors.fromDate.message}</span>}
           </div>
           <div className={styles.date}>TO: <input type='date'  {...register('toDate')} /></div>
           <div>
-            <Button variant="contained" color="success" type='submit' >Fetch</Button>&nbsp;
-            <Button variant="contained" color="success" onClick={() => printLedger()} className={styles.print_btn}>PRINT</Button>
+            <Button variant="contained" color="success" type='button' onClick={() => fetch_ledger(getValues())} >Fetch</Button>&nbsp;
+            <Button variant="contained" color="success" type='button' onClick={() => printLedger()} className={styles.print_btn}>PRINT</Button>
             <ReactToPrint
               trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
               content={() => componentRef.current}

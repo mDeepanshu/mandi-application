@@ -19,9 +19,9 @@ function VyapariVasuliSheet() {
   const [ledgerColumns, setledgerColumns] = useState(["INDEX", "PARTY NAME", "OPENING AMOUNT", "DAY BILL", "CLOSING AMOUNT"]);
   const [keyArray, setKeyArray] = useState(["index", "partyName", "openingAmount", "dayBill", "closingAmount"]);
 
-  const { register, handleSubmit, formState: { errors }, getValues } = useForm();
+  const { register, formState: { errors }, getValues } = useForm();
 
-  const fetch_ledger = async (data) => {
+  const fetch_vasuli_sheet = async (data) => {
     const { fromDate, toDate } = data;
     getLedgerData(fromDate, toDate);
   }
@@ -61,13 +61,13 @@ function VyapariVasuliSheet() {
     <>
       <div className={styles.container}>
         <h1>VASULI SHEET</h1>
-        <form className={styles.dateFields} onSubmit={handleSubmit(fetch_ledger)}>
+        <form className={styles.dateFields} onSubmit={(e) => e.preventDefault()}>
           <div className={styles.date}>
-            FROM: <input type='date'{...register('fromDate', { required: 'From date is required' })} /><br />
+            DATE: <input type='date'{...register('fromDate', { required: 'From date is required' })} /><br />
             {errors.fromDate && <span className="error">{errors.fromDate.message}</span>}
           </div>
           <div>
-            <Button variant="contained" color="success" type='submit' >Fetch Vasuli Sheet</Button>&nbsp;
+            <Button variant="contained" color="success" type='button' onClick={() => fetch_vasuli_sheet(getValues())}  >Fetch Vasuli Sheet</Button>&nbsp;
             <Button variant="contained" color="success" type="button" onClick={() => printLedger()} className={styles.print_btn}>PRINT VASULI SHEET</Button>
             <ReactToPrint
               trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
