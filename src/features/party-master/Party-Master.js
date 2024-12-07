@@ -76,12 +76,16 @@ const PartyMaster = () => {
 
   useEffect(() => {
     tableData.map((elem) => {
-      const newLastVasuliDate = new Date(elem.lastVasuliDate);
-      const todayDate = new Date();
-      const diffInMs = Math.abs(todayDate - newLastVasuliDate);
-      // Convert milliseconds to days
-      const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24)) - elem.maxLoanDays;
-      elem.daysExceded = diffInDays;
+      if (elem.lastVasuliDate) {
+        const newLastVasuliDate = new Date(elem.lastVasuliDate);
+        const todayDate = new Date();
+        const diffInMs = Math.abs(todayDate - newLastVasuliDate);
+        // Convert milliseconds to days
+        const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24)) - elem.maxLoanDays;
+        elem.daysExceded = diffInDays;
+      } else {
+        elem.daysExceded = "NA";
+      }
     })
   }, [tableData]);
 
