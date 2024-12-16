@@ -7,14 +7,25 @@
 h1{
     width: 100%;
 }
+
 .dateFields {
     width: 100%;
     display: flex;
     align-items: center;
+    /* padding-bottom: 20px; */
+}
+
+.constants {
+    width: 100%;
+    display: flex;
+    padding-bottom: 5px;
+    justify-content: end;
+    gap: 4px;
 }
 
 .date{
-    width: 15%;
+    /* width: 15%; */
+    padding-right: 10px;
 }
 
 .tableContainer {

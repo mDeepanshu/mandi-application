@@ -114,17 +114,16 @@ function KisanBillSummary() {
                       <td align="right">{row.nagarPalikaTax}</td>
                       <td align="right">{row.nagdi}</td>
                       <td align="right">{row.openingAmount}</td>
-                      <td align="right">{row.dayBill}</td>
-                      <td align="right">{row.closingAmount}</td>
+                      <td align="right">{row.driver}</td>
+                      <td align="right">{row.pakkaTotal}</td>
                     </tr>
                     {row.summaryBills?.map((bill, index) => (
                       <tr>
                         <td align="right">{bill.itemName}</td>
-                        <td align="right">rate.{bill.rate}</td>
-                        <td align="right">qan.{bill.quantity}</td>
-                        <td align="right">bag.{bill.bag}</td>
-                        <td align="right">total.{bill.itemTotal}</td>
-                        {/* <td align="right">{row.partyName}</td> */}
+                        <td align="right" className={styles.alignedText}><div><b>R</b></div>|<div className={styles.billDataNumber}>{bill.rate}</div></td>
+                        <td align="right" className={styles.alignedText}><div><b>Q</b></div>|<div className={styles.billDataNumber}>{bill.quantity}</div></td>
+                        <td align="right" className={styles.alignedText}><div><b>B</b></div>|<div className={styles.billDataNumber}>{bill.bag}</div></td>
+                        <td align="right" className={styles.alignedText}><div><b>T</b></div>|<div className={styles.billDataNumber}>{bill.itemTotal}</div></td>
                       </tr>
                     ))}
                   </>

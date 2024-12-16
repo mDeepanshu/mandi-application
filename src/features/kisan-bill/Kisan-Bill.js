@@ -12,7 +12,10 @@ import KisanBillPrint from "../../dialogs/kisan-bill/kisan-bill-print";
 import "./kisan-bill.module.css";
 import SharedTable from "../../shared/ui/table/table";
 import PreviousBills from "../../shared/ui/previous-bill/previousBill";
-
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Alert from '@mui/material/Alert';
 
 function KisanBill() {
 
@@ -24,8 +27,9 @@ function KisanBill() {
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
 
-  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total","Date","Vyapari Name", "Edit", "Previuos Edits"]);
-  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "itemTotal","auctionDate","partyName", "edit", "navigation"]);
+  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Date", "Vyapari Name", "Edit", "Previuos Edits"]);
+  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "itemTotal", "auctionDate", "partyName", "edit", "navigation"]);
+  const [open, setOpen] = useState(false);
 
 
   const [fieldDefinitions] = useState([
@@ -150,15 +154,20 @@ function KisanBill() {
 
   const saveBill = async () => {
     // const saveRes = saveKisanBill();
-    let tableSnapshot=[];
+    let tableSnapshot = [];
     tableData.forEach(element => {
-      
-      tableSnapshot.push(element[0]);
+      tableSnapshot.push(element[element.length-1]);
     });
-    const bill = {...getValues(), kisanBillItems:tableSnapshot,kisanId:getValues().kisan.partyId,kisanName:getValues().kisan.name,billDate:getValues().date};
+    const bill = { ...getValues(), kisanBillItems: tableSnapshot, kisanId: getValues().kisan.partyId, kisanName: getValues().kisan.name, billDate: getValues().date };
     delete bill.kisan;
     delete bill.date;
-    saveKisanBill(bill);
+    console.log(bill);
+    
+    const saveRes = await saveKisanBill(bill);
+    if (saveRes.responseCode == "200") {
+      setOpen(true);
+    }
+
   }
 
   const refreshBill = async () => {
@@ -171,6 +180,27 @@ function KisanBill() {
       reset({ ...getValues(), ...billConstant });
     }
   }
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
+
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={handleClose}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
+
 
   return (
     <div>
@@ -263,15 +293,15 @@ function KisanBill() {
             </Grid>
             <Grid container spacing={2} paddingBottom={2}>
               <Grid item xs={11}>
-                <PreviousBills billData={{id:getValues()?.kisan?.partyId,date:getValues()?.date}} partyType={"kisan"}/>
+                <PreviousBills billData={{ id: getValues()?.kisan?.partyId, date: getValues()?.date }} partyType={"kisan"} />
               </Grid>
             </Grid>
             <TableContainer component={Paper} className='bill-table'>
-              <SharedTable columns={kisanBillColumnsColumns} tableData={structuredClone(tableData)} keyArray={keyArray}  refreshBill={refreshBill}/>
+              <SharedTable columns={kisanBillColumnsColumns} tableData={structuredClone(tableData)} keyArray={keyArray} refreshBill={refreshBill} />
             </TableContainer>
             <Grid container spacing={2} justifyContent="flex-end" p={2}>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                   <Controller
                     key="kharchaTotal"
                     name="kharchaTotal"
@@ -292,17 +322,17 @@ function KisanBill() {
                     )}
                   />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                   <Controller
                     key="totalBikri"
                     name="totalBikri"
                     control={control}
                     defaultValue=""
-                    rules={{ required: "Toal Bikri is Required" }}
+                    rules={{ required: "Total is Required" }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Pakki Bikri"
+                        label="Total"
                         variant="outlined"
                         sx={{ mb: 3 }}
                         fullWidth
@@ -313,12 +343,33 @@ function KisanBill() {
                     )}
                   />
                 </Grid>
+                <Grid item xs={2}>
+                  <Controller
+                    key="total"
+                    name="total"
+                    control={control}
+                    defaultValue=""
+                    rules={{ required: "Total Bikri is Required" }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Total Bikri"
+                        variant="outlined"
+                        sx={{ mb: 3 }}
+                        fullWidth
+                        error={!!errors.total}
+                        helperText={errors.total ? errors.total.message : ""}
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
               </Grid>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                   <Button variant="contained" color="primary" fullWidth onClick={saveBill}>Save Bill</Button>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                   <Button variant="contained" color="success" type='submit' fullWidth>Print</Button>
                   <ReactToPrint
                     trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
@@ -332,6 +383,22 @@ function KisanBill() {
       </form>
       <div style={{ display: 'none' }}>
         <KisanBillPrint ref={componentRef} tableDataPrint={structuredClone(tableData)} restructureTable={true} formData={formData} />
+      </div>
+      <div>
+        <Snackbar
+          open={open}
+          autoHideDuration={2500}
+          onClose={handleClose}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="success"
+            variant="filled"
+            sx={{ width: '100%' }}
+          >
+            BILL SAVED
+          </Alert>
+        </Snackbar>
       </div>
     </div>
   );

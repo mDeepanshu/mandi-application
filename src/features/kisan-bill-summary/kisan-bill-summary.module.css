@@ -34,3 +34,15 @@ h1{
     justify-content: center; /* Align items horizontally */
     padding-bottom: 5px;
 }
+
+.alignedText {
+    display: inline-flex;
+    padding-right: 5px;
+    /* justify-content: flex-end; */
+    /* white-space: nowrap; */
+  }
+
+  .billDataNumber{
+    text-align: start;
+    width: 2rem;
+  }

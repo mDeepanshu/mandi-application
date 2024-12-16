@@ -21,13 +21,26 @@ function Ledger() {
   const [ledgerColumns, setledgerColumns] = useState(["INDEX", "DATE", "ITEM NAME", "CREDIT", "DEBIT"]);
   const [keyArray, setKeyArray] = useState(["index", "date", "itemName", "cr", "dr"]);
   const [vyapariList, setVyapariList] = useState([]);
+  const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
+  const twoDaysPrior = new Date();
+  twoDaysPrior.setDate(twoDaysPrior.getDate() - 2);
+  const priorDate = twoDaysPrior.toISOString().split('T')[0];
 
-  const { register, control, handleSubmit, formState: { errors }, getValues } = useForm();
+  const { register, control, handleSubmit, formState: { errors }, getValues, trigger, setValue } = useForm({
+    defaultValues: {
+      toDate: currentDate, // Set the default value to current date
+      fromDate: priorDate, // Default to 2 days prior date
+    },
+  });
 
   const fetch_ledger = async (data) => {
-    const { fromDate, toDate } = data;
-    getLedgerData(data.vyapari_id.partyId, fromDate, toDate);
-
+    const isValid = await trigger(); // Validates all fields
+    if (isValid) {
+      const { fromDate, toDate } = data;
+      getLedgerData(data.vyapari_id.partyId, fromDate, toDate);
+    } else {
+      console.log('Validation failed');
+    }
   }
 
   const getVyapariNames = async () => {
@@ -39,12 +52,14 @@ function Ledger() {
     const ledger = await getLedger(vyapari_id, fromDate, toDate);
     if (ledger) {
       setTableData(ledger.responseBody?.transactions);
+      setValue("closingAmount", ledger.responseBody?.closingAmount);
+      setValue("openingAmount", ledger.responseBody?.openingAmount);
     }
 
   }
 
   useEffect(() => {
-      getVyapariNames();
+    getVyapariNames();
   }, []);
 
   const printLedger = () => {
@@ -55,49 +70,77 @@ function Ledger() {
     <>
       <div className={styles.container}>
         <h1>LEDGER</h1>
-        <form className={styles.dateFields} onSubmit={(e) => e.preventDefault()}>
-          <div className={styles.vyapariName}>
-            <div>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <div className={styles.dateFields}>
+            <div className={styles.vyapariName}>
+              <div>
+                <Controller
+                  name="vyapari_id"
+                  control={control}
+                  rules={{ required: "Enter Patry Name" }}
+                  render={({ field }) => (
+                    <Autocomplete
+                      {...field}
+                      options={vyapariList}
+                      getOptionLabel={(option) => option.name}
+                      getOptionKey={(option) => option.partyId}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Vyapari Name"
+                          InputProps={{
+                            ...params.InputProps,
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchIcon />
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      )}
+                      onChange={(event, value) => field.onChange(value)}
+                      disablePortal
+                      id="combo-box-demo"
+                    />
+                  )}
+                />
+                <p className='err-msg'>{errors.vyapari_id?.message}</p>
+              </div>
+            </div>
+            <div className={styles.date}>
               <Controller
-                name="vyapari_id"
+                name="fromDate"
                 control={control}
-                rules={{ required: "Enter Patry Name" }}
+                rules={{ required: "Enter From Date" }}
+                defaultValue=""
                 render={({ field }) => (
-                  <Autocomplete
+                  <TextField
                     {...field}
-                    options={vyapariList}
-                    getOptionLabel={(option) => option.name}
-                    getOptionKey={(option) => option.partyId}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Vyapari Name"
-                        InputProps={{
-                          ...params.InputProps,
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchIcon />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    )}
-                    onChange={(event, value) => field.onChange(value)}
-                    disablePortal
-                    id="combo-box-demo"
+                    label="FROM DATE"
+                    variant="outlined"
+                    type='date'
                   />
                 )}
               />
-              <p className='err-msg'>{errors.vyapari_id?.message}</p>
+              <p className="error">{errors.fromDate?.message}</p>
             </div>
-          </div>
-          <div className={styles.date}>
-          <div>FROM: <input type='date'{...register('fromDate', { required: 'From date is required' })} /></div><br />
-            {errors.fromDate && <span className="error">{errors.fromDate.message}</span>}
-          </div>
-          <div className={styles.date}>
-            <div>TO: <input type='date'  {...register('toDate', { required: 'To date is required' })} /></div><br />
-            {errors.fromDate && <span className="error">{errors.toDate.message}</span>}
+            <div className={styles.date}>
+              <Controller
+                name="toDate"
+                control={control}
+                rules={{ required: "Enter To Date" }}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="TO DATE"
+                    variant="outlined"
+                    type='date'
+                  />
+                )}
+              />
+              <p className="error">{errors.toDate?.message}</p>
+            </div>
           </div>
           <div>
             <Button variant="contained" color="success" type='button' onClick={() => fetch_ledger(getValues())} >FETCH LEDGER</Button>&nbsp;
@@ -106,6 +149,10 @@ function Ledger() {
               trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
               content={() => componentRef.current}
             />
+          </div>
+          <div className={styles.constants}>
+            <div>OPENING BALANCE: <input type='number'{...register('openingAmount')} disabled /></div>
+            <div>CLOSING BALANCE: <input type='number'{...register('closingAmount')} disabled /></div>
           </div>
         </form>
         <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} />

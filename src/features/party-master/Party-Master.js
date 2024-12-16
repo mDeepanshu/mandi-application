@@ -204,16 +204,6 @@ const PartyMaster = () => {
               </Grid>
               <Grid item xs={6} sm={2}>
                 <Controller
-                  name="maxLoanDays"
-                  control={control}
-                  rules={{ required: "Max Loan Days" }}
-                  defaultValue=""
-                  render={({ field }) => <TextField {...field} fullWidth label="MAX LOAN DAYS" variant="outlined" />}
-                />
-                <p className='err-msg'>{errors.contact?.message}</p>
-              </Grid>
-              <Grid item xs={6} sm={2}>
-                <Controller
                   name="contact"
                   control={control}
                   rules={{ required: "Enter Contact" }}
