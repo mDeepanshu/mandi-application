@@ -9,6 +9,10 @@ import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { updateAuctionTransaction } from "../../../gateway/comman-apis";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { getAllPartyList } from "../../../gateway/comman-apis";
+import Autocomplete from '@mui/material/Autocomplete';
+import SearchIcon from '@mui/icons-material/Search';
+import { InputAdornment } from '@mui/material';
 
 function SharedTable(props) {
 
@@ -24,11 +28,16 @@ function SharedTable(props) {
     const [fieldDefinitions, setFieldDefinitions] = useState([]);
     const [sync, setSync] = useState({});
     const [openSync, setOpenSync] = useState(false);
+    const [vyapariList, setVyapariList] = useState([]);
 
     const { control, formState: { errors }, setValue, getValues } = useForm();
     const [rowVariables, setRowVariables] = useState([]);
 
-    const excludeArr = ["edit", "delete", "index", "navigation", "auctionDate","partyName"];
+    const excludeArr = ["edit", "delete", "index", "navigation", "auctionDate"];
+
+    useEffect(() => {
+        getVyapariNames();
+    }, []);
 
     const handleNavigationClick = (rowIndex, direction) => {
         setRowVariables(prev => {
@@ -45,13 +54,22 @@ function SharedTable(props) {
         setOpen(false);
     };
 
-    const editFromTable = (index,tranIdx) => {
+    const getVyapariNames = async () => {
+        const allVyapari = await getAllPartyList("VYAPARI");
+        if (allVyapari?.responseBody) setVyapariList(allVyapari?.responseBody);
+    }
+
+
+    const editFromTable = (index, tranIdx) => {
         setEditingIndex(index);
         setOpen(true);
         for (let int = 0; int < props.keyArray.length; int++) {
-            // if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation"))
             if (!excludeArr.includes(props.keyArray[int]))
-                setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
+                if (keyArray[int]=="partyName") {
+                    const defaultOption = vyapariList.find(option =>  option.name == tableData[index]?.[tranIdx]?.partyName);
+                    setValue("partyName", defaultOption || null);
+                    
+                }else setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
         }
 
     }
@@ -96,9 +114,8 @@ function SharedTable(props) {
     };
 
     const updateRecord = async (saveAndReflect) => {
-
         if (saveAndReflect) {
-            let changedValues = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues(), auctionDate: new Date() };
+            let changedValues = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues(), auctionDate: new Date(), vyapariId:getValues().partyName.partyId };
             const updateRes = await updateAuctionTransaction(changedValues);
             props.refreshBill();
             handleClose();
@@ -147,7 +164,7 @@ function SharedTable(props) {
         const minutes = String(date.getMinutes()).padStart(2, '0');
         const seconds = String(date.getSeconds()).padStart(2, '0');
         return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
-      };
+    };
 
     return (
         <div>
@@ -167,7 +184,7 @@ function SharedTable(props) {
                                     {(() => {
                                         switch (key) {
                                             case "edit":
-                                                return <Button onClick={() => editFromTable(index,rowData.length - 1)}><Edit /></Button>;
+                                                return <Button onClick={() => editFromTable(index, rowData.length - 1)}><Edit /></Button>;
                                             case "delete":
                                                 return <Button onClick={() => deleteFromTable(index)}><Delete /></Button>;
                                             case "index":
@@ -202,28 +219,68 @@ function SharedTable(props) {
                     <DialogContent>
                         <DialogContentText></DialogContentText>
                         <div className={styles.editForm}>
-                            {fieldDefinitions.map((fieldDef) => (
-                                <Controller
-                                    key={fieldDef.name}
-                                    name={fieldDef.name}
-                                    control={control}
-                                    defaultValue={fieldDef.defaultValue}
-                                    rules={fieldDef.validation}
-                                    render={({ field }) => (
-                                        <TextField
-                                            {...field}
-                                            label={fieldDef.label}
-                                            variant="outlined"
-                                            sx={{ mb: 3 }}
-                                            fullWidth
-                                            error={!!errors[field.name]}
-                                            helperText={errors[field.name] ? errors[field.name].message : ''}
-                                            size="small"
+                            {fieldDefinitions.map((fieldDef) => {
+                                if (fieldDef.name === "partyName") {
+                                    return (
+                                        <Controller
+                                            key={fieldDef.partyId}
+                                            name={fieldDef.name}
+                                            control={control}
+                                            rules={{ required: "Enter Patry Name" }}
+                                            render={({ field }) => (
+                                                <Autocomplete
+                                                    {...field}
+                                                    options={vyapariList}
+                                                    getOptionLabel={(option) => option.name}
+                                                    getOptionKey={(option) => option.partyId}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            label="Vyapari Name"
+                                                            InputProps={{
+                                                                ...params.InputProps,
+                                                                startAdornment: (
+                                                                    <InputAdornment position="start">
+                                                                        <SearchIcon />
+                                                                    </InputAdornment>
+                                                                ),
+                                                            }}
+                                                        />
+                                                    )}
+                                                    onChange={(event, value) => field.onChange(value)}
+                                                    disablePortal
+                                                    id="combo-box-demo"
+                                                    sx={{ width: '100%' }} // Ensures Autocomplete is 100% wide
+                                                />
+                                            )}
                                         />
-                                    )}
-                                />
-                            ))}
+                                    );
+                                } else {
+                                    return (
+                                        <Controller
+                                            key={fieldDef.name}
+                                            name={fieldDef.name}
+                                            control={control}
+                                            defaultValue={fieldDef.defaultValue}
+                                            rules={fieldDef.validation}
+                                            render={({ field }) => (
+                                                <TextField
+                                                    {...field}
+                                                    label={fieldDef.label}
+                                                    variant="outlined"
+                                                    sx={{ mb: 3 }}
+                                                    fullWidth
+                                                    error={!!errors[fieldDef.name]}
+                                                    helperText={errors[fieldDef.name] ? errors[fieldDef.name].message : ''}
+                                                    size="small"
+                                                />
+                                            )}
+                                        />
+                                    );
+                                }
+                            })}
                         </div>
+
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Cancel</Button>

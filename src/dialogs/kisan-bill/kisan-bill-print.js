@@ -11,35 +11,42 @@ const KisanBillPrint = forwardRef((props, ref) => {
   }, [props]);
 
   useEffect(() => {
-    if (props.restructureTable) {
-      let arr = [];
-      if (props.fromPreviousBill) {
-        arr = localTable?.[0];
-      } else {
-        arr.push(localTable?.[0]?.[0]);
-      }
-      console.log(arr);
-      let flag = true;
-      for (let index = 1; index < localTable.length; index++) {
-        for (const element of arr) {
-          if (element.rate == localTable[index][0].rate && element.itemName == localTable[index][0].itemName) {
-            console.log(element,localTable[index]);
-            element.quantity += localTable[index][0].quantity;
-            element.itemTotal += localTable[index][0].itemTotal;
-            element.bag += localTable[index][0].bag;
-            flag=false;
-            break;
+    if (localTable.length) {
+      if (props.restructureTable) {
+        let arr = [];
+        let basicArr = [];
+        if (props.fromPreviousBill) {
+          arr.push(localTable?.[0]);
+          basicArr=localTable;
+        } else {
+          arr.push(localTable?.[0]?.[0]);
+          localTable.forEach(element => {
+            basicArr.push(element[0]);
+          });
+        }
+        if (arr.length) {
+          let flag = true;
+          for (let index = 1; index < basicArr.length; index++) {
+            for (const element of arr) {
+              if (element.rate == basicArr[index].rate && element.itemName == basicArr[index].itemName) {
+                element.quantity += basicArr[index].quantity;
+                element.itemTotal += basicArr[index].itemTotal;
+                element.bag += basicArr[index].bag;
+                flag = false;
+                break;
+              }
+            }
+            if (flag) {
+              arr.push(basicArr[index]);
+            }
+            flag = true;
           }
         }
-        if (flag) {
-          arr.push(localTable[index][0]);
-          flag=!flag;
-        }
-      }
-      console.log(arr);
+        console.log(arr);
 
-      setPrintTable(arr);
-    } else setPrintTable(props.tableDataPrint);
+        setPrintTable(arr);
+      } else setPrintTable(props.tableDataPrint);
+    }
 
   }, [localTable]);
 

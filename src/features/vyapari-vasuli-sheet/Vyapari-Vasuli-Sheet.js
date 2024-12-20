@@ -16,8 +16,8 @@ function VyapariVasuliSheet() {
   const triggerRef = useRef();
 
   const [tableData, setTableData] = useState([]);
-  const [ledgerColumns, setledgerColumns] = useState(["INDEX", "PARTY NAME", "OPENING AMOUNT", "DAY BILL", "CLOSING AMOUNT"]);
-  const [keyArray, setKeyArray] = useState(["index", "partyName", "openingAmount", "dayBill", "closingAmount"]);
+  const [ledgerColumns, setledgerColumns] = useState(["INDEX", "PARTY NAME", "OPENING AMOUNT", "DAY BILL", "TTL", "CLOSING AMOUNT"]);
+  const [keyArray, setKeyArray] = useState(["index", "partyName", "openingAmount", "dayBill", "ttl", "closingAmount"]);
 
   const { register, formState: { errors }, getValues } = useForm();
 
@@ -37,6 +37,15 @@ function VyapariVasuliSheet() {
     } else data = { startDate: fromDate }
 
     const ledger = await getVyapariVasuliSheet(data);
+    ledger.responseBody.forEach(element => {
+      const total = element.dayBill
+        .split(",")
+        .map(Number)
+        .reduce((sum, num) => sum + num, 0);
+      element.ttl = total;
+      // element.dayBill=element.dayBill.split(",").map(String);
+    });
+
     if (ledger) {
       setTableData(ledger.responseBody);
     }

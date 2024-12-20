@@ -125,48 +125,6 @@ function MasterTable(props) {
             <div className={styles.paninator}>
                 <Pagination count={totalPages} page={page} onChange={handleChange} />
             </div>
-            {/* <div >
-                <table className={styles.table}>
-                    <thead>
-                        <tr>
-                            {columns.map((row, index) => (
-                                <th align="left" key={index}>{row}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className={styles.tableBody}>
-                        {tableData.map((rowData, index) => (
-                            <tr key={index}>
-                                {keyArray.map((key, i) =>
-                                    <td key={i} align="left" style={{ borderBottom: "none" }}>
-                                        {(() => {
-                                            switch (key) {
-                                                case "edit":
-                                                    return <button onClick={() => editFromTable(index)}>Edit</button>;
-                                                case "delete":
-                                                    return <button onClick={() => deleteFromTable(index)}>Delete</button>;
-                                                case "daysExceded":
-                                                    return (
-                                                        <div className={`${styles.myClass} ${rowData[key] > 0 ? styles.daysExceded : styles.daysNotExceded}`}>
-                                                            {rowData[key]}
-                                                        </div>
-                                                    );
-                                                case "index":
-                                                    return (page - 1) * 10 + index + 1;
-                                                default:
-                                                    return rowData[key];
-                                            }
-                                        })()}
-                                    </td>
-                                )}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div className={styles.paginator}>
-                    <Pagination count={totalPages} page={page} onChange={handleChange} />
-                </div>
-            </div> */}
             <div>
                 <Dialog open={open} onClose={handleClose}>
                     <DialogTitle>EDIT DATA</DialogTitle>

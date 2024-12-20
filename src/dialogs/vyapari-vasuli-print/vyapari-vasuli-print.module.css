@@ -5,3 +5,9 @@ table{
 td{
     border:none;
 }
+
+@media print {
+    .container{
+        font-size: 11px;
+    }
+}

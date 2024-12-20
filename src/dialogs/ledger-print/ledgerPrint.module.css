@@ -5,3 +5,8 @@ table{
 td{
     border:none;
 }
+
+.constants{
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+}

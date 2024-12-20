@@ -36,6 +36,13 @@ const PartyMaster = () => {
   const [keyArray, setKeyArray] = useState(["index", "contact", "idNo", "name", "owedAmount", "partyId", "maxLoanDays", "lastVasuliDate", "daysExceded", "partyType"]);
   const currentPartyType = watch("partyType", "KISAN");
 
+  const partyTypeSelected = watch("partyType", "KISAN");
+
+  // Conditionally set the validation rules based on partyType
+  const vasuliDayLimitValidation = partyTypeSelected === "VYAPARI" 
+    ? { required: "Enter Vasuli Day Limit" } 
+    : {}; // No validation for "KISAN"
+
   const sortOnId = () => {
     const sortedData = [...tableDataFiltered].sort((a, b) => a.idNo - b.idNo);
     setTableDataFiltered(sortedData); // Update the state with the sorted array
@@ -194,13 +201,13 @@ const PartyMaster = () => {
               </Grid>
               <Grid item xs={6} sm={2}>
                 <Controller
-                  name="vasuliDayLimit"
+                  name="maxLoanDays"
                   control={control}
-                  rules={{ required: "Enter Vasuli Day Limit" }}
+                  rules={vasuliDayLimitValidation}
                   defaultValue=""
                   render={({ field }) => <TextField {...field} fullWidth label="VASULI DAY LIMIT" variant="outlined" disabled={currentPartyType == "KISAN"} />}
                 />
-                <p className='err-msg'>{errors.vasuliDayLimit?.message}</p>
+                <p className='err-msg'>{errors.maxLoanDays?.message}</p>
               </Grid>
               <Grid item xs={6} sm={2}>
                 <Controller

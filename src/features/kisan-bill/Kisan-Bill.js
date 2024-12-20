@@ -103,6 +103,14 @@ function KisanBill() {
         required: 'Commission is required',
       },
     },
+    {
+      name: 'bags',
+      label: 'Bags',
+      defaultValue: '',
+      validation: {
+        required: 'Bags is required',
+      },
+    },
 
   ]);
 
@@ -158,7 +166,29 @@ function KisanBill() {
     tableData.forEach(element => {
       tableSnapshot.push(element[element.length-1]);
     });
-    const bill = { ...getValues(), kisanBillItems: tableSnapshot, kisanId: getValues().kisan.partyId, kisanName: getValues().kisan.name, billDate: getValues().date };
+    // 
+    let mergedTable = [];
+    mergedTable.push(tableSnapshot[0]);
+    if (tableSnapshot.length) {
+      let flag = true;
+      for (let index = 1; index < tableSnapshot.length; index++) {
+        for (const element of mergedTable) {
+          if (element.rate == tableSnapshot[index].rate && element.itemName == tableSnapshot[index].itemName) {
+            element.quantity += tableSnapshot[index].quantity;
+            element.itemTotal += tableSnapshot[index].itemTotal;
+            element.bag += tableSnapshot[index].bag;
+            flag = false;
+            break;
+          }
+        }
+        if (flag) {
+          mergedTable.push(tableSnapshot[index]);
+        }
+        flag=true;
+      }
+    }
+    // 
+    const bill = { ...getValues(), kisanBillItems: mergedTable, kisanId: getValues().kisan.partyId, kisanName: getValues().kisan.name, billDate: getValues().date };
     delete bill.kisan;
     delete bill.date;
     console.log(bill);

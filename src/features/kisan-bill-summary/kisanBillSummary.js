@@ -18,8 +18,14 @@ function KisanBillSummary() {
   const [apiResponse, setResponseData] = useState();
   // const [ledgerColumns, setledgerColumns] = useState(["INDEX", "PARTY NAME", "OPENING AMOUNT", "DAY BILL", "CLOSING AMOUNT"]);
   // const [keyArray, setKeyArray] = useState(["index", "partyName", "openingAmount", "dayBill", "closingAmount"]);
+  const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
 
-  const { register, formState: { errors }, getValues } = useForm();
+  const { register, formState: { errors }, getValues } = useForm({
+    defaultValues: {
+      toDate: currentDate, // Set the default value to current date
+      fromDate: currentDate, // Default to 2 days prior date
+    },
+  });
 
   const fetch_ledger = async (data) => {
     const { fromDate, toDate } = data;
@@ -67,7 +73,7 @@ function KisanBillSummary() {
           </div>
         </form>
         <br />
-        <div>
+        <div ref={componentRef}>
           <div className={styles.totals}>
             <div><b>Kaccha Total:</b> {apiResponse?.kacchaTotal}</div>
             <div><b>Commission:</b> {apiResponse?.commission}</div>
@@ -79,7 +85,7 @@ function KisanBillSummary() {
             <div><b>Driver:</b> {apiResponse?.driver}</div>
             <div><b>Pakka Total:</b> {apiResponse?.pakkaTotal}</div>
           </div>
-          <div ref={componentRef}>
+          <div>
             <table border="1">
               <thead>
                 <tr>
@@ -97,35 +103,37 @@ function KisanBillSummary() {
                   <th>PAKKA TOTAL</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody style={{ fontSize: '13px' }}>
                 {tableData?.map((row, index) => (
                   <>
                     <tr key={index}>
-                      {/* <td component="th" scope="row">
-                      {index + 1}
-                    </td> */}
-                      <td align="right">{row.billId}</td>
-                      <td align="right">{row.openingAmount}</td>
-                      <td align="right">{row.dayBill}</td>
-                      <td align="right">{row.closingAmount}</td>
-                      <td align="right">{row.kharchaTotal}</td>
-                      <td align="right">{row.commissionRate}</td>
-                      <td align="right">{row.bhada}</td>
-                      <td align="right">{row.nagarPalikaTax}</td>
-                      <td align="right">{row.nagdi}</td>
-                      <td align="right">{row.openingAmount}</td>
-                      <td align="right">{row.driver}</td>
-                      <td align="right">{row.pakkaTotal}</td>
+                      <td align="left">{row.date}</td>
+                      <td align="left">{row.billId}</td>
+                      <td align="left">{row.kisanName}</td>
+                      <td align="center">{row.totalBikri}</td>
+                      <td align="center">{row.commission}</td>
+                      <td align="center">{row.hammali}</td>
+                      <td align="center">{row.bhada}</td>
+                      <td align="center">{row.nagarPalikaTax}</td>
+                      <td align="center">{row.nagdi}</td>
+                      <td align="center">{row.statCharge}</td>
+                      <td align="center">{row.driver}</td>
+                      <td align="center">{row.total}</td>
                     </tr>
-                    {row.summaryBills?.map((bill, index) => (
-                      <tr>
-                        <td align="right">{bill.itemName}</td>
-                        <td align="right" className={styles.alignedText}><div><b>R</b></div>|<div className={styles.billDataNumber}>{bill.rate}</div></td>
-                        <td align="right" className={styles.alignedText}><div><b>Q</b></div>|<div className={styles.billDataNumber}>{bill.quantity}</div></td>
-                        <td align="right" className={styles.alignedText}><div><b>B</b></div>|<div className={styles.billDataNumber}>{bill.bag}</div></td>
-                        <td align="right" className={styles.alignedText}><div><b>T</b></div>|<div className={styles.billDataNumber}>{bill.itemTotal}</div></td>
+                    {row.summaryBills?.map((bill, billIndex) => (
+                      <tr key={billIndex} style={{ lineHeight: '0.6', padding: '0' }}>
+                        <td colSpan="12" style={{ textAlign: 'left', padding: '5px' }}>
+                          <div className={styles.itemDetails}>
+                            <span style={{ display: 'inline-block', width: '150px' }}>{bill.itemName}</span>
+                            <span style={{ display: 'inline-block', width: '50px' }}><b>R</b>|{bill.rate}</span>
+                            <span style={{ display: 'inline-block', width: '50px' }}><b>Q</b>|{bill.quantity}</span>
+                            <span style={{ display: 'inline-block', width: '50px' }}><b>B</b>|{bill.bag}</span>
+                            <span style={{ display: 'inline-block', width: '50px' }}><b>T</b>|{bill.itemTotal}</span>
+                          </div>
+                        </td>
                       </tr>
                     ))}
+                    <hr/>
                   </>
                 ))}
               </tbody>
@@ -134,8 +142,6 @@ function KisanBillSummary() {
         </div>
       </div>
       <div style={{ display: 'none' }}>
-        {/* <LedgerPrint ref={componentRef} tableData={tableData} formData={getValues()} /> */}
-
       </div>
     </>
   );

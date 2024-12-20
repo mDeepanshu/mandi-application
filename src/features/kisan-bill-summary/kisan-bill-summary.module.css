@@ -46,3 +46,9 @@ h1{
     text-align: start;
     width: 2rem;
   }
+
+  .itemDetails{
+    display: flex;
+    gap: 15px;
+    
+  }
