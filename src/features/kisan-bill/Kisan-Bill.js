@@ -31,8 +31,11 @@ function KisanBill() {
   const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Date", "Vyapari Name", "Edit", "Previuos Edits"]);
   const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "itemTotal", "auctionDate", "partyName", "edit", "navigation"]);
   const [open, setOpen] = useState(false);
-  const today = new Date().toISOString().split('T')[0];
-
+  // const today = new Date().toISOString().split('T')[0];
+  const todayd = new Date();
+  const today = new Date(todayd.getTime() - todayd.getTimezoneOffset() * 60000)
+    .toISOString()
+    .split('T')[0];
 
   const [fieldDefinitions] = useState([
     {
@@ -128,13 +131,16 @@ function KisanBill() {
     if (isValid) {
       let formValues = getValues();
       const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
-      console.log(billData);
       if (billData) {
         const auctionList = billData?.responseBody?.bills;
         setTableData(auctionList);
-        const billConstant = billData?.responseBody;
-        delete billConstant.bills;
-        reset({ ...getValues(), ...billConstant });
+        if (billData?.responseBody?.bills?.length) {
+          const billConstant = billData?.responseBody;
+          delete billConstant.bills;
+          reset({ ...getValues(), ...billConstant });
+        } else {
+          reset({ kisan: null });
+        }
       }
     }
   }
@@ -167,11 +173,11 @@ function KisanBill() {
     // const saveRes = saveKisanBill();
     let tableSnapshot = [];
     tableData.forEach(element => {
-      tableSnapshot.push({...element[element.length-1]});
+      tableSnapshot.push({ ...element[element.length - 1] });
     });
     // 
     let mergedTable = [];
-    mergedTable.push({...tableSnapshot[0]});
+    mergedTable.push({ ...tableSnapshot[0] });
     if (tableSnapshot.length) {
       let flag = true;
       for (let index = 1; index < tableSnapshot.length; index++) {
@@ -185,17 +191,15 @@ function KisanBill() {
           }
         }
         if (flag) {
-          mergedTable.push({...tableSnapshot[index]});
+          mergedTable.push({ ...tableSnapshot[index] });
         }
-        flag=true;
+        flag = true;
       }
     }
     // 
     const bill = { ...getValues(), kisanBillItems: mergedTable, kisanId: getValues().kisan.partyId, kisanName: getValues().kisan.name, billDate: getValues().date };
     delete bill.kisan;
     delete bill.date;
-    console.log(bill);
-    
     const saveRes = await saveKisanBill(bill);
     if (saveRes.responseCode == "200") {
       setOpen(true);
@@ -279,6 +283,7 @@ function KisanBill() {
                   render={({ field }) => (
                     <Autocomplete
                       {...field}
+                      value={field.value || null}
                       options={kisanList}
                       getOptionLabel={(option) => option.name}
                       getOptionKey={(option) => option.partyId}

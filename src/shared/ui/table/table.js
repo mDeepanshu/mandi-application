@@ -103,6 +103,9 @@ function SharedTable(props) {
                 }
             }
             setFieldDefinitions(fields);
+        }else{
+            setTableData([]);
+            setAllTableData([]);
         }
     }, [props]);
 

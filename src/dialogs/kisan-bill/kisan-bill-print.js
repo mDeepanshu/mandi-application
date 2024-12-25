@@ -42,8 +42,6 @@ const KisanBillPrint = forwardRef((props, ref) => {
             flag = true;
           }
         }
-        console.log(arr);
-
         setPrintTable(arr);
       } else setPrintTable(props.tableDataPrint);
     }
