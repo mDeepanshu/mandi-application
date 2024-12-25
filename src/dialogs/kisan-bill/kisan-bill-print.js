@@ -21,7 +21,7 @@ const KisanBillPrint = forwardRef((props, ref) => {
         } else {
           arr.push(localTable?.[0]?.[0]);
           localTable.forEach(element => {
-            basicArr.push(element[0]);
+            basicArr.push(element[element.length-1]);
           });
         }
         if (arr.length) {
@@ -52,7 +52,7 @@ const KisanBillPrint = forwardRef((props, ref) => {
 
 
   return (
-    <div ref={ref}>
+    <div ref={ref} className={styles.container}>
       <h1 className={styles.heading}>Haji Sabzi Mandi Bill</h1>
       <div className={styles.constants}>
         <div>Bhada: {props.formData?.bhada}</div>
@@ -84,7 +84,7 @@ const KisanBillPrint = forwardRef((props, ref) => {
           </TableHead>
           <TableBody>
             {printTable?.map((row, index) => (
-              <TableRow key={index}>
+              <TableRow key={index} sx={{ '& > *': { padding: '4px 8px' } }}>
                 <TableCell component="th" scope="row">
                   {row?.itemName}
                 </TableCell>

@@ -14,6 +14,7 @@ import MasterTable from "../../shared/ui/master-table/master-table";
 import styles from "./party-master.module.css";
 import PartyPrint from "../../dialogs/party-print/party-print-dialog";
 import ReactToPrint from 'react-to-print';
+import Alert from '@mui/material/Alert';
 
 const PartyMaster = () => {
   // const { handleSubmit, control, getValues } = useForm();
@@ -21,7 +22,7 @@ const PartyMaster = () => {
   const componentRef = useRef();
 
   const [open, setOpen] = useState(false);
-  const { handleSubmit, control, watch, getValues, formState: { errors } } = useForm({
+  const { handleSubmit, control, watch, getValues, formState: { errors }, reset } = useForm({
     defaultValues: {
       partyType: 'KISAN', // Ensure this matches one of the MenuItem values
     },
@@ -31,6 +32,10 @@ const PartyMaster = () => {
   const [filterVyapariText, setFilterVyapariText] = useState(true);
 
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
+  const [alertType, setAlertType] = useState("");
+  const [alertMsg, setAlertMsg] = useState("");
+  const [alertData, setAlertData] = useState({});
+
 
   const [partyColumns, setPartyColumns] = useState(["INDEX", "CONTACT", "ID NO", "PARTY NAME", "OWED AMOUNT", "PARTY ID", "MAX LOAN DAYS", "Last Vasuli Date", "Days Exceded", "PARTY TYPE"]);
   const [keyArray, setKeyArray] = useState(["index", "contact", "idNo", "name", "owedAmount", "partyId", "maxLoanDays", "lastVasuliDate", "daysExceded", "partyType"]);
@@ -39,8 +44,8 @@ const PartyMaster = () => {
   const partyTypeSelected = watch("partyType", "KISAN");
 
   // Conditionally set the validation rules based on partyType
-  const vasuliDayLimitValidation = partyTypeSelected === "VYAPARI" 
-    ? { required: "Enter Vasuli Day Limit" } 
+  const vasuliDayLimitValidation = partyTypeSelected === "VYAPARI"
+    ? { required: "Enter Vasuli Day Limit" }
     : {}; // No validation for "KISAN"
 
   const sortOnId = () => {
@@ -99,7 +104,11 @@ const PartyMaster = () => {
   const onSubmit = async (data) => {
     const values = getValues();
     if (tableData.some(elem => elem.name == values.name && elem.partyType == values.partyType)) {
-      setOpen(true);
+      setAlertData({
+        open: true,
+        alertType: "success",
+        alertMsg: "SAVED"
+      });
       return;
     }
     let newTableData = [
@@ -111,8 +120,10 @@ const PartyMaster = () => {
     try {
       const result = await addPartyGlobal(newTableData);
       if (result.responseCode == 201) {
-        setTableData([...tableData, newTableData[0]]);
-        setTableDataFiltered([...tableDataFiltered, newTableData[0]]);
+        reset();
+        fetchItems();
+        // setTableData([...tableData, newTableData[0]]);
+        // setTableDataFiltered([...tableDataFiltered, newTableData[0]]);
       }
     } catch (error) {
     }
@@ -122,11 +133,15 @@ const PartyMaster = () => {
     if (reason === 'clickaway') {
       return;
     }
-    setOpen(false);
+    setAlertData({
+      open: false,
+      alertType: "",
+      alertMsg: ""
+    });
   };
 
   const print = () => {
-    const table = tableDataFiltered.filter(elem => elem.daysExceded>0);
+    const table = tableDataFiltered.filter(elem => elem.daysExceded > 0);
     setPrintTableData(table);
   }
 
@@ -260,17 +275,24 @@ const PartyMaster = () => {
           <MasterTable columns={partyColumns} tableData={tableDataFiltered} keyArray={keyArray} className={styles.sharedTable} />
         </Grid>
       </Grid>
-      <div>
-        <Snackbar
-          open={open}
-          autoHideDuration={4000}
-          message="ALREADY EXISTS"
-          action={action}
-          onClose={handleClose}
-        />
-      </div>
       <div style={{ display: 'none' }}>
         <PartyPrint ref={componentRef} columns={["INDEX", "PARTY NAME", "OWED AMOUNT"]} tableData={printTableData} keyArray={["index", "name", "owedAmount"]} />
+      </div>
+      <div>
+        <Snackbar
+          open={alertData.open}
+          autoHideDuration={4000}
+          onClose={handleClose}
+        >
+          <Alert
+            onClose={handleClose}
+            severity={alertData.alertType}
+            variant="filled"
+            sx={{ width: '100%' }}
+          >
+            {alertData.alertMsg}
+          </Alert>
+        </Snackbar>
       </div>
     </>
   );

@@ -1,7 +1,8 @@
 import React, { forwardRef, useEffect,useState } from 'react';
 import { Grid } from "@mui/material";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import "./vyapari-bill-print.css";
+import styles from "./vyapari-bill-print.module.css";
+
 const VyapariBillPrint = forwardRef((props, ref) => {
 
   const [printTable,setPrintTable] = useState([]);
@@ -19,10 +20,11 @@ const VyapariBillPrint = forwardRef((props, ref) => {
       setPrintTable(props.tableData);
     } 
   }, [props]);
+
   return (
-    <div ref={ref}>
-      <h1 className='heading'>Haji Sabzi Mandi Bill</h1>
-      <div className='constants'>
+    <div ref={ref} className={styles.container}>
+      <h1 className={styles.heading}>Haji Sabzi Mandi Bill</h1>
+      <div className={styles.constants}>
         <div>Vyapari Name: {props.formData?.vyapari_name?.name}</div>
         <div>Date: {props.formData?.date}</div>
       </div>
@@ -39,7 +41,7 @@ const VyapariBillPrint = forwardRef((props, ref) => {
           </TableHead>
           <TableBody>
             {printTable?.map((row, index) => (
-              <TableRow key={index}>
+              <TableRow key={index}  sx={{ '& > *': { padding: '4px 8px' } }}>
                 <TableCell component="th" scope="row">
                   {row.itemName}
                 </TableCell>

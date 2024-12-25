@@ -21,6 +21,7 @@ function KisanBill() {
 
   const componentRef = useRef();
   const triggerRef = useRef();
+  const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
 
   const { handleSubmit, control, formState: { errors }, getValues, trigger, reset } = useForm();
   const [kisanList, setKisanList] = useState([]);
@@ -30,6 +31,7 @@ function KisanBill() {
   const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Date", "Vyapari Name", "Edit", "Previuos Edits"]);
   const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "itemTotal", "auctionDate", "partyName", "edit", "navigation"]);
   const [open, setOpen] = useState(false);
+  const today = new Date().toISOString().split('T')[0];
 
 
   const [fieldDefinitions] = useState([
@@ -126,6 +128,7 @@ function KisanBill() {
     if (isValid) {
       let formValues = getValues();
       const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
+      console.log(billData);
       if (billData) {
         const auctionList = billData?.responseBody?.bills;
         setTableData(auctionList);
@@ -164,11 +167,11 @@ function KisanBill() {
     // const saveRes = saveKisanBill();
     let tableSnapshot = [];
     tableData.forEach(element => {
-      tableSnapshot.push(element[element.length-1]);
+      tableSnapshot.push({...element[element.length-1]});
     });
     // 
     let mergedTable = [];
-    mergedTable.push(tableSnapshot[0]);
+    mergedTable.push({...tableSnapshot[0]});
     if (tableSnapshot.length) {
       let flag = true;
       for (let index = 1; index < tableSnapshot.length; index++) {
@@ -182,7 +185,7 @@ function KisanBill() {
           }
         }
         if (flag) {
-          mergedTable.push(tableSnapshot[index]);
+          mergedTable.push({...tableSnapshot[index]});
         }
         flag=true;
       }
@@ -306,7 +309,7 @@ function KisanBill() {
                   name="date"
                   control={control}
                   rules={{ required: "Enter Date" }}
-                  defaultValue=""
+                  defaultValue={today}
                   render={({ field }) => (
                     <TextField
                       {...field}

@@ -8,8 +8,11 @@ const VyapariVasuliPrint = forwardRef((props, ref) => {
             <div className={styles.constants}>
                 <div> Date: {props.formData?.fromDate}</div>
             </div>
-            <table border="1" style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
+            <table
+                border="1"
+                style={{ borderCollapse: "collapse", width: "100%" }}
+                className={styles.table}
+            >                <thead>
                     <tr>
                         <th>NAME</th>
                         <th>OPN AMT</th>
@@ -22,8 +25,8 @@ const VyapariVasuliPrint = forwardRef((props, ref) => {
                     {props.tableData?.map((row, index) => (
                         <tr key={index}>
                             <td className={styles.partyName}>{row.partyName}</td>
-                            <td align='left'>{row.openingAmount}</td>
-                            <td align='left'>{row.dayBill}</td>
+                            <td align='left' className={styles.openingAmount}>{row.openingAmount}</td>
+                            <td align='left' className={styles.daybill}>{row.dayBill}</td>
                             <td align='left'>{row.ttl}</td>
                             <td align='right'>{row.closingAmount}</td>
                         </tr>

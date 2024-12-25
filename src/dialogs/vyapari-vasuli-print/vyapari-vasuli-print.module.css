@@ -1,10 +1,31 @@
-table{
+.container{
+    font-size: 12px;
+    padding: 0 20px;
+}
+.table {
     width: 100%;
 }
 
-td{
-    border:none;
+td {
+    border: none;
 }
+
+
+.daybill{
+    width: 60%;
+}
+
+.openingAmount{
+    width: 60px;
+}
+
+.table td {
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+    max-width: 150px;
+}
+
 
 @media print {
     .container{

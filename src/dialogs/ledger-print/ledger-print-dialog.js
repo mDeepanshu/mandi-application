@@ -4,7 +4,7 @@ import styles from "./ledgerPrint.module.css";
 const LedgerPrint = forwardRef((props, ref) => {
 
     return (
-        <div ref={ref}>
+        <div ref={ref} className={styles.container}>
             <h1 className='heading'>Ledger</h1>
             <div className={styles.constants}>
                 <div>From Date: {props.formData?.fromDate}</div>
@@ -16,7 +16,6 @@ const LedgerPrint = forwardRef((props, ref) => {
             <table border="1">
                 <thead>
                     <tr>
-                        <th>IDX</th>
                         <th>DATE</th>
                         <th>ITEM NAME</th>
                         <th>CR</th>
@@ -25,11 +24,8 @@ const LedgerPrint = forwardRef((props, ref) => {
                 </thead>
                 <tbody>
                     {props.tableData?.map((row, index) => (
-                        <tr key={index} style={{ lineHeight: '0.8', padding: '0', fontSize:'10px' }}>
-                            <td component="th" scope="row">
-                                {index + 1}
-                            </td>
-                            <td align="right">{row.date}</td>
+                        <tr key={index} style={{ lineHeight: '0.8', padding: '0', fontSize:'12px' }}>
+                            <td align="left">{row.date}</td>
                             <td align="right">{row.itemName}</td>
                             <td align="right">{row.cr}</td>
                             <td align="right">{row.dr}</td>

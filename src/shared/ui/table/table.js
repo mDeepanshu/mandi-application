@@ -4,7 +4,6 @@ import { Delete, Edit, ArrowForwardIos, ArrowBackIos } from '@mui/icons-material
 import { Button } from "@mui/material";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
 import styles from "./table.module.css";
-import Pagination from '@mui/material/Pagination';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { updateAuctionTransaction } from "../../../gateway/comman-apis";
 import Snackbar from '@mui/material/Snackbar';
@@ -86,7 +85,7 @@ function SharedTable(props) {
         if (props.tableData.length) {
             setColumns(props.columns);
             setRowVariables(Array(props.tableData.length).fill(0));
-            setTableData(props.tableData.slice(0, 10));
+            setTableData(props.tableData);
             setAllTableData(props.tableData);
             setTotalPages(Math.floor(props.tableData.length / 10));
             setKeyArray(props.keyArray);
@@ -180,7 +179,7 @@ function SharedTable(props) {
                     {tableData?.map((rowData, index) => {
                         return (<TableRow key={index}>
                             {keyArray.map((key, i) =>
-                                <TableCell key={i} align="left">
+                                <TableCell key={i} align="left" sx={{ padding: "4px 8px", lineHeight: "1rem" }}>
                                     {(() => {
                                         switch (key) {
                                             case "edit":
@@ -210,9 +209,6 @@ function SharedTable(props) {
                     })}
                 </TableBody>
             </Table>
-            <div className={styles.paninator}>
-                <Pagination count={totalPages} page={page} onChange={handleChange} />
-            </div>
             <div>
                 <Dialog open={open} onClose={handleClose}>
                     <DialogTitle>EDIT DATA</DialogTitle>
