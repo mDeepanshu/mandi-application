@@ -36,3 +36,11 @@ export const kisanBillSummary = async (startDate,endDate) => {
   }
 };
 
+export const saveAllKisanBill = async () => {
+  try {
+    const response = await axiosHttp.patch(`/autoSaveBills`);
+    return response.data;
+  } catch (error) {
+    console.error('Error posting data:', error);
+  }
+};

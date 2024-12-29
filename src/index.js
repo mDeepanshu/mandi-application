@@ -11,6 +11,9 @@ import PartyMaster from "./features/party-master/Party-Master";
 import Ledger from "./features/ledger/ledger";
 import KisanBillSummary from "./features/kisan-bill-summary/kisanBillSummary";
 import VyapariVasuliSheet  from "./features/vyapari-vasuli-sheet/Vyapari-Vasuli-Sheet";
+import AuctionEntry from "./features/auction-entry/auction-entry";
+import VasuliList from "./features/vasuli-list/vasuli-list";
+
 
 const router = createBrowserRouter([
 	{
@@ -48,6 +51,14 @@ const router = createBrowserRouter([
 			{
 				path: 'vyapari-vasuli-sheet',
 				element: <VyapariVasuliSheet />
+			},
+			{
+				path: 'auction-entry',
+				element: <AuctionEntry />
+			},
+			{
+				path: 'vasuli-list',
+				element: <VasuliList />
 			},
 		],
 		// errorElement: <Error />

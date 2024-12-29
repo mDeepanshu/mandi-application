@@ -21,7 +21,6 @@ const PartyMaster = () => {
   const triggerRef = useRef();
   const componentRef = useRef();
 
-  const [open, setOpen] = useState(false);
   const { handleSubmit, control, watch, getValues, formState: { errors }, reset } = useForm({
     defaultValues: {
       partyType: 'KISAN', // Ensure this matches one of the MenuItem values
@@ -32,8 +31,6 @@ const PartyMaster = () => {
   const [filterVyapariText, setFilterVyapariText] = useState(true);
 
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
-  const [alertType, setAlertType] = useState("");
-  const [alertMsg, setAlertMsg] = useState("");
   const [alertData, setAlertData] = useState({});
 
 

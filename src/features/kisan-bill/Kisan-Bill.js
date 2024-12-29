@@ -27,6 +27,7 @@ function KisanBill() {
   const [kisanList, setKisanList] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
+  const [noEntries, setNoEntries] = useState(false);
 
   const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Date", "Vyapari Name", "Edit", "Previuos Edits"]);
   const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "itemTotal", "auctionDate", "partyName", "edit", "navigation"]);
@@ -127,12 +128,17 @@ function KisanBill() {
   };
 
   const fetchBill = async () => {
+    setNoEntries(false);
     const isValid = await trigger(['kisan', 'date']);
     if (isValid) {
       let formValues = getValues();
       const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
       if (billData) {
         const auctionList = billData?.responseBody?.bills;
+        
+        if (billData?.responseBody?.bills?.length === 0) {
+          setNoEntries(true);
+        }
         setTableData(auctionList);
         if (billData?.responseBody?.bills?.length) {
           const billConstant = billData?.responseBody;
@@ -335,6 +341,7 @@ function KisanBill() {
               </Grid>
             </Grid>
             <TableContainer component={Paper} className='bill-table'>
+              {noEntries && `NO ENTRIES FOUND`}
               <SharedTable columns={kisanBillColumnsColumns} tableData={structuredClone(tableData)} keyArray={keyArray} refreshBill={refreshBill} />
             </TableContainer>
             <Grid container spacing={2} justifyContent="flex-end" p={2}>

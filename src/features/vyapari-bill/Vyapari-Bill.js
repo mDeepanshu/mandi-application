@@ -55,22 +55,6 @@ function VyapariBill() {
     if (allVyapari?.responseBody) setVyapariList(allVyapari?.responseBody);
   }
 
-  // const editFromTable = (index) => {
-  // }
-
-  // const deleteFromTable = (index) => {
-  // }
-
-
-
-  // useEffect(() => {
-  //   if (formData) {
-  //     if (triggerRef.current) {
-  //       triggerRef.current.click();
-  //     }
-  //   }
-  // }, [formData]);
-
   const printBill = () => {
     triggerRef.current.click();
 
@@ -168,7 +152,7 @@ function VyapariBill() {
                 helperText={errors.previous_remaining ? errors.previous_remaining.message : ""}
                 size="small"
                 sx={{ mb: 3 }}
-                defaultValue="1"
+                defaultValue=""
                 fullWidth
                 label="Current Outstanding"
                 variant="outlined"

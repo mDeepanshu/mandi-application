@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Grid } from "@mui/material";
 import { useForm, Controller } from 'react-hook-form';
 import { TextField, Button } from "@mui/material";
 import { kisanBillSummary } from '../../gateway/kisan-bill-apis';
-import MasterTable from "../../shared/ui/master-table/master-table";
-import LedgerPrint from "../../dialogs/ledger-print/ledger-print-dialog";
 import ReactToPrint from 'react-to-print';
 
 import styles from "./kisan-bill-summary.module.css";
@@ -16,8 +13,6 @@ function KisanBillSummary() {
 
   const [tableData, setTableData] = useState([]);
   const [apiResponse, setResponseData] = useState();
-  // const [ledgerColumns, setledgerColumns] = useState(["INDEX", "PARTY NAME", "OPENING AMOUNT", "DAY BILL", "CLOSING AMOUNT"]);
-  // const [keyArray, setKeyArray] = useState(["index", "partyName", "openingAmount", "dayBill", "closingAmount"]);
   const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
 
   const { register, formState: { errors }, getValues } = useForm({

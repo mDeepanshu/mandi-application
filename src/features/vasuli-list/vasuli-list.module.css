@@ -1,0 +1,45 @@
+.container{
+    padding: 5px 15px;
+    display: flex;
+    flex-direction: column; 
+}
+
+h1{
+    width: 100%;
+}
+
+.dateFields {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    /* padding-bottom: 20px; */
+}
+
+.constants {
+    width: 100%;
+    display: flex;
+    padding-bottom: 5px;
+    justify-content: end;
+    gap: 4px;
+}
+
+.date{
+    /* width: 15%; */
+    padding-right: 10px;
+}
+
+.tableContainer {
+    width: 100%;
+}
+
+
+.print_btn {
+    /* padding-left: 5px; */
+    margin-left: 5px;
+    /* padding-left: 30px; */
+}
+
+.vyapariName{
+    width: 25%;
+    padding-right: 15px;
+}

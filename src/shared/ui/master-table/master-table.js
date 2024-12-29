@@ -19,9 +19,10 @@ function MasterTable(props) {
     const [allTableData, setAllTableData] = useState([]);
     const [keyArray, setKeyArray] = useState([]);
     const [fieldDefinitions, setFieldDefinitions] = useState([]);
+    const [paginationLength, setPaginationLength] = useState(10);
 
     const { control, handleSubmit, register, reset, formState: { errors }, setValue, getValues } = useForm();
-    let tableHeight = "";
+
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -50,9 +51,9 @@ function MasterTable(props) {
 
     useEffect(() => {
         setColumns(props.columns);
-        setTableData(props.tableData.slice(0, 10));
+        setTableData(props.tableData.slice(0, paginationLength));
         setAllTableData(props.tableData);
-        setTotalPages(Math.floor(props.tableData.length / 10));
+        setTotalPages(Math.floor(props.tableData.length / paginationLength) + 1);
         setKeyArray(props.keyArray);
 
         let fields = [];
@@ -72,59 +73,79 @@ function MasterTable(props) {
 
     const handleChange = (event, value) => {
         setPage(value);
-        setTableData(allTableData.slice(value * 10, value * 10 + 10));
+        setTableData(allTableData.slice(value * paginationLength, value * paginationLength + paginationLength));
     };
 
-    const updateRecord = (event, value) => {
+
+    const handleSelectChange = (event) => {
+        const selectedValue = parseInt(event.target.value, 10);
+        setPaginationLength(selectedValue);
+        setTotalPages(Math.floor(props.tableData.length / selectedValue) + 1);
+        setPage(1);
+        setTableData(props.tableData.slice(0, selectedValue));
     };
+
+    const updateRecord = (event, value) => { };
 
     return (
         <div>
-            <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
-                <Table stickyHeader aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            {columns.map((row, index) => (
-                                <TableCell align="left" key={index}><b>{row}</b></TableCell>
-                            ))}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {tableData.map((rowData, index) => (
-                            <TableRow key={index}>
-                                {keyArray.map((key, i) =>
-                                    <TableCell key={i} align="left" sx={{ borderBottom: "none" }}>
-                                        {(() => {
-                                            switch (key) {
-                                                case "edit":
-                                                    return <Button onClick={() => editFromTable(index)}><Edit /></Button>;
-                                                case "delete":
-                                                    return <Button onClick={() => deleteFromTable(index)}><Delete /></Button>;
-                                                case "daysExceded":
-                                                    return (
-                                                        <div className={`${styles.myClass} ${rowData[key] > 0 ? styles.daysExceded : styles.daysNotExceded}`}>
-                                                            {rowData[key]}
-                                                        </div>
-                                                    );
-                                                case "index":
-                                                    return (page - 1) * 10 + index + 1;
-                                                case "navigation":
-                                                    return <><Button><ArrowBackIos /></Button><Button><ArrowForwardIos /></Button></>;
-                                                default:
-                                                    return rowData[key];
-                                            }
-                                        })()}
-                                    </TableCell>
-                                )}
+            <TableContainer component={Paper} className={styles.table}>
+                <div className={styles.tableBody}>
+                    <Table aria-label="simple table">
+                        <TableHead>
+                            <TableRow>
+                                {columns.map((row, index) => (
+                                    <TableCell align="left" key={index}><b>{row}</b></TableCell>
+                                ))}
                             </TableRow>
-
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHead>
+                        <TableBody>
+                            {tableData.map((rowData, index) => (
+                                <TableRow key={index}>
+                                    {keyArray.map((key, i) => (
+                                        <TableCell key={i} align="left" sx={{ padding: "4px 8px", lineHeight: "1.5rem" }}>
+                                            {(() => {
+                                                switch (key) {
+                                                    case "edit":
+                                                        return <Button onClick={() => editFromTable(index)}><Edit /></Button>;
+                                                    case "delete":
+                                                        return <Button onClick={() => deleteFromTable(index)}><Delete /></Button>;
+                                                    case "index":
+                                                        return (page - 1) * paginationLength + index + 1;
+                                                    case "navigation":
+                                                        return (
+                                                            <>
+                                                                <Button><ArrowBackIos /></Button>
+                                                                <Button><ArrowForwardIos /></Button>
+                                                            </>
+                                                        );
+                                                    case "daysExceded":
+                                                        return (
+                                                            <div className={`${styles.myClass} ${rowData[key] > 0 ? styles.daysExceded : styles.daysNotExceded}`}>
+                                                                {rowData[key]}
+                                                            </div>
+                                                        );
+                                                    default:
+                                                        return rowData[key];
+                                                }
+                                            })()}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+                <div className={styles.paninator}>
+                    <select value={paginationLength} onChange={handleSelectChange} id="paginationLengthSelect" className={styles.selectLength}>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <Pagination count={totalPages} page={page} onChange={handleChange} />
+                </div>
             </TableContainer>
-            <div className={styles.paninator}>
-                <Pagination count={totalPages} page={page} onChange={handleChange} />
-            </div>
             <div>
                 <Dialog open={open} onClose={handleClose}>
                     <DialogTitle>EDIT DATA</DialogTitle>

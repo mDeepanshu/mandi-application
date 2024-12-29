@@ -29,26 +29,4 @@ const changeLoginState = (value) => {
 	);
 }
 
-// const router = createBrowserRouter([
-// 	{
-// 		path: '/',
-// 		element: <App />,
-// 		children: [
-// 			{
-// 				path: '/',
-// 				element: <Home />
-// 			},
-// 			{
-// 				path: 'kisan-bill',
-// 				element: <Kisan />
-// 			},
-// 			{
-// 				path: 'vyapari-bill',
-// 				element: <Vyapari />
-// 			},
-// 		],
-// 		// errorElement: <Error />
-// 	}
-// ])
-
 export default App;
