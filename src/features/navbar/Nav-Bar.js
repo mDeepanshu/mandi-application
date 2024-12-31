@@ -20,7 +20,7 @@ const remNavItems = [
     { name: 'item-master', label: 'ITEM MASTER' },
     { name: 'party-master', label: 'PARTY MASTER' },
     { name: 'saveKisanBill', label: 'SAVE ALL KISAN BILL' },
-    { name: 'auction-entry', label: 'KALAM LIST' },
+    { name: 'auction-entry', label: 'AUCTION ENTRIES' },
     { name: 'vasuli-list', label: 'VASULI LIST' },
 ];
 const drawerWidth = 240;

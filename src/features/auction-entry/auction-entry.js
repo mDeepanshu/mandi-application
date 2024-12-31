@@ -6,15 +6,14 @@ import MasterTable from "../../shared/ui/master-table/master-table";
 import ReactToPrint from 'react-to-print';
 import styles from "./auction-entries.module.css";
 
-function VasuliList() {
+function AuctionEntries() {
 
-  const componentRef = useRef();
   const triggerRef = useRef();
 
   const [tableData, setTableData] = useState([]);
-  const [vasuliListColumns, setVasuliListColumns] = useState(["INDEX", "AMOUNT", "DATE","NAME", "REMARK"]);
-  const [keyArray, setKeyArray] = useState(["index","amount" ,"date", "vyapariName", "remark"]);
-  const [vasuliList, setVasuliList] = useState([]);
+  const [auctionEntriesColumns, setAuctionEntriesColumns] = useState(["INDEX","KISANNAME" ,"ITEMNAME", "VYAPARINAME", "RATE", "QUANTITY", "AMOUNT", "BAG", "DATE"]);
+  const [keyArray, setKeyArray] = useState(["index","kisanName" ,"itemName", "vyapariName", "rate", "quantity", "amount", "bag", "auctionDate"]);
+  const [auctionEntries, setAuctionEntries] = useState([]);
   const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
 
   const { register, control, handleSubmit, formState: { errors }, getValues, trigger, setValue } = useForm({
@@ -24,16 +23,16 @@ function VasuliList() {
     },
   });
 
-  const fetch_vasuliList = async (data) => {
+  const fetch_auctionEntriesList = async () => {
     const isValid = await trigger(); // Validates all fields
     if (isValid) {
-      getVasulies();
+      getAuctionEntries();
     } else {
       console.log('Validation failed');
     }
   }
 
-  const getVasulies = async() => {
+  const getAuctionEntries = async() => {
     const { fromDate, toDate } = getValues();
     const vasuliList = await getAuctionEntriesList(fromDate, toDate);
     if (vasuliList) {
@@ -48,7 +47,7 @@ function VasuliList() {
   return (
     <>
       <div className={styles.container}>
-        <h1>KALAM ENTRIES</h1>
+        <h1>AUCTION ENTRIES</h1>
         <form onSubmit={(e) => e.preventDefault()}>
           <div className={styles.dateFields}>
             <div className={styles.date}>
@@ -87,7 +86,7 @@ function VasuliList() {
             </div>
           </div>
           <div>
-            <Button variant="contained" color="success" type='button' onClick={() => fetch_vasuliList(getValues())} >FETCH</Button>&nbsp;
+            <Button variant="contained" color="success" type='button' onClick={() => fetch_auctionEntriesList()} >FETCH</Button>&nbsp;
             {/* <Button variant="contained" color="success" type='button' onClick={() => printLedger()} className={styles.print_btn}>PRINT LEDGER</Button>
             <ReactToPrint
               trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
@@ -95,7 +94,7 @@ function VasuliList() {
             /> */}
           </div>
         </form>
-        <MasterTable columns={vasuliListColumns} tableData={tableData} keyArray={keyArray} />
+        <MasterTable columns={auctionEntriesColumns} tableData={tableData} keyArray={keyArray} />
       </div>
       <div style={{ display: 'none' }}>
         {/* <LedgerPrint ref={componentRef} tableData={tableData} formData={getValues()} /> */}
@@ -104,4 +103,4 @@ function VasuliList() {
   );
 }
 
-export default VasuliList;
+export default AuctionEntries;

@@ -82,7 +82,7 @@ const KisanBillPrint = forwardRef((props, ref) => {
           </TableHead>
           <TableBody>
             {printTable?.map((row, index) => (
-              <TableRow key={index} sx={{ '& > *': { padding: '4px 8px' } }}>
+              <TableRow key={index} sx={{ '& > *': { padding: '4px 8px',lineHeight:`1.4rem` } }}>
                 <TableCell component="th" scope="row">
                   {row?.itemName}
                 </TableCell>

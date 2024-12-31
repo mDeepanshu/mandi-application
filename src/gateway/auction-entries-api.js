@@ -1,8 +1,8 @@
 import axiosHttp from "../interceptors/error-handling-interceptor";
 
-export const getAuctionEntriesList = async (vyapariId,startDate,endDate) => {
+export const getAuctionEntriesList = async (startDate,endDate) => {
   try {
-    const response = await axiosHttp.get(`/vyapari/ledger?vyapariId=${vyapariId}&startDate=${startDate}&endDate=${endDate}`);
+    const response = await axiosHttp.get(`/auction/list-auction-transaction?startDate=${startDate}&endDate=${endDate}`);
     return response.data;
   } catch (error) {
     console.error('Error:', error);
