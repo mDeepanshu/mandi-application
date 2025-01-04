@@ -13,10 +13,11 @@ function VasuliList() {
   const triggerRef = useRef();
 
   const [tableData, setTableData] = useState([]);
-  const [vasuliListColumns, setVasuliListColumns] = useState(["INDEX", "AMOUNT", "DATE","NAME", "REMARK"]);
-  const [keyArray, setKeyArray] = useState(["index","amount" ,"date", "vyapariName", "remark"]);
+  const [vasuliListColumns, setVasuliListColumns] = useState(["INDEX", "AMOUNT", "DATE", "NAME", "REMARK"]);
+  const [keyArray, setKeyArray] = useState(["index", "amount", "date", "vyapariName", "remark"]);
   const [vasuliList, setVasuliList] = useState([]);
   const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
+  const [vasuliTotal, setVasuliTotal] = useState([]);
 
   const { register, control, handleSubmit, formState: { errors }, getValues, trigger, setValue } = useForm({
     defaultValues: {
@@ -34,11 +35,15 @@ function VasuliList() {
     }
   }
 
-  const getVasulies = async() => {
+  const getVasulies = async () => {
     const { fromDate, toDate } = getValues();
     const vasuliList = await getVasuliList(fromDate, toDate);
     if (vasuliList) {
-      setTableData(vasuliList.responseBody);
+      setTableData(vasuliList.responseBody?.vasuliList);
+      setVasuliTotal(vasuliList.responseBody?.totalVasuli);
+    } else {
+      setTableData([]);
+      setVasuliTotal(`NA`);
     }
   }
 
@@ -87,13 +92,16 @@ function VasuliList() {
               <p className="error">{errors.toDate?.message}</p>
             </div>
           </div>
-          <div>
+          <div className={styles.btns}>
             <Button variant="contained" color="success" type='button' onClick={() => fetch_vasuliList(getValues())} >FETCH</Button>&nbsp;
             {/* <Button variant="contained" color="success" type='button' onClick={() => printLedger()} className={styles.print_btn}>PRINT LEDGER</Button>
             <ReactToPrint
               trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
               content={() => componentRef.current}
             /> */}
+            <div>
+              <b>VASULI TOTAL:</b> {vasuliTotal}
+            </div>
           </div>
         </form>
         <MasterTable columns={vasuliListColumns} tableData={tableData} keyArray={keyArray} />

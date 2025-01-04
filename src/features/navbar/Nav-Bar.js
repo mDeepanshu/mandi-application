@@ -19,7 +19,7 @@ const navItems = [
 const remNavItems = [
     { name: 'item-master', label: 'ITEM MASTER' },
     { name: 'party-master', label: 'PARTY MASTER' },
-    { name: 'saveKisanBill', label: 'SAVE ALL KISAN BILL' },
+    // { name: 'saveKisanBill', label: 'SAVE ALL KISAN BILL' },
     { name: 'auction-entry', label: 'AUCTION ENTRIES' },
     { name: 'vasuli-list', label: 'VASULI LIST' },
 ];
@@ -88,7 +88,6 @@ function NavBar(props) {
                         </ListItem>
                     </Link>
                 ))}
-                <button>Save All Kisan Bill</button>
             </List>
         </Box>
     );
@@ -144,17 +143,11 @@ function NavBar(props) {
                         >
                             {remNavItems.map((item, index) => (
                                 <MenuItem key={index} onClick={handleClose}>
-                                    {item.name === 'saveKisanBill' ? (
-                                        <Button type='button' onClick={saveKisanBill} key={item.name}>
+                                    <Link to={item.name} key={index}>
+                                        <Button key={item.name}>
                                             {item.label}
                                         </Button>
-                                    ) : (
-                                        <Link to={item.name} key={index}>
-                                            <Button key={item.name}>
-                                                {item.label}
-                                            </Button>
-                                        </Link>
-                                    )}
+                                    </Link>
                                 </MenuItem>
                             ))}
                         </Menu>

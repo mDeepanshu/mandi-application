@@ -29,7 +29,7 @@ export const saveKisanBill = async (bill) => {
 
 export const kisanBillSummary = async (startDate,endDate) => {
   try {
-    const response = await axiosHttp.get(`/kisan/kisanBillPaymentSummary?startDate=${startDate}&endDate=${endDate}`);
+    const response = await axiosHttp.get(`/kisan/kisanBillPaymentSummary?startDate=${startDate}&endDate=${endDate}&listLive=true`);
     return response.data;
   } catch (error) {
     console.error('Error posting data:', error);

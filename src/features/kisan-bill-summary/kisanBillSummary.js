@@ -38,8 +38,14 @@ function KisanBillSummary() {
 
     const billSummary = await kisanBillSummary(fromDate, toDate);
     if (billSummary) {
-      setTableData(billSummary.responseBody?.kisanBills);
-      setResponseData(billSummary.responseBody);
+      const allKisanBills = billSummary.responseBody?.kisanBills;
+      if (allKisanBills.length) {
+        setTableData(allKisanBills);
+        setResponseData(billSummary.responseBody);
+      } else {
+        setTableData([]);
+        setResponseData({});
+      }
     }
 
   }
@@ -93,7 +99,6 @@ function KisanBillSummary() {
                   <th>BHADA</th>
                   <th>N.TAX</th>
                   <th>NAGDI</th>
-                  <th>STAT CHAR</th>
                   <th>DRIV. ENAM</th>
                   <th>PAKKA TOTAL</th>
                 </tr>
@@ -111,7 +116,6 @@ function KisanBillSummary() {
                       <td align="center">{row.bhada}</td>
                       <td align="center">{row.nagarPalikaTax}</td>
                       <td align="center">{row.nagdi}</td>
-                      <td align="center">{row.statCharge}</td>
                       <td align="center">{row.driver}</td>
                       <td align="center">{row.total}</td>
                     </tr>
@@ -128,7 +132,7 @@ function KisanBillSummary() {
                         </td>
                       </tr>
                     ))}
-                    <hr/>
+                    <hr />
                   </>
                 ))}
               </tbody>

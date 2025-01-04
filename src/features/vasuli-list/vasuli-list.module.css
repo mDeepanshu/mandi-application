@@ -43,3 +43,10 @@ h1{
     width: 25%;
     padding-right: 15px;
 }
+
+.btns{
+    display: flex;
+    padding: 10px 0;
+    align-items: center;
+    gap: 30px;
+}
