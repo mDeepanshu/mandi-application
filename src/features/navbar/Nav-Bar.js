@@ -22,6 +22,7 @@ const remNavItems = [
     // { name: 'saveKisanBill', label: 'SAVE ALL KISAN BILL' },
     { name: 'auction-entry', label: 'AUCTION ENTRIES' },
     { name: 'vasuli-list', label: 'VASULI LIST' },
+    { name: 'device-control', label: 'DEVICE CONTROL' },
 ];
 const drawerWidth = 240;
 

@@ -13,6 +13,7 @@ import KisanBillSummary from "./features/kisan-bill-summary/kisanBillSummary";
 import VyapariVasuliSheet  from "./features/vyapari-vasuli-sheet/Vyapari-Vasuli-Sheet";
 import AuctionEntries from "./features/auction-entry/auction-entry";
 import VasuliList from "./features/vasuli-list/vasuli-list";
+import DeviceControl from "./features/device-control/device-control";
 
 
 const router = createBrowserRouter([
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
 			{
 				path: 'vasuli-list',
 				element: <VasuliList />
+			},
+			{
+				path: 'device-control',
+				element: <DeviceControl />
 			},
 		],
 		// errorElement: <Error />

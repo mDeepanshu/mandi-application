@@ -47,11 +47,20 @@
 }
 
 .selectLength{
-    /* width: 100%; */
     height: 70%;
 }
 
 .tableBody{
     max-height: 400px;
     overflow-y: auto;
+}
+
+.grantBtn{
+    border-radius: 7px;
+    background-color: red;
+}
+
+.rejectBtn{
+    border-radius: 7px;
+    background-color: green;
 }

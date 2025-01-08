@@ -36,7 +36,7 @@ function MasterTable(props) {
         setOpen(true);
         for (let int = 0; int < props.keyArray.length; int++) {
             if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) {
-                setValue(keyArray[int], tableData[index]?.[0]?.[keyArray[int]]);
+                setValue(keyArray[int], tableData?.[index]?.[0]?.[keyArray[int]]);
             }
         }
 
@@ -51,9 +51,9 @@ function MasterTable(props) {
 
     useEffect(() => {
         setColumns(props.columns);
-        setTableData(props.tableData.slice(0, paginationLength));
+        setTableData(props.tableData?.slice(0, paginationLength));
         setAllTableData(props.tableData);
-        setTotalPages(Math.floor(props.tableData.length / paginationLength) + 1);
+        setTotalPages(Math.floor(props.tableData?.length / paginationLength) + 1);
         setKeyArray(props.keyArray);
 
         let fields = [];
@@ -80,9 +80,9 @@ function MasterTable(props) {
     const handleSelectChange = (event) => {
         const selectedValue = parseInt(event.target.value, 10);
         setPaginationLength(selectedValue);
-        setTotalPages(Math.floor(props.tableData.length / selectedValue) + 1);
+        setTotalPages(Math.floor(props.tableData?.length / selectedValue) + 1);
         setPage(1);
-        setTableData(props.tableData.slice(0, selectedValue));
+        setTableData(props.tableData?.slice(0, selectedValue));
     };
 
     const updateRecord = (event, value) => { };
@@ -100,7 +100,7 @@ function MasterTable(props) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {tableData.map((rowData, index) => (
+                            {tableData?.map((rowData, index) => (
                                 <TableRow key={index}>
                                     {keyArray.map((key, i) => (
                                         <TableCell key={i} align="left" sx={{ padding: "4px 8px", lineHeight: "1.5rem" }}>
@@ -110,6 +110,10 @@ function MasterTable(props) {
                                                         return <Button onClick={() => editFromTable(index)}><Edit /></Button>;
                                                     case "delete":
                                                         return <Button onClick={() => deleteFromTable(index)}><Delete /></Button>;
+                                                    case "grant":
+                                                        return <Button disabled={rowData?.status===`APPROVED`} sx={{ borderRadius: "15px" }} onClick={()=>props.changeStatus(`APPROVED`,rowData?.id)} className={styles.deviceControlBtn} variant="contained" color="success">GRANT</Button>;
+                                                    case "revoke":
+                                                        return <Button disabled={rowData?.status===`REJECTED`} sx={{ borderRadius: "15px" }} onClick={()=>props.changeStatus(`REJECTED`,rowData?.id)} className={styles.deviceControlBtn} variant="contained" color="error">REJECT</Button>;
                                                     case "index":
                                                         return (page - 1) * paginationLength + index + 1;
                                                     case "navigation":
