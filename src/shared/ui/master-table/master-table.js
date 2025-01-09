@@ -11,7 +11,7 @@ function MasterTable(props) {
 
     const [open, setOpen] = useState(false);
     // const [editingIndex, setEditingIndex] = useState(0);
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
 
     const [columns, setColumns] = useState([]);
@@ -53,7 +53,7 @@ function MasterTable(props) {
         setColumns(props.columns);
         setTableData(props.tableData?.slice(0, paginationLength));
         setAllTableData(props.tableData);
-        setTotalPages(Math.floor(props.tableData?.length / paginationLength) + 1);
+        setTotalPages(Math.ceil(props.tableData?.length / paginationLength)-1);
         setKeyArray(props.keyArray);
 
         let fields = [];
@@ -80,8 +80,8 @@ function MasterTable(props) {
     const handleSelectChange = (event) => {
         const selectedValue = parseInt(event.target.value, 10);
         setPaginationLength(selectedValue);
-        setTotalPages(Math.floor(props.tableData?.length / selectedValue) + 1);
-        setPage(1);
+        setTotalPages(Math.ceil(props.tableData?.length / selectedValue)-1);
+        setPage(0);
         setTableData(props.tableData?.slice(0, selectedValue));
     };
 
@@ -111,11 +111,11 @@ function MasterTable(props) {
                                                     case "delete":
                                                         return <Button onClick={() => deleteFromTable(index)}><Delete /></Button>;
                                                     case "grant":
-                                                        return <Button disabled={rowData?.status===`APPROVED`} sx={{ borderRadius: "15px" }} onClick={()=>props.changeStatus(`APPROVED`,rowData?.id)} className={styles.deviceControlBtn} variant="contained" color="success">GRANT</Button>;
+                                                        return <Button disabled={rowData?.status === `APPROVED`} sx={{ borderRadius: "15px" }} onClick={() => props.changeStatus(`APPROVED`, rowData?.id)} className={styles.deviceControlBtn} variant="contained" color="success">GRANT</Button>;
                                                     case "revoke":
-                                                        return <Button disabled={rowData?.status===`REJECTED`} sx={{ borderRadius: "15px" }} onClick={()=>props.changeStatus(`REJECTED`,rowData?.id)} className={styles.deviceControlBtn} variant="contained" color="error">REJECT</Button>;
+                                                        return <Button disabled={rowData?.status === `REJECTED`} sx={{ borderRadius: "15px" }} onClick={() => props.changeStatus(`REJECTED`, rowData?.id)} className={styles.deviceControlBtn} variant="contained" color="error">REJECT</Button>;
                                                     case "index":
-                                                        return (page - 1) * paginationLength + index + 1;
+                                                        return page * paginationLength + index + 1;
                                                     case "navigation":
                                                         return (
                                                             <>

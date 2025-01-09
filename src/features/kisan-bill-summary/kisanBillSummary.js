@@ -74,7 +74,7 @@ function KisanBillSummary() {
           </div>
         </form>
         <br />
-        <div ref={componentRef}>
+        <div ref={componentRef} className={styles.print_section}>
           <div className={styles.totals}>
             <div><b>Kaccha Total:</b> {apiResponse?.kacchaTotal}</div>
             <div><b>Commission:</b> {apiResponse?.commission}</div>

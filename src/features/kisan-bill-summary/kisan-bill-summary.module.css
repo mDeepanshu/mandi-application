@@ -1,14 +1,14 @@
-.container{
-    padding: 5px 15px;
+.container {
+    padding: 5px 10px;
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
 }
 
-h1{
+h1 {
     width: 100%;
 }
 
-.date{
+.date {
     width: 30%;
 }
 
@@ -28,10 +28,11 @@ h1{
     /* padding-left: 30px; */
 }
 
-.totals{
+.totals {
     display: flex;
     gap: 5px;
-    justify-content: center; /* Align items horizontally */
+    justify-content: center;
+    /* Align items horizontally */
     padding-bottom: 5px;
 }
 
@@ -40,15 +41,21 @@ h1{
     padding-right: 5px;
     /* justify-content: flex-end; */
     /* white-space: nowrap; */
-  }
+}
 
-  .billDataNumber{
+.billDataNumber {
     text-align: start;
     width: 2rem;
-  }
+}
 
-  .itemDetails{
+.itemDetails {
     display: flex;
     gap: 15px;
-    
-  }
+
+}
+
+@media print {
+    .print_section {
+        padding: 0 10px;
+    }
+}
