@@ -84,6 +84,11 @@ function VyapariVasuliSheet() {
             />
           </div>
         </form>
+        <div className={styles.totals}>
+          <div>OPENING TOTAL:</div>
+          <div>DAY TOTAL:</div>
+          <div>CLOSING TOTAL:</div>
+        </div>
         <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} />
       </div>
       <div style={{ display: 'none' }}>

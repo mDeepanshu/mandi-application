@@ -155,6 +155,9 @@ function VyapariBill() {
                 defaultValue=""
                 fullWidth
                 label="Current Outstanding"
+                InputLabelProps={{
+                  shrink: true,
+                }}
                 variant="outlined"
               />
             </Grid>

@@ -11,7 +11,7 @@ function MasterTable(props) {
 
     const [open, setOpen] = useState(false);
     // const [editingIndex, setEditingIndex] = useState(0);
-    const [page, setPage] = useState(0);
+    const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
     const [columns, setColumns] = useState([]);
@@ -53,7 +53,7 @@ function MasterTable(props) {
         setColumns(props.columns);
         setTableData(props.tableData?.slice(0, paginationLength));
         setAllTableData(props.tableData);
-        setTotalPages(Math.ceil(props.tableData?.length / paginationLength)-1);
+        setTotalPages(Math.ceil(props.tableData?.length / paginationLength));
         setKeyArray(props.keyArray);
 
         let fields = [];
@@ -73,15 +73,15 @@ function MasterTable(props) {
 
     const handleChange = (event, value) => {
         setPage(value);
-        setTableData(allTableData.slice(value * paginationLength, value * paginationLength + paginationLength));
+        setTableData(allTableData.slice((value-1) * paginationLength, (value-1) * paginationLength + paginationLength));
     };
 
 
     const handleSelectChange = (event) => {
         const selectedValue = parseInt(event.target.value, 10);
         setPaginationLength(selectedValue);
-        setTotalPages(Math.ceil(props.tableData?.length / selectedValue)-1);
-        setPage(0);
+        setTotalPages(Math.ceil(props.tableData?.length / selectedValue));
+        setPage(1);
         setTableData(props.tableData?.slice(0, selectedValue));
     };
 
@@ -115,7 +115,7 @@ function MasterTable(props) {
                                                     case "revoke":
                                                         return <Button disabled={rowData?.status === `REJECTED`} sx={{ borderRadius: "15px" }} onClick={() => props.changeStatus(`REJECTED`, rowData?.id)} className={styles.deviceControlBtn} variant="contained" color="error">REJECT</Button>;
                                                     case "index":
-                                                        return page * paginationLength + index + 1;
+                                                        return (page-1) * paginationLength + index + 1;
                                                     case "navigation":
                                                         return (
                                                             <>

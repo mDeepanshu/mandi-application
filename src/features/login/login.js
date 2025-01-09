@@ -9,7 +9,7 @@ function Login({ changeLoginState }) {
 
     const OnPasswordInput = (value) => {
         setPassword(value.target.value);
-        if (value.target.value==="9876") {
+        if (value.target.value == process.env.REACT_APP_PASS) {
             setTimeout(() => {                
                 changeLoginState(false);
             }, 100);
