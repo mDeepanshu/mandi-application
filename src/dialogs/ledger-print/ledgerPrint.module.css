@@ -12,5 +12,6 @@ td{
 
 .constants{
     display: flex;
-    flex-direction: column; /* Stack items vertically */
+    padding: 5px 0;
+    gap: 20px;
 }

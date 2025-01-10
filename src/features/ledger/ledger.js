@@ -18,8 +18,8 @@ function Ledger() {
   const triggerRef = useRef();
 
   const [tableData, setTableData] = useState([]);
-  const [ledgerColumns, setledgerColumns] = useState(["INDEX", "DATE", "ITEM NAME", "CREDIT", "DEBIT"]);
-  const [keyArray, setKeyArray] = useState(["index", "date", "itemName", "cr", "dr"]);
+  const [ledgerColumns, setledgerColumns] = useState(["DATE", "ITEM NAME", "CREDIT", "DEBIT"]);
+  const [keyArray, setKeyArray] = useState(["date", "itemName", "cr", "dr"]);
   const [vyapariList, setVyapariList] = useState([]);
   const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
   const twoDaysPrior = new Date();
@@ -51,7 +51,10 @@ function Ledger() {
   const getLedgerData = async (vyapari_id, fromDate, toDate) => {
     const ledger = await getLedger(vyapari_id, fromDate, toDate);
     if (ledger) {
-      setTableData(ledger.responseBody?.transactions);
+      if (ledger.responseBody?.transactions?.length) {
+        const transactionWithTotals = insertDateWiseTotal([...ledger.responseBody?.transactions]);
+        setTableData(transactionWithTotals);
+      }else setTableData([]);
       setValue("closingAmount", ledger.responseBody?.closingAmount);
       setValue("openingAmount", ledger.responseBody?.openingAmount);
     }
@@ -64,6 +67,34 @@ function Ledger() {
 
   const printLedger = () => {
     triggerRef.current.click();
+  }
+
+  const insertDateWiseTotal = (transactions) => {
+    let date = transactions?.[0]?.date;
+    let dateTotal = transactions?.[0]?.dr;
+    for (let i = 1; i < transactions.length; i++) {
+      if (transactions[i].date == date) {
+        dateTotal += transactions[i].dr;
+      } else {
+        date = transactions?.[i]?.date;
+        const amt = transactions?.[i]?.dr;
+        transactions.splice(i, 0, {
+          date: "TOTAL",
+          itemName: "",
+          cr: "",
+          dr: dateTotal,
+        });
+        dateTotal = amt;
+        i++;
+      }
+    }
+    transactions.push({
+      date: "TOTAL",
+      itemName: "",
+      cr: "",
+      dr: dateTotal,
+    });
+    return transactions;
   }
 
   return (
@@ -158,7 +189,7 @@ function Ledger() {
         <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} />
       </div>
       <div style={{ display: 'none' }}>
-        <LedgerPrint ref={componentRef} tableData={tableData} formData={getValues()} />
+        <LedgerPrint ref={componentRef} tableData={[...tableData]} formData={getValues()} />
       </div>
     </>
   );

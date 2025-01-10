@@ -73,7 +73,7 @@ function MasterTable(props) {
 
     const handleChange = (event, value) => {
         setPage(value);
-        setTableData(allTableData.slice((value-1) * paginationLength, (value-1) * paginationLength + paginationLength));
+        setTableData(allTableData.slice((value - 1) * paginationLength, (value - 1) * paginationLength + paginationLength));
     };
 
 
@@ -102,7 +102,7 @@ function MasterTable(props) {
                         <TableBody>
                             {tableData?.map((rowData, index) => (
                                 <TableRow key={index}>
-                                    {keyArray.map((key, i) => (
+                                    {keyArray?.map((key, i) => (
                                         <TableCell key={i} align="left" sx={{ padding: "4px 8px", lineHeight: "1.5rem" }}>
                                             {(() => {
                                                 switch (key) {
@@ -115,7 +115,9 @@ function MasterTable(props) {
                                                     case "revoke":
                                                         return <Button disabled={rowData?.status === `REJECTED`} sx={{ borderRadius: "15px" }} onClick={() => props.changeStatus(`REJECTED`, rowData?.id)} className={styles.deviceControlBtn} variant="contained" color="error">REJECT</Button>;
                                                     case "index":
-                                                        return (page-1) * paginationLength + index + 1;
+                                                        return (page - 1) * paginationLength + index + 1;
+                                                    case "date":
+                                                        return rowData[key] === "TOTAL" ? <b>TOTAL</b> : rowData[key];
                                                     case "navigation":
                                                         return (
                                                             <>
@@ -130,7 +132,7 @@ function MasterTable(props) {
                                                             </div>
                                                         );
                                                     default:
-                                                        return rowData[key];
+                                                        return rowData.date === "TOTAL" ? <b>{rowData[key]}</b> : rowData[key];
                                                 }
                                             })()}
                                         </TableCell>

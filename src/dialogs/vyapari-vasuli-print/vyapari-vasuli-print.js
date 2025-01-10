@@ -16,9 +16,9 @@ const VyapariVasuliPrint = forwardRef((props, ref) => {
                     <tr>
                         <th>NAME</th>
                         <th>OPN AMT</th>
-                        <th>DAY BILL</th>
                         <th>TTL</th>
                         <th>CLS AMT</th>
+                        <th>DAY BILL</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -26,13 +26,19 @@ const VyapariVasuliPrint = forwardRef((props, ref) => {
                         <tr key={index}>
                             <td className={styles.partyName}>{row.partyName}</td>
                             <td align='left' className={styles.openingAmount}>{row.openingAmount}</td>
-                            <td align='left' className={styles.daybill}>{row.dayBill}</td>
                             <td align='left'>{row.ttl}</td>
                             <td align='right'>{row.closingAmount}</td>
+                            <td align='left' className={styles.daybill}>{row.dayBill}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+            <div className={styles.totals}>
+                <div>OPENING TOTAL: {props.formData?.openingAmountSum}</div>
+                <div>DAY TOTAL: {props.formData?.daybill}</div>
+                <div>CLOSING TOTAL: {props.formData?.closingAmountSum}</div>
+            </div>
+            <hr/>
 
         </div>
     );

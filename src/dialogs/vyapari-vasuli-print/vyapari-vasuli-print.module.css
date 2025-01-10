@@ -26,6 +26,12 @@ td {
     max-width: 150px;
 }
 
+.totals{
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    padding: 0 5px;
+}
 
 @media print {
     .container{

@@ -18,6 +18,12 @@ function VyapariVasuliSheet() {
   const [tableData, setTableData] = useState([]);
   const [ledgerColumns, setledgerColumns] = useState(["INDEX", "PARTY NAME", "OPENING AMOUNT", "DAY BILL", "TTL", "CLOSING AMOUNT"]);
   const [keyArray, setKeyArray] = useState(["index", "partyName", "openingAmount", "dayBill", "ttl", "closingAmount"]);
+  const [totals, setTotals] = useState({
+    openingAmountSum: 0,
+    closingAmountSum: 0,
+    daybill: 0,
+  });
+
 
   const { register, formState: { errors }, getValues } = useForm();
 
@@ -37,17 +43,22 @@ function VyapariVasuliSheet() {
     } else data = { startDate: fromDate }
 
     const ledger = await getVyapariVasuliSheet(data);
-    ledger.responseBody.forEach(element => {
-      const total = element.dayBill
+    let dayBillTotal=0;
+    ledger?.responseBody?.vasuliList?.forEach(element => {
+      let total = element.dayBill
         .split(",")
         .map(Number)
         .reduce((sum, num) => sum + num, 0);
       element.ttl = total;
-      // element.dayBill=element.dayBill.split(",").map(String);
+      dayBillTotal+=total;
     });
-
+    setTotals({
+      openingAmountSum:ledger?.responseBody?.openingAmountSum,
+      daybill:dayBillTotal,
+      closingAmountSum:ledger?.responseBody?.closingAmountSum
+    });
     if (ledger) {
-      setTableData(ledger.responseBody);
+      setTableData(ledger?.responseBody?.vasuliList);
     }
 
   }
@@ -56,7 +67,7 @@ function VyapariVasuliSheet() {
     const init = async () => {
       const date = new Date();
       const formattedDate = date.toISOString().slice(0, 10);
-      const ledgerData = await getLedgerData(formattedDate);
+      getLedgerData(formattedDate);
     };
 
     init();
@@ -85,14 +96,14 @@ function VyapariVasuliSheet() {
           </div>
         </form>
         <div className={styles.totals}>
-          <div>OPENING TOTAL:</div>
-          <div>DAY TOTAL:</div>
-          <div>CLOSING TOTAL:</div>
+          <div>OPENING TOTAL:{totals.openingAmountSum}</div>
+          <div>DAY TOTAL:{totals.daybill}</div>
+          <div>CLOSING TOTAL:{totals.closingAmountSum}</div>
         </div>
         <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} />
       </div>
       <div style={{ display: 'none' }}>
-        <VyapariVasuliPrint ref={componentRef} tableData={tableData} formData={getValues()} />
+        <VyapariVasuliPrint ref={componentRef} tableData={tableData} formData={{...getValues(),...totals}} />
       </div>
     </>
   );
