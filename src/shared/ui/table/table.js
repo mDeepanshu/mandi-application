@@ -64,11 +64,11 @@ function SharedTable(props) {
         setOpen(true);
         for (let int = 0; int < props.keyArray.length; int++) {
             if (!excludeArr.includes(props.keyArray[int]))
-                if (keyArray[int]=="partyName") {
-                    const defaultOption = vyapariList.find(option =>  option.name == tableData[index]?.[tranIdx]?.partyName);
+                if (keyArray[int] == "partyName") {
+                    const defaultOption = vyapariList.find(option => option.name == tableData[index]?.[tranIdx]?.partyName);
                     setValue("partyName", defaultOption || null);
-                    
-                }else setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
+
+                } else setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
         }
 
     }
@@ -103,7 +103,7 @@ function SharedTable(props) {
                 }
             }
             setFieldDefinitions(fields);
-        }else{
+        } else {
             setTableData([]);
             setAllTableData([]);
         }
@@ -117,7 +117,7 @@ function SharedTable(props) {
 
     const updateRecord = async (saveAndReflect) => {
         if (saveAndReflect) {
-            let changedValues = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues(), auctionDate: new Date(), vyapariId:getValues().partyName.partyId };
+            let changedValues = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues(), auctionDate: new Date(), vyapariId: getValues().partyName.partyId };
             const updateRes = await updateAuctionTransaction(changedValues);
             props.refreshBill();
             handleClose();
@@ -216,7 +216,6 @@ function SharedTable(props) {
                 <Dialog open={open} onClose={handleClose}>
                     <DialogTitle>EDIT DATA</DialogTitle>
                     <DialogContent>
-                        <DialogContentText></DialogContentText>
                         <div className={styles.editForm}>
                             {fieldDefinitions.map((fieldDef) => {
                                 if (fieldDef.name === "partyName") {
@@ -268,6 +267,9 @@ function SharedTable(props) {
                                                     label={fieldDef.label}
                                                     variant="outlined"
                                                     sx={{ mb: 3 }}
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
                                                     fullWidth
                                                     error={!!errors[fieldDef.name]}
                                                     helperText={errors[fieldDef.name] ? errors[fieldDef.name].message : ''}

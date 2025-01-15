@@ -6,18 +6,22 @@ import MasterTable from "../../shared/ui/master-table/master-table";
 import ReactToPrint from 'react-to-print';
 import styles from "./auction-entries.module.css";
 import Autocomplete from '@mui/material/Autocomplete';
+import AuctionEdit from "../../dialogs/auction-edit/auction-edit";
 
 function AuctionEntries() {
 
   const triggerRef = useRef();
 
   const [tableData, setTableData] = useState([]);
-  const [auctionEntriesColumns, setAuctionEntriesColumns] = useState(["INDEX", "KISANNAME", "ITEMNAME", "VYAPARINAME", "RATE", "QUANTITY", "AMOUNT", "BAG", "DATE"]);
-  const [keyArray, setKeyArray] = useState(["index", "kisanName", "itemName", "vyapariName", "rate", "quantity", "amount", "bag", "auctionDate"]);
-  const [auctionEntries, setAuctionEntries] = useState([]);
+  const [auctionEntriesColumns, setAuctionEntriesColumns] = useState(["", "INDEX", "KISANNAME", "ITEMNAME", "VYAPARINAME", "RATE", "QUANTITY", "AMOUNT", "BAG", "DATE"]);
+  const [keyArray, setKeyArray] = useState(["checkbox", "index", "kisanName", "itemName", "vyapariName", "rate", "quantity", "amount", "bag", "auctionDate"]);
   const [tabletList, setTabletList] = useState([]);
   const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
   const [selectedTablet, setSelectedTablet] = useState(null);
+  const [showAuctionEdit, setShowAuctionEdit] = useState(false);
+  const [auctionToEdit, setAuctionToEdit] = useState([]);
+
+  let auctionToEditIndex = [];
 
   const { register, control, handleSubmit, formState: { errors }, getValues, trigger, setValue } = useForm({
     defaultValues: {
@@ -37,11 +41,9 @@ function AuctionEntries() {
 
   const getAuctionEntries = async () => {
     const { fromDate, toDate } = getValues();
-    console.log(selectedTablet);
     let deviceId = selectedTablet ? selectedTablet.id : ``;
-    console.log(deviceId);
-    
-    const vasuliList = await getAuctionEntriesList(fromDate, toDate,deviceId);
+
+    const vasuliList = await getAuctionEntriesList(fromDate, toDate, deviceId);
     if (vasuliList) {
       setTableData(vasuliList.responseBody);
     }
@@ -53,8 +55,6 @@ function AuctionEntries() {
 
   const getDevicelist = async () => {
     const decivelist = await getActiveDevices();
-    console.log(decivelist);
-
     setTabletList(decivelist?.responseBody);
 
   }
@@ -62,6 +62,26 @@ function AuctionEntries() {
   useEffect(() => {
     getDevicelist();
   }, []);
+
+  const edit = () => {
+    let arr = [];
+    auctionToEditIndex.forEach(element => {
+      console.log(element);
+      arr.push(tableData[element]);
+    });
+    setAuctionToEdit(arr);
+    setShowAuctionEdit(true);
+  }
+
+  const onSelectEntry = (e, i) => {
+    if (e.target.checked) auctionToEditIndex.push(i);
+    else auctionToEditIndex = auctionToEditIndex.filter(item => item !== i);
+  }
+
+  const handleToClose = (refreshTable) => {
+    if (refreshTable) getAuctionEntries();
+    setShowAuctionEdit(false);
+  };
 
   return (
     <>
@@ -103,7 +123,6 @@ function AuctionEntries() {
               />
               <p className="error">{errors.toDate?.message}</p>
             </div>
-            {/* <div> */}
             <Autocomplete
               disablePortal
               options={tabletList}
@@ -113,10 +132,10 @@ function AuctionEntries() {
               onChange={(event, newValue) => setSelectedTablet(newValue)}
               renderInput={(params) => <TextField {...params} label="TABLET" />}
             />
-            {/* </div> */}
           </div>
-          <div>
+          <div className={styles.btns}>
             <Button variant="contained" color="success" type='button' onClick={() => fetch_auctionEntriesList()} >FETCH</Button>&nbsp;
+            <Button variant="contained" color="secondary" type='button' onClick={() => edit()} >EDIT</Button>&nbsp;
             {/* <Button variant="contained" color="success" type='button' onClick={() => printLedger()} className={styles.print_btn}>PRINT LEDGER</Button>
             <ReactToPrint
               trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
@@ -124,10 +143,14 @@ function AuctionEntries() {
             /> */}
           </div>
         </form>
-        <MasterTable columns={auctionEntriesColumns} tableData={tableData} keyArray={keyArray} />
+        <MasterTable columns={auctionEntriesColumns} tableData={tableData} keyArray={keyArray} onSelectEntry={(e, i) => onSelectEntry(e, i)} />
       </div>
       <div style={{ display: 'none' }}>
         {/* <LedgerPrint ref={componentRef} tableData={tableData} formData={getValues()} /> */}
+      </div>
+      <div>
+        {/* {showAuctionEdit && <AuctionEdit/>} */}
+        <AuctionEdit open={showAuctionEdit} onClose={(refreshTable) => handleToClose(refreshTable)} auctionToEdit={auctionToEdit} />
       </div>
     </>
   );

@@ -12,7 +12,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import "./item-master.module.css"
 import { Delete, AddCircleOutline } from '@mui/icons-material';
 import Snackbar from '@mui/material/Snackbar';
-import SharedTable from "../../shared/ui/table/table";
 import MasterTable from "../../shared/ui/master-table/master-table";
 
 

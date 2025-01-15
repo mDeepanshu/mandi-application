@@ -17,3 +17,12 @@ export const getActiveDevices = async () => {
     console.error('Error:', error);
   }
 };
+
+export const editAuction = async (obj,deviceId) => {
+  try {
+    const response = await axiosHttp.patch(`/auction/edit-auction`,obj,{headers:{"deviceId":deviceId}});
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};

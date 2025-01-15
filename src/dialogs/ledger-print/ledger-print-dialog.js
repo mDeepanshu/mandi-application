@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useState } from 'react';
 import styles from "./ledgerPrint.module.css";
+import { dateFormat } from "../../constants/config";
 
 const LedgerPrint = forwardRef((props, ref) => {
     const [tableData, setTableData] = useState([]);
@@ -26,8 +27,7 @@ const LedgerPrint = forwardRef((props, ref) => {
     return (
         <div ref={ref} className={styles.container}>
             <div className={styles.constants}>
-                <div>FROM: {props.formData?.fromDate}</div>
-                <div>TILL: {props.formData?.toDate}</div>
+                <div>NAME: <b>{props.formData?.vyapari_id?.name}</b></div>
             </div>
             <table border="1">
                 <thead>
@@ -41,7 +41,7 @@ const LedgerPrint = forwardRef((props, ref) => {
                 <tbody>
                     {tableData?.map((row, index) => (
                         <tr key={index} style={{ lineHeight: '0.8', padding: '0', fontSize: '12px' }}>
-                            <td align="left">{checkArr.includes(row.date) ? <b>{row.date}</b> : row.date}</td>
+                            <td align="left">{checkArr.includes(row.date) ? <b>{row.date}</b> : new Date(row.date).toLocaleString('en-IN', dateFormat)}</td>
                             <td align="right">{row.itemName}</td>
                             <td align="right">{row.cr}</td>
                             <td align="right">{checkArr.includes(row.date) ? <b>{row.dr}</b> : row.dr}</td>

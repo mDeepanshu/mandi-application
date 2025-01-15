@@ -1,0 +1,29 @@
+.row_one{
+    padding: 10px;
+    display: flex;
+}
+
+.row_one > * {
+    width: 50%;
+    padding: 5px;
+}
+
+.row_two{
+    padding: 10px;
+    display: flex;
+}
+
+.row_two > * {
+    padding: 5px;
+}
+
+.row_two > :first-child{
+    width: 50%;
+}
+
+.table{
+    height: 60%;
+    /* margin: 0 15px; */
+    margin-left: 10px;
+    width: 97%;
+}

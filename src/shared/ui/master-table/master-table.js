@@ -6,14 +6,20 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, T
 import styles from "./masterTable.module.css";
 import Pagination from '@mui/material/Pagination';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import Autocomplete from '@mui/material/Autocomplete';
+import SearchIcon from '@mui/icons-material/Search';
+import { InputAdornment } from '@mui/material';
+import { getAllPartyList } from "../../../gateway/comman-apis";
+import { dateFormat, dateTimeFormat } from "../../../constants/config";
 
 function MasterTable(props) {
 
     const [open, setOpen] = useState(false);
-    // const [editingIndex, setEditingIndex] = useState(0);
+    const [editingIndex, setEditingIndex] = useState(0);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-
+    const [vyapariList, setVyapariList] = useState([]);
+    const [auctionEntryKisanId, setAuctionEntryKisanId] = useState({ kisanId: null, count: 0 });
     const [columns, setColumns] = useState([]);
     const [tableData, setTableData] = useState([]);
     const [allTableData, setAllTableData] = useState([]);
@@ -32,14 +38,16 @@ function MasterTable(props) {
     };
 
     const editFromTable = (index) => {
-        // setEditingIndex(index);
-        setOpen(true);
+        setEditingIndex(index);
         for (let int = 0; int < props.keyArray.length; int++) {
             if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) {
-                setValue(keyArray[int], tableData?.[index]?.[0]?.[keyArray[int]]);
+                if (keyArray[int] == "vyapariName") {
+                    const defaultOption = vyapariList.find(option => option.name == tableData[index]?.vyapariName);
+                    setValue("vyapariName", defaultOption || null);
+                } else setValue(keyArray[int], tableData?.[index]?.[keyArray[int]]);
             }
         }
-
+        setOpen(true);
     }
 
     const deleteFromTable = (index) => {
@@ -48,6 +56,14 @@ function MasterTable(props) {
         // setTableData(newRows);
     }
 
+    const getVyapariNames = async () => {
+        const allVyapari = await getAllPartyList("VYAPARI");
+        if (allVyapari?.responseBody) setVyapariList(allVyapari?.responseBody);
+    }
+
+    useEffect(() => {
+        getVyapariNames();
+    }, []);
 
     useEffect(() => {
         setColumns(props.columns);
@@ -85,7 +101,55 @@ function MasterTable(props) {
         setTableData(props.tableData?.slice(0, selectedValue));
     };
 
-    const updateRecord = (event, value) => { };
+    const updateRecord = () => {
+        let editedData = getValues();
+        console.log(editedData);
+
+        let finalEdit;
+        if (editedData.vyapariName) {
+            editedData.vyapariId = editedData.vyapariName.partyId;
+            editedData.vyapariName = editedData.vyapariName.name;
+        }
+        // delete editedData.vyapariName;
+        if (editedData.itemTotal) {
+            finalEdit = {
+                ...editedData,
+                itemTotal: Number(editedData.rate) * Number(editedData.quantity),
+            }
+        } else {
+            finalEdit = {
+                ...editedData,
+                total: Number(editedData.rate) * Number(editedData.quantity),
+            }
+        }
+        if (props.editEntry) {
+            console.log(`finalEdit`, finalEdit);
+            props.editEntry(editingIndex, finalEdit);
+        }
+
+        // const updatedObject = { ...tableData[editingIndex] };
+        // let previousTableData = tableData;
+        // previousTableData[editingIndex] = updatedObject;
+        // setTableData(previousTableData);
+        handleClose();
+    };
+
+    const auctionEntryChecked = (e, index, kisanId) => {
+        console.log(kisanId);
+        
+        props.onSelectEntry(e, index);
+        if (!e.target.checked) {
+            setAuctionEntryKisanId((prevState) => ({
+                kisanId:kisanId,
+                count: prevState.count - 1,
+            }));
+        }else{
+            setAuctionEntryKisanId((prevState) => ({
+                kisanId:kisanId,
+                count: prevState.count + 1,
+            }));
+        }
+    }
 
     return (
         <div>
@@ -116,8 +180,12 @@ function MasterTable(props) {
                                                         return <Button disabled={rowData?.status === `REJECTED`} sx={{ borderRadius: "15px" }} onClick={() => props.changeStatus(`REJECTED`, rowData?.id)} className={styles.deviceControlBtn} variant="contained" color="error">REJECT</Button>;
                                                     case "index":
                                                         return (page - 1) * paginationLength + index + 1;
+                                                    case "checkbox":
+                                                        return <input type='checkbox' onChange={(e) => auctionEntryChecked(e, index, rowData?.kisanId)} disabled={rowData?.kisanId != auctionEntryKisanId.kisanId && auctionEntryKisanId.count > 0} />;
                                                     case "date":
-                                                        return rowData[key] === "TOTAL" ? <b>TOTAL</b> : rowData[key];
+                                                        return rowData[key] === "TOTAL" ? <b>TOTAL</b> : new Date(rowData[key]).toLocaleString('en-IN', dateFormat);
+                                                    case "auctionDate":
+                                                        return rowData[key] === "TOTAL" ? <b>TOTAL</b> : new Date(rowData[key]).toLocaleString('en-IN', dateTimeFormat);
                                                     case "navigation":
                                                         return (
                                                             <>
@@ -156,34 +224,76 @@ function MasterTable(props) {
                 <Dialog open={open} onClose={handleClose}>
                     <DialogTitle>EDIT DATA</DialogTitle>
                     <DialogContent>
-                        <DialogContentText></DialogContentText>
                         <div className={styles.editForm}>
-                            {fieldDefinitions.map((fieldDef) => (
-                                <Controller
-                                    key={fieldDef.name}
-                                    name={fieldDef.name}
-                                    control={control}
-                                    defaultValue={fieldDef.defaultValue}
-                                    rules={fieldDef.validation}
-                                    render={({ field }) => (
-                                        <TextField
-                                            {...field}
-                                            label={fieldDef.label}
-                                            variant="outlined"
-                                            sx={{ mb: 3 }}
-                                            fullWidth
-                                            error={!!errors[field.name]}
-                                            helperText={errors[field.name] ? errors[field.name].message : ''}
-                                            size="small"
+                            {fieldDefinitions.map((fieldDef) => {
+                                if (fieldDef.name === "vyapariName") {
+                                    return (
+                                        <Controller
+                                            key={fieldDef.partyId}
+                                            name={fieldDef.name}
+                                            control={control}
+                                            rules={{ required: "Enter Patry Name" }}
+                                            render={({ field }) => (
+                                                <Autocomplete
+                                                    {...field}
+                                                    options={vyapariList}
+                                                    getOptionLabel={(option) => option.name}
+                                                    getOptionKey={(option) => option.partyId}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            label="Vyapari Name"
+                                                            InputProps={{
+                                                                ...params.InputProps,
+                                                                startAdornment: (
+                                                                    <InputAdornment position="start">
+                                                                        <SearchIcon />
+                                                                    </InputAdornment>
+                                                                ),
+                                                            }}
+                                                            size='small'
+                                                        />
+                                                    )}
+                                                    onChange={(event, value) => field.onChange(value)}
+                                                    disablePortal
+                                                    id="combo-box-demo"
+                                                    sx={{ width: '100%', paddingBottom: '10px' }} // Ensures Autocomplete is 100% wide
+                                                />
+                                            )}
                                         />
-                                    )}
-                                />
-                            ))}
+                                    );
+                                } else {
+                                    return (
+                                        <Controller
+                                            key={fieldDef.name}
+                                            name={fieldDef.name}
+                                            control={control}
+                                            defaultValue={fieldDef.defaultValue}
+                                            rules={fieldDef.validation}
+                                            render={({ field }) => (
+                                                <TextField
+                                                    {...field}
+                                                    label={fieldDef.label}
+                                                    variant="outlined"
+                                                    sx={{ mb: 3 }}
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                    fullWidth
+                                                    error={!!errors[fieldDef.name]}
+                                                    helperText={errors[fieldDef.name] ? errors[fieldDef.name].message : ''}
+                                                    size="small"
+                                                />
+                                            )}
+                                        />
+                                    );
+                                }
+                            })}
                         </div>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose}>Cancel</Button>
-                        <Button onClick={updateRecord}>Save</Button>
+                        <Button onClick={updateRecord} color='success' variant="contained">Save</Button>
+                        <Button onClick={handleClose} variant="contained">Cancel</Button>
                     </DialogActions>
                 </Dialog>
             </div>

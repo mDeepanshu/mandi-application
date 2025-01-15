@@ -11,6 +11,8 @@ axiosHttp.interceptors.response.use(
         return response;
     },
     (error) => {
+        console.log(error);
+        
         if (error?.response?.status != 200) {
         }
         return Promise.reject('error');
