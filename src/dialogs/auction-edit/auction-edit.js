@@ -59,8 +59,6 @@ const AuctionEdit = (props) => {
     }
 
     const editEntry = (index, newObject) => {
-        console.log(index, newObject, buyItemsArr[index]);
-
         setTableData((prevItems) => {
             const updatedItems = [...prevItems];
             updatedItems[index] = { ...updatedItems[index], ...newObject };

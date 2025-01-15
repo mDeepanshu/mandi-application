@@ -103,8 +103,6 @@ function MasterTable(props) {
 
     const updateRecord = () => {
         let editedData = getValues();
-        console.log(editedData);
-
         let finalEdit;
         if (editedData.vyapariName) {
             editedData.vyapariId = editedData.vyapariName.partyId;
@@ -123,7 +121,6 @@ function MasterTable(props) {
             }
         }
         if (props.editEntry) {
-            console.log(`finalEdit`, finalEdit);
             props.editEntry(editingIndex, finalEdit);
         }
 
@@ -135,8 +132,6 @@ function MasterTable(props) {
     };
 
     const auctionEntryChecked = (e, index, kisanId) => {
-        console.log(kisanId);
-        
         props.onSelectEntry(e, index);
         if (!e.target.checked) {
             setAuctionEntryKisanId((prevState) => ({

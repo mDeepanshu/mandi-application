@@ -12,8 +12,6 @@ function DeviceControl() {
   const init = async() => {
     const deviceList = await getAllDevices();
     setDeviceData(deviceList?.responseBody)
-    console.log(deviceList);
-    
   }
   useEffect(() => {
     init();
@@ -22,7 +20,6 @@ function DeviceControl() {
   const changeStatus = async (status,id) => {
     const res = await updateStatus(id,status);
     init();
-    console.log(res);    
   }
 
   const revokeDevice = async () => {

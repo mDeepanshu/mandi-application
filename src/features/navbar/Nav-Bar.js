@@ -45,7 +45,6 @@ function NavBar(props) {
 
     const saveKisanBill = async () => {
         const response = await saveAllKisanBill();
-        console.log(response);
         if (response?.responseCode === "200") {
             setAlertData({
                 open: true,

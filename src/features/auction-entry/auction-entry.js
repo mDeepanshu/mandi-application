@@ -66,7 +66,6 @@ function AuctionEntries() {
   const edit = () => {
     let arr = [];
     auctionToEditIndex.forEach(element => {
-      console.log(element);
       arr.push(tableData[element]);
     });
     setAuctionToEdit(arr);
