@@ -21,9 +21,9 @@ function VyapariBill() {
   const { register, handleSubmit, control, formState: { errors }, getValues, trigger, setValue } = useForm();
   const [vyapariList, setVyapariList] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const [vyapariTableColumns, setVyapariTableColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total","Date","Kisan Name", "Edit", "Delete", "Updated Tran."]);
+  const [vyapariTableColumns, setVyapariTableColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total","Date","Kisan Name", "DEVICE NAME" ,"Edit", "Delete", "Updated Tran."]);
   const [formData, setFormData] = useState();
-  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", 'itemTotal',"auctionDate","partyName", "edit", "delete", "navigation"]);
+  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", 'itemTotal',"auctionDate","partyName","deviceName" , "edit", "delete", "navigation"]);
 
   useEffect(() => {
     getVyapariNames();

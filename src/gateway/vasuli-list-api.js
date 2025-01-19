@@ -8,3 +8,12 @@ export const getVasuliList = async (startDate,endDate) => {
     console.error('Error:', error);
   }
 };
+
+export const editVasuli = async (vasuli) => {
+  try {
+    const response = await axiosHttp.put(`/vyapari/edit-vasuli`,vasuli);
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};

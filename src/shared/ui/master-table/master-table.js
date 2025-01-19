@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { Delete, Edit, ArrowForwardIos, ArrowBackIos } from '@mui/icons-material';
 import { Button } from "@mui/material";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import styles from "./masterTable.module.css";
 import Pagination from '@mui/material/Pagination';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import Autocomplete from '@mui/material/Autocomplete';
 import SearchIcon from '@mui/icons-material/Search';
 import { InputAdornment } from '@mui/material';
@@ -27,15 +27,9 @@ function MasterTable(props) {
     const [fieldDefinitions, setFieldDefinitions] = useState([]);
     const [paginationLength, setPaginationLength] = useState(10);
 
-    const { control, handleSubmit, register, reset, formState: { errors }, setValue, getValues } = useForm();
+    const { control, formState: { errors }, setValue, getValues } = useForm();
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
+    const handleClose = () => setOpen(false);
 
     const editFromTable = (index) => {
         setEditingIndex(index);
@@ -66,12 +60,16 @@ function MasterTable(props) {
     }, []);
 
     useEffect(() => {
-        setColumns(props.columns);
         setTableData(props.tableData?.slice(0, paginationLength));
         setAllTableData(props.tableData);
         setTotalPages(Math.ceil(props.tableData?.length / paginationLength));
-        setKeyArray(props.keyArray);
+        if (props.keyArray.includes("checkbox")) unCheckAllBoxes();
+        setPage(1);
+    }, [props.tableData]);
 
+    useEffect(() => {
+        setColumns(props.columns);
+        setKeyArray(props.keyArray);
         let fields = [];
         for (let int = 0; int < props.keyArray.length; int++) {
             if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) {
@@ -124,10 +122,6 @@ function MasterTable(props) {
             props.editEntry(editingIndex, finalEdit);
         }
 
-        // const updatedObject = { ...tableData[editingIndex] };
-        // let previousTableData = tableData;
-        // previousTableData[editingIndex] = updatedObject;
-        // setTableData(previousTableData);
         handleClose();
     };
 
@@ -135,15 +129,23 @@ function MasterTable(props) {
         props.onSelectEntry(e, index);
         if (!e.target.checked) {
             setAuctionEntryKisanId((prevState) => ({
-                kisanId:kisanId,
+                kisanId: kisanId,
                 count: prevState.count - 1,
             }));
-        }else{
+        } else {
             setAuctionEntryKisanId((prevState) => ({
-                kisanId:kisanId,
+                kisanId: kisanId,
                 count: prevState.count + 1,
             }));
         }
+    }
+
+    const unCheckAllBoxes = () => {
+        setAuctionEntryKisanId({ kisanId: null, count: 0 });
+        const checkboxes = document.querySelectorAll('.table_cell input[type="checkbox"]');
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = false;
+        });
     }
 
     return (
@@ -160,9 +162,9 @@ function MasterTable(props) {
                         </TableHead>
                         <TableBody>
                             {tableData?.map((rowData, index) => (
-                                <TableRow key={index}>
+                                <TableRow key={index} className='table_cell'>
                                     {keyArray?.map((key, i) => (
-                                        <TableCell key={i} align="left" sx={{ padding: "4px 8px", lineHeight: "1.5rem" }}>
+                                        <TableCell key={i} align="left" sx={{ padding: "4px 8px", lineHeight: "1.2rem" }}>
                                             {(() => {
                                                 switch (key) {
                                                     case "edit":
@@ -176,7 +178,7 @@ function MasterTable(props) {
                                                     case "index":
                                                         return (page - 1) * paginationLength + index + 1;
                                                     case "checkbox":
-                                                        return <input type='checkbox' onChange={(e) => auctionEntryChecked(e, index, rowData?.kisanId)} disabled={rowData?.kisanId != auctionEntryKisanId.kisanId && auctionEntryKisanId.count > 0} />;
+                                                        return <input type='checkbox' checked={props.checkedEntries[(page - 1) * paginationLength + index]} key={(page - 1) * paginationLength + index} onChange={(e) => auctionEntryChecked(e, (page - 1) * paginationLength + index, rowData?.kisanId)} disabled={rowData?.kisanId != auctionEntryKisanId.kisanId && auctionEntryKisanId.count > 0} />;
                                                     case "date":
                                                         return rowData[key] === "TOTAL" ? <b>TOTAL</b> : new Date(rowData[key]).toLocaleString('en-IN', dateFormat);
                                                     case "auctionDate":
@@ -240,6 +242,7 @@ function MasterTable(props) {
                                                             label="Vyapari Name"
                                                             InputProps={{
                                                                 ...params.InputProps,
+                                                                shrink: true,
                                                                 startAdornment: (
                                                                     <InputAdornment position="start">
                                                                         <SearchIcon />

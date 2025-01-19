@@ -57,7 +57,7 @@ function KisanBillSummary() {
   return (
     <>
       <div className={styles.container}>
-        <h1>Kisan Bill Payment Summry</h1>
+        <h1>KISAN BILL SUMMARY</h1>
         <form className={styles.dateFields} onSubmit={(e) => e.preventDefault()}>
           <div className={styles.date}>
             FROM: <input type='date'{...register('fromDate', { required: 'From date is required' })} /><br />
@@ -75,31 +75,31 @@ function KisanBillSummary() {
         </form>
         <br />
         <div ref={componentRef} className={styles.print_section}>
-          <div className={styles.totals}>
-            <div><b>Kaccha Total:</b> {apiResponse?.kacchaTotal}</div>
-            <div><b>Commission:</b> {apiResponse?.commission}</div>
+          {/* <div className={styles.totals}> */}
+            {/* <div><b>Kaccha Total:</b> {apiResponse?.kacchaTotal}</div> */}
+            {/* <div><b>Commission:</b> {apiResponse?.commission}</div>
             <div><b>Hammali:</b> {apiResponse?.hammali}</div>
             <div><b>Bhada:</b> {apiResponse?.bhada}</div>
             <div><b>Nagar PalikaTax:</b> {apiResponse?.nagarPalikaTax}</div>
             <div><b>Nagdi:</b> {apiResponse?.nagdi}</div>
             <div><b>Mandi Kharcha:</b> {apiResponse?.mandiKharcha}</div>
-            <div><b>Driver:</b> {apiResponse?.driver}</div>
-            <div><b>Pakka Total:</b> {apiResponse?.pakkaTotal}</div>
-          </div>
+            <div><b>Driver:</b> {apiResponse?.driver}</div> */}
+            <div><b>PAKKA TOTAL: {apiResponse?.pakkaTotal}</b></div>
+          {/* </div> */}
           <div>
             <table border="1">
               <thead>
                 <tr>
-                  <th>Bill Date</th>
-                  <th>Bill No.</th>
-                  <th>Party Name</th>
-                  <th>KACH. TOTAL</th>
+                  <th>BILL DATE</th>
+                  <th>BILL NO.</th>
+                  <th>PARTY NAME</th>
+                  {/* <th>KACH. TOTAL</th>
                   <th>COMM.</th>
                   <th>HUMM.</th>
                   <th>BHADA</th>
                   <th>N.TAX</th>
                   <th>NAGDI</th>
-                  <th>DRIV. ENAM</th>
+                  <th>DRIV. ENAM</th> */}
                   <th>PAKKA TOTAL</th>
                 </tr>
               </thead>
@@ -110,13 +110,13 @@ function KisanBillSummary() {
                       <td align="left">{row.date}</td>
                       <td align="left">{row.billId}</td>
                       <td align="left">{row.kisanName}</td>
-                      <td align="center">{row.totalBikri}</td>
+                      {/* <td align="center">{row.totalBikri}</td>
                       <td align="center">{row.commission}</td>
                       <td align="center">{row.hammali}</td>
                       <td align="center">{row.bhada}</td>
                       <td align="center">{row.nagarPalikaTax}</td>
                       <td align="center">{row.nagdi}</td>
-                      <td align="center">{row.driver}</td>
+                      <td align="center">{row.driver}</td> */}
                       <td align="center">{row.total}</td>
                     </tr>
                     {row.summaryBills?.map((bill, billIndex) => (

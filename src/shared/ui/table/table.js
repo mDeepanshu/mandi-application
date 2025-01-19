@@ -92,7 +92,6 @@ function SharedTable(props) {
 
             let fields = [];
             for (let int = 0; int < props.keyArray.length; int++) {
-                // if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) {
                 if (!excludeArr.includes(props.keyArray[int])) {
                     fields.push({
                         name: props.keyArray[int],
@@ -237,6 +236,7 @@ function SharedTable(props) {
                                                             label="Vyapari Name"
                                                             InputProps={{
                                                                 ...params.InputProps,
+                                                                shrink: true,
                                                                 startAdornment: (
                                                                     <InputAdornment position="start">
                                                                         <SearchIcon />
@@ -281,7 +281,6 @@ function SharedTable(props) {
                                 }
                             })}
                         </div>
-
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Cancel</Button>

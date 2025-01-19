@@ -76,7 +76,7 @@ const PartyMaster = () => {
 
   const onPartyInput = (event, field) => {
     field.onChange(event);  // Update the value in react-hook-form
-    setTableDataFiltered(tableData.filter(elem => elem.name.toLowerCase().includes(event.target.value)));
+    setTableDataFiltered(tableData.filter(elem => elem.name.toLowerCase().includes(event.target.value.toLowerCase())));
   }
 
   useEffect(() => {
@@ -175,18 +175,23 @@ const PartyMaster = () => {
                 <Controller
                   name="name"
                   control={control}
-                  rules={{ required: "Enter Name" }}
+                  rules={{ required: "Enter Party Name" }}
                   defaultValue=""
-
-                  render={({ field }) => <TextField {...field} fullWidth label="PARTY NAME" variant="outlined" InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                    onChange={(e) => onPartyInput(e, field)}
-                  />}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      type='text'
+                      label="Party Name"
+                      variant="outlined"
+                      inputProps={{
+                        style: {
+                          textTransform: "uppercase", // Ensure the input content is transformed
+                        },
+                      }}
+                      onChange={(e) => onPartyInput(e,field)}
+                    />
+                  )}
                 />
                 <p className='err-msg'>{errors.name?.message}</p>
               </Grid>

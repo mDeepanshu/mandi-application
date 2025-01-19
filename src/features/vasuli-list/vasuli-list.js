@@ -2,10 +2,11 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Grid } from "@mui/material";
 import { useForm, Controller } from 'react-hook-form';
 import { TextField, Button } from "@mui/material";
-import { getVasuliList } from '../../gateway/vasuli-list-api';
+import { getVasuliList, editVasuli } from '../../gateway/vasuli-list-api';
 import MasterTable from "../../shared/ui/master-table/master-table";
 import ReactToPrint from 'react-to-print';
 import styles from "./vasuli-list.module.css";
+import { useOutletContext } from 'react-router-dom';
 
 function VasuliList() {
 
@@ -13,11 +14,12 @@ function VasuliList() {
   const triggerRef = useRef();
 
   const [tableData, setTableData] = useState([]);
-  const [vasuliListColumns, setVasuliListColumns] = useState(["INDEX", "AMOUNT", "DATE", "NAME", "REMARK"]);
-  const [keyArray, setKeyArray] = useState(["index", "amount", "date", "vyapariName", "remark"]);
+  const [vasuliListColumns, setVasuliListColumns] = useState(["INDEX", "AMOUNT", "DATE", "NAME", "REMARK", "EDIT"]);
+  const [keyArray, setKeyArray] = useState(["index", "amount", "date", "vyapariName", "remark", "edit"]);
   const [vasuliList, setVasuliList] = useState([]);
-  const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
+  const currentDate = new Date().toISOString().split('T')[0];
   const [vasuliTotal, setVasuliTotal] = useState([]);
+  const { snackbarChange } = useOutletContext();
 
   const { register, control, handleSubmit, formState: { errors }, getValues, trigger, setValue } = useForm({
     defaultValues: {
@@ -49,6 +51,25 @@ function VasuliList() {
 
   const printLedger = () => {
     triggerRef.current.click();
+  }
+
+  const editEntry = async (editingIndex, finalEdit) => {
+    console.log(tableData[editingIndex],finalEdit);
+    
+    const editObject = {
+      ...tableData[editingIndex],
+      ...finalEdit,
+    }
+    const editRes = await editVasuli(editObject);
+    if (editRes) {
+      getVasulies();
+      snackbarChange({
+        open: true,
+        alertType: "success",
+        alertMsg: "EDIT SUCCESS"
+      });
+    }
+
   }
 
   return (
@@ -104,7 +125,7 @@ function VasuliList() {
             </div>
           </div>
         </form>
-        <MasterTable columns={vasuliListColumns} tableData={tableData} keyArray={keyArray} />
+        <MasterTable columns={vasuliListColumns} tableData={tableData} keyArray={keyArray} editEntry={(editingIndex, finalEdit) => editEntry(editingIndex, finalEdit)} />
       </div>
       <div style={{ display: 'none' }}>
         {/* <LedgerPrint ref={componentRef} tableData={tableData} formData={getValues()} /> */}

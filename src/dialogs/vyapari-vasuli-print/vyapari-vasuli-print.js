@@ -12,7 +12,8 @@ const VyapariVasuliPrint = forwardRef((props, ref) => {
                 border="1"
                 style={{ borderCollapse: "collapse", width: "100%" }}
                 className={styles.table}
-            >                <thead>
+            >
+                <thead>
                     <tr>
                         <th>NAME</th>
                         <th>OPN AMT</th>
@@ -38,7 +39,7 @@ const VyapariVasuliPrint = forwardRef((props, ref) => {
                 <div>DAY TOTAL: {props.formData?.daybill}</div>
                 <div>CLOSING TOTAL: {props.formData?.closingAmountSum}</div>
             </div>
-            <hr/>
+            <hr />
 
         </div>
     );
