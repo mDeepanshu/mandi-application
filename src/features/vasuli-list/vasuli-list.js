@@ -54,8 +54,6 @@ function VasuliList() {
   }
 
   const editEntry = async (editingIndex, finalEdit) => {
-    console.log(tableData[editingIndex],finalEdit);
-    
     const editObject = {
       ...tableData[editingIndex],
       ...finalEdit,

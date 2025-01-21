@@ -12,7 +12,7 @@ const VyapariBillPrint = forwardRef((props, ref) => {
     if(props.restructureTable){
       
       let arr=[];
-      props.tableData.forEach(element => {
+      props.tableData?.forEach(element => {
         arr.push(element[0]);
       });
       setPrintTable(arr);

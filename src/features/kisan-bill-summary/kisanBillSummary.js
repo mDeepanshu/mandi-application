@@ -50,9 +50,7 @@ function KisanBillSummary() {
 
   }
 
-  const printLedger = () => {
-    triggerRef.current.click();
-  }
+  const printLedger = () => triggerRef.current.click();
 
   return (
     <>
@@ -76,22 +74,22 @@ function KisanBillSummary() {
         <br />
         <div ref={componentRef} className={styles.print_section}>
           {/* <div className={styles.totals}> */}
-            {/* <div><b>Kaccha Total:</b> {apiResponse?.kacchaTotal}</div> */}
-            {/* <div><b>Commission:</b> {apiResponse?.commission}</div>
+          {/* <div><b>Kaccha Total:</b> {apiResponse?.kacchaTotal}</div> */}
+          {/* <div><b>Commission:</b> {apiResponse?.commission}</div>
             <div><b>Hammali:</b> {apiResponse?.hammali}</div>
             <div><b>Bhada:</b> {apiResponse?.bhada}</div>
             <div><b>Nagar PalikaTax:</b> {apiResponse?.nagarPalikaTax}</div>
             <div><b>Nagdi:</b> {apiResponse?.nagdi}</div>
             <div><b>Mandi Kharcha:</b> {apiResponse?.mandiKharcha}</div>
             <div><b>Driver:</b> {apiResponse?.driver}</div> */}
-            <div><b>PAKKA TOTAL: {apiResponse?.pakkaTotal}</b></div>
+          <div><b>PAKKA TOTAL: {apiResponse?.pakkaTotal}</b></div>
           {/* </div> */}
           <div>
             <table border="1">
               <thead>
                 <tr>
-                  <th>BILL DATE</th>
-                  <th>BILL NO.</th>
+                  {/* <th>BILL DATE</th> */}
+                  {/* <th>BILL NO.</th> */}
                   <th>PARTY NAME</th>
                   {/* <th>KACH. TOTAL</th>
                   <th>COMM.</th>
@@ -107,17 +105,17 @@ function KisanBillSummary() {
                 {tableData?.map((row, index) => (
                   <>
                     <tr key={index}>
-                      <td align="left">{row.date}</td>
-                      <td align="left">{row.billId}</td>
-                      <td align="left">{row.kisanName}</td>
-                      {/* <td align="center">{row.totalBikri}</td>
-                      <td align="center">{row.commission}</td>
+                      {/* <td align="left">{row.date}</td> */}
+                      {/* <td align="left">{row.billId}</td> */}
+                      <td align="left"><b>{row.kisanName}</b></td>
+                      <td align="left"><b>{row.totalBikri}</b></td>
+                      {/* <td align="center">{row.commission}</td>
                       <td align="center">{row.hammali}</td>
                       <td align="center">{row.bhada}</td>
                       <td align="center">{row.nagarPalikaTax}</td>
                       <td align="center">{row.nagdi}</td>
-                      <td align="center">{row.driver}</td> */}
-                      <td align="center">{row.total}</td>
+                      <td align="center">{row.driver}</td>
+                      <td align="center"><b>{row.total}</b></td> */}
                     </tr>
                     {row.summaryBills?.map((bill, billIndex) => (
                       <tr key={billIndex} style={{ lineHeight: '0.6', padding: '0' }}>
@@ -132,7 +130,11 @@ function KisanBillSummary() {
                         </td>
                       </tr>
                     ))}
-                    <hr />
+                    <tr>
+                      <td colSpan="2">
+                        <hr className={styles.seprator}/>
+                      </td>
+                    </tr>
                   </>
                 ))}
               </tbody>

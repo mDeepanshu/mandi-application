@@ -33,7 +33,7 @@ function MasterTable(props) {
 
     const editFromTable = (index) => {
         setEditingIndex(index);
-        for (let int = 0; int < props.keyArray.length; int++) {
+        for (let int = 0; int < props.keyArray?.length; int++) {
             if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) {
                 if (keyArray[int] == "vyapariName") {
                     const defaultOption = vyapariList.find(option => option.name == tableData[index]?.vyapariName);
@@ -71,7 +71,7 @@ function MasterTable(props) {
         setColumns(props.columns);
         setKeyArray(props.keyArray);
         let fields = [];
-        for (let int = 0; int < props.keyArray.length; int++) {
+        for (let int = 0; int < props.keyArray?.length; int++) {
             if (!(props.keyArray[int] === "edit" || props.keyArray[int] === "delete" || props.keyArray[int] === "index" || props.keyArray[int] === "navigation")) {
                 fields.push({
                     name: props.keyArray[int],
@@ -143,7 +143,7 @@ function MasterTable(props) {
     const unCheckAllBoxes = () => {
         setAuctionEntryKisanId({ kisanId: null, count: 0 });
         const checkboxes = document.querySelectorAll('.table_cell input[type="checkbox"]');
-        checkboxes.forEach((checkbox) => {
+        checkboxes?.forEach((checkbox) => {
             checkbox.checked = false;
         });
     }
@@ -152,7 +152,7 @@ function MasterTable(props) {
         <div>
             <TableContainer component={Paper} className={styles.table}>
                 <div className={styles.tableBody}>
-                    <Table aria-label="simple table">
+                    <Table stickyHeader aria-label="simple table">
                         <TableHead>
                             <TableRow>
                                 {columns.map((row, index) => (

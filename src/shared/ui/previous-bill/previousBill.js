@@ -25,10 +25,10 @@ function PreviousBills(props) {
             billDetails = await getVyapariBillVersions(props.billData?.id, props.billData?.date, 0);
         }
 
-        if (billDetails.responseBody) {
+        if (billDetails?.responseBody) {
             setTotalPreviousBills(billDetails?.responseBody?.totalPages);
             setOpen(true);
-            setBillData(billDetails.responseBody);
+            setBillData(billDetails?.responseBody);
         } else {
             setOpenErr(true);
         }

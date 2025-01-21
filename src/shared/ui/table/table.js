@@ -81,8 +81,7 @@ function SharedTable(props) {
 
 
     useEffect(() => {
-
-        if (props.tableData.length) {
+        if (props.tableData?.length) {
             setColumns(props.columns);
             setRowVariables(Array(props.tableData.length).fill(0));
             setTableData(props.tableData);
@@ -116,7 +115,7 @@ function SharedTable(props) {
 
     const updateRecord = async (saveAndReflect) => {
         if (saveAndReflect) {
-            let changedValues = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...getValues(), auctionDate: new Date(), vyapariId: getValues().partyName.partyId };
+            let changedValues = { ...tableData[editingIndex][tableData[editingIndex]?.length - 1], ...getValues(), auctionDate: new Date(), vyapariId: getValues().partyName.partyId };
             const updateRes = await updateAuctionTransaction(changedValues);
             props.refreshBill();
             handleClose();
@@ -141,7 +140,7 @@ function SharedTable(props) {
                 }
             }
 
-            const updatedObject = { ...tableData[editingIndex][tableData[editingIndex].length - 1], ...finalEdit };
+            const updatedObject = { ...tableData[editingIndex][tableData[editingIndex]?.length - 1], ...finalEdit };
             let previousTableData = tableData[editingIndex].push(updatedObject);
             // previousTableData[editingIndex][tableData[editingIndex].length - 1] = updatedObject;
             // setTableData(previousTableData);
@@ -173,7 +172,7 @@ function SharedTable(props) {
                 <TableHead>
                     <TableRow>
                         {columns.map((row, index) => (
-                            <TableCell align="left" key={index}>{row}</TableCell>
+                            <TableCell align="left" key={index}><b>{row}</b></TableCell>
                         ))}
                     </TableRow>
                 </TableHead>
@@ -185,24 +184,24 @@ function SharedTable(props) {
                                     {(() => {
                                         switch (key) {
                                             case "edit":
-                                                return <Button onClick={() => editFromTable(index, rowData.length - 1)}><Edit /></Button>;
+                                                return <Button onClick={() => editFromTable(index, rowData?.length - 1)}><Edit /></Button>;
                                             case "delete":
                                                 return <Button onClick={() => deleteFromTable(index)}><Delete /></Button>;
                                             case "index":
                                                 return (page - 1) * 10 + index + 1;
                                             case "navigation":
-                                                if (rowData.length > 1) {
+                                                if (rowData?.length > 1) {
                                                     return <>
                                                         <Button disabled={rowVariables[index] === 0} onClick={() => handleNavigationClick(index, -1)}><ArrowBackIos /></Button>
-                                                        <Button disabled={rowVariables[index] === rowData.length - 1} onClick={() => handleNavigationClick(index, +1)}><ArrowForwardIos /></Button>
+                                                        <Button disabled={rowVariables[index] === rowData?.length - 1} onClick={() => handleNavigationClick(index, +1)}><ArrowForwardIos /></Button>
                                                     </>;
                                                 } else {
                                                     return "No Edit History";
                                                 }
                                             case "auctionDate":
-                                                return handleConvertDate(rowData?.[rowData.length - 1 - rowVariables?.[index]]?.[key]);
+                                                return handleConvertDate(rowData?.[rowData?.length - 1 - rowVariables?.[index]]?.[key]);
                                             default:
-                                                return rowData?.[rowData.length - 1 - rowVariables?.[index]]?.[key];
+                                                return rowData?.[rowData?.length - 1 - rowVariables?.[index]]?.[key];
                                         }
                                     })()}
                                 </TableCell>

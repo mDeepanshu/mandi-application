@@ -51,7 +51,11 @@ h1 {
 .itemDetails {
     display: flex;
     gap: 15px;
+}
 
+.seprator{
+    /* border: 1px solid rgb(27, 27, 27); */
+    margin: 1px 0;
 }
 
 @media print {

@@ -21,9 +21,9 @@ function VyapariBill() {
   const { register, handleSubmit, control, formState: { errors }, getValues, trigger, setValue } = useForm();
   const [vyapariList, setVyapariList] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const [vyapariTableColumns, setVyapariTableColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total","Date","Kisan Name", "DEVICE NAME" ,"Edit", "Delete", "Updated Tran."]);
+  const [vyapariTableColumns, setVyapariTableColumns] = useState(["Item Name", "Bag", "Chungi", "Rate", "Quantity", "Item Total","Date","Kisan Name", "DEVICE NAME" ,"Edit", "Delete", "Updated Tran."]);
   const [formData, setFormData] = useState();
-  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", 'itemTotal',"auctionDate","partyName","deviceName" , "edit", "delete", "navigation"]);
+  const [keyArray, setKeyArray] = useState(["itemName", "bag", "chungi", "rate", "quantity", 'itemTotal',"auctionDate","partyName","deviceName" , "edit", "delete", "navigation"]);
 
   useEffect(() => {
     getVyapariNames();
@@ -62,7 +62,7 @@ function VyapariBill() {
 
   const saveBill = async () => {
     let tableSnapshot=[];
-    tableData.forEach(element => {
+    tableData?.forEach(element => {
       tableSnapshot.push(element[0]);
     });
     const bill = {...getValues(), vyapariBillItems:tableSnapshot,vyapariId:getValues()?.vyapari_name?.partyId,vyapariName:getValues().vyapari_name?.name,billDate:getValues()?.date};
