@@ -32,7 +32,7 @@ function SharedTable(props) {
     const { control, formState: { errors }, setValue, getValues } = useForm();
     const [rowVariables, setRowVariables] = useState([]);
 
-    const excludeArr = ["edit", "delete", "index", "navigation", "auctionDate"];
+    const excludeArr = ["edit", "delete", "index", "navigation", "auctionDate","deviceName"];
 
     useEffect(() => {
         getVyapariNames();

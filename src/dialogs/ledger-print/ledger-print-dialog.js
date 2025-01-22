@@ -4,20 +4,16 @@ import { dateFormat } from "../../constants/config";
 
 const LedgerPrint = forwardRef((props, ref) => {
     const [tableData, setTableData] = useState([]);
-    const checkArr = ["OPENING AMOUNT","CLOSING AMOUNT","TOTAL"];
+    const checkArr = ["OPN AMOUNT", "CLS AMOUNT", "TOTAL"];
 
     useEffect(() => {
         if (props.tableData.length) {
             props.tableData.unshift({
-                date: "OPENING AMOUNT",
-                itemName: "",
-                cr: "",
+                date: "OPN AMOUNT",
                 dr: props.formData?.openingAmount,
             });
             props.tableData.push({
-                date: "CLOSING AMOUNT",
-                itemName: "",
-                cr: "",
+                date: "CLS AMOUNT",
                 dr: props.formData?.closingAmount,
             });
             setTableData(props.tableData);
@@ -39,14 +35,19 @@ const LedgerPrint = forwardRef((props, ref) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {tableData?.map((row, index) => (
-                        <tr key={index} style={{ lineHeight: '0.8', padding: '0', fontSize: '12px' }}>
-                            <td align="left">{checkArr.includes(row.date) ? <b>{row.date}</b> : new Date(row.date).toLocaleString('en-IN', dateFormat)}</td>
-                            <td align="right">{row.itemName}</td>
-                            <td align="right">{row.cr}</td>
-                            <td align="right">{checkArr.includes(row.date) ? <b>{row.dr}</b> : row.dr}</td>
-                        </tr>
-                    ))}
+                    {tableData?.map((row, index) => {
+                        return checkArr.includes(row.date) ?
+                            <tr key={index} style={{ lineHeight: '0.8', padding: '0', fontSize: '11px' }}>
+                                <td colSpan={2} align="left"><b>{row.date}</b></td>
+                                <td colSpan={2} align="right"><b>{row.dr}</b></td>
+                            </tr> :
+                            <tr key={index} style={{ lineHeight: '0.8', padding: '0', fontSize: '11px' }}>
+                                <td align="left">{new Date(row.date).toLocaleString('en-IN', dateFormat)}</td>
+                                <td align="right">{row.itemName}</td>
+                                <td align="right">{row.cr}</td>
+                                <td align="right">{row.dr}</td>
+                            </tr>
+                    })}
                 </tbody>
             </table>
         </div>

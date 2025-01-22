@@ -26,8 +26,8 @@ const AuctionEdit = (props) => {
     const [buyItemsArr, setTableData] = useState([]);
     const kisanRef = useRef(null);
     const itemRef = useRef(null);
-    const [columns, setColumns] = useState(["INDEX", "VYAPARINAME", "RATE", "QUANTITY", "AMOUNT", "BAG", "EDIT"]);
-    const [keyArray, setKeyArray] = useState(["index", "vyapariName", "rate", "quantity", "amount", "bag", "edit"]);
+    const [columns, setColumns] = useState(["INDEX", "VYAPARINAME", "RATE", "QUANTITY", "AMOUNT", "BAG","CHUNGI", "EDIT"]);
+    const [keyArray, setKeyArray] = useState(["index", "vyapariName", "rate", "quantity", "amount", "bag","chungi", "edit"]);
 
     useEffect(() => {
         initKisanList();
@@ -87,6 +87,7 @@ const AuctionEdit = (props) => {
                 rate: element.rate,
                 quantity: element.quantity,
                 bags: element.bag,
+                chungi: element.chungi,
                 auctionDate: element.auctionDate
             })
         });
