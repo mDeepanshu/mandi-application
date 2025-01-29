@@ -14,8 +14,8 @@ function AuctionEntries() {
   const triggerRef = useRef();
   const componentRef = useRef();
   const [tableData, setTableData] = useState([]);
-  const [auctionEntriesColumns, setAuctionEntriesColumns] = useState(["", "INDEX", "KISANNAME", "ITEMNAME", "VYAPARINAME", "RATE", "QUANTITY","CHUNGI", "AMOUNT", "BAG", "DATE"]);
-  const [keyArray, setKeyArray] = useState(["checkbox", "index", "kisanName", "itemName", "vyapariName", "rate", "quantity","chungi", "amount", "bag", "auctionDate"]);
+  const [auctionEntriesColumns, setAuctionEntriesColumns] = useState(["", "INDEX", "KISANNAME", "ITEMNAME", "VYAPARINAME", "RATE", "QUANTITY","BAGS W.","CHUNGI", "AMOUNT", "BAG", "DATE"]);
+  const [keyArray, setKeyArray] = useState(["checkbox", "index", "kisanName", "itemName", "vyapariName", "rate", "quantity","bagsWeight","chungi", "amount", "bag", "auctionDate"]);
   const [tabletList, setTabletList] = useState([]);
   const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
   const [selectedTablet, setSelectedTablet] = useState(null);
@@ -23,8 +23,8 @@ function AuctionEntries() {
   const [auctionToEdit, setAuctionToEdit] = useState([]);
   const [total, setTotal] = useState([]);
   const [checkedEntries, setCheckedEntries] = useState([]);
-  const [auctionEntriesColumnsPrint, setAuctionEntriesColumnsPrint] = useState(["KISANNAME", "ITEMNAME", "VYAPARINAME", "RATE", "Q","C","T", "BAG", "DATE"]);
-  const [keyArrayPrint, setKeyArrayPrint] = useState(["kisanName", "itemName", "vyapariName", "rate", "quantity","chungi","amount", "bag", "auctionDate"]);
+  const [auctionEntriesColumnsPrint, setAuctionEntriesColumnsPrint] = useState(["KISANNAME", "ITEMNAME", "VYAPARINAME", "RATE", "Q","B.W.","C","T", "BAG", "DATE"]);
+  const [keyArrayPrint, setKeyArrayPrint] = useState(["kisanName", "itemName", "vyapariName", "rate", "quantity","bagsWeight","chungi","amount", "bag", "auctionDate"]);
 
   let auctionToEditIndex = [];
 

@@ -76,7 +76,7 @@ const AuctionEdit = (props) => {
                 itemId:getValues().itemName.itemId,
                 bag:null,
                 buyItems:[],
-                auctionDate: new Date(),
+                auctionDate: new Date(props.auctionToEdit?.[0]?.auctionSubmitDate).toISOString()
             }]
         }
 
@@ -88,9 +88,10 @@ const AuctionEdit = (props) => {
                 quantity: element.quantity,
                 bags: element.bag,
                 chungi: element.chungi,
-                auctionDate: element.auctionDate
+                auctionDate: new Date(element.auctionDate).toISOString()
             })
         });
+        
         const editRes = await editAuction(editObj,buyItemsArr[0].deviceId);
         if (editRes) {
             snackbarChange({

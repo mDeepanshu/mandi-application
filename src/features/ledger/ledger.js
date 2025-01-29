@@ -30,6 +30,7 @@ function Ledger() {
     defaultValues: {
       toDate: currentDate, // Set the default value to current date
       fromDate: priorDate, // Default to 2 days prior date
+      vyapariId:""
     },
   });
 
@@ -38,6 +39,7 @@ function Ledger() {
     if (isValid) {
       const { fromDate, toDate } = data;
       getLedgerData(data.vyapari_id.partyId, fromDate, toDate);
+      setValue("vyapariId",data.vyapari_id.idNo);
     } else {
       console.log('Validation failed');
     }

@@ -22,14 +22,14 @@ const LedgerPrint = forwardRef((props, ref) => {
 
     return (
         <div ref={ref} className={styles.container}>
-            <div className={styles.constants}>
-                <div>NAME: <b>{props.formData?.vyapari_id?.name}</b></div>
+            <div className={styles.constants} style={{ fontSize: '11px' }}>
+                <div><b>{props.formData?.vyapari_id?.name} | </b>ID: <b>{props.formData?.vyapari_id?.idNo}</b></div>
             </div>
-            <table border="1">
+            <table border="1" style={{fontSize: '10px'}}>
                 <thead>
                     <tr>
                         <th>DATE</th>
-                        <th>ITEM NAME</th>
+                        <th>ITEM</th>
                         <th>CR</th>
                         <th>DE</th>
                     </tr>
@@ -37,11 +37,11 @@ const LedgerPrint = forwardRef((props, ref) => {
                 <tbody>
                     {tableData?.map((row, index) => {
                         return checkArr.includes(row.date) ?
-                            <tr key={index} style={{ lineHeight: '0.8', padding: '0', fontSize: '11px' }}>
+                            <tr key={index} style={{ lineHeight: '0.8', padding: '0' }}>
                                 <td colSpan={2} align="left"><b>{row.date}</b></td>
                                 <td colSpan={2} align="right"><b>{row.dr}</b></td>
                             </tr> :
-                            <tr key={index} style={{ lineHeight: '0.8', padding: '0', fontSize: '11px' }}>
+                            <tr key={index} style={{ lineHeight: '0.8', padding: '0' }}>
                                 <td align="left">{new Date(row.date).toLocaleString('en-IN', dateFormat)}</td>
                                 <td align="right">{row.itemName}</td>
                                 <td align="right">{row.cr}</td>
