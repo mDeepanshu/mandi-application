@@ -1,7 +1,8 @@
-.container{
+.container {
     font-size: 12px;
     padding: 0 20px;
 }
+
 .table {
     width: 100%;
 }
@@ -10,12 +11,16 @@ td {
     border: none;
 }
 
+tr {
+    border-bottom: 1px solid black;
+    /* Line between rows */
+}
 
-.daybill{
+.daybill {
     width: 60%;
 }
 
-.openingAmount{
+.openingAmount {
     width: 60px;
 }
 
@@ -26,7 +31,7 @@ td {
     max-width: 150px;
 }
 
-.totals{
+.totals {
     display: flex;
     justify-content: space-between;
     font-weight: 600;
@@ -34,7 +39,7 @@ td {
 }
 
 @media print {
-    .container{
+    .container {
         font-size: 11px;
     }
 }

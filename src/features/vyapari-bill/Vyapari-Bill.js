@@ -8,7 +8,7 @@ import { getAllPartyList } from "../../gateway/comman-apis";
 import Autocomplete from '@mui/material/Autocomplete';
 import SearchIcon from '@mui/icons-material/Search';
 import VyapariBillPrint from "../../dialogs/vyapari-bill/vyapari-bill-print";
-import "./vyapari-bill.css";
+import styles from "./vyapari-bill.module.css";
 import ReactToPrint from 'react-to-print';
 import SharedTable from "../../shared/ui/table/table";
 import PreviousBills from "../../shared/ui/previous-bill/previousBill";
@@ -17,13 +17,18 @@ function VyapariBill() {
 
   const componentRef = useRef();
   const triggerRef = useRef();
+  const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
 
-  const { register, handleSubmit, control, formState: { errors }, getValues, trigger, setValue } = useForm();
+  const { register, handleSubmit, control, formState: { errors }, getValues, trigger, setValue } = useForm({
+    defaultValues:{
+      date:currentDate
+    }
+  });
   const [vyapariList, setVyapariList] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const [vyapariTableColumns, setVyapariTableColumns] = useState(["Item Name", "Bag", "Chungi", "Rate", "Quantity", "Item Total","Date","Kisan Name", "DEVICE NAME" ,"Edit", "Delete", "Updated Tran."]);
+  const [vyapariTableColumns, setVyapariTableColumns] = useState(["Item Name", "Bag", "Chungi", "Rate", "Quantity", "Bags W.", "Item Total", "Date", "Kisan Name", "DEVICE NAME", "Edit", "Delete", "Updated Tran."]);
   const [formData, setFormData] = useState();
-  const [keyArray, setKeyArray] = useState(["itemName", "bag", "chungi", "rate", "quantity", 'itemTotal',"auctionDate","partyName","deviceName" , "edit", "delete", "navigation"]);
+  const [keyArray, setKeyArray] = useState(["itemName", "bag", "chungi", "rate", "quantity", "bagWiseQuantity", 'itemTotal', "auctionDate", "partyName", "deviceName", "edit", "delete", "navigation"]);
 
   useEffect(() => {
     getVyapariNames();
@@ -43,7 +48,7 @@ function VyapariBill() {
     if (isValid) {
       const formValues = getValues();
       const billData = await getVyapariBill(formValues.vyapari_name.partyId, formValues.date);
-      
+
       setTableData(billData?.responseBody?.billList);
       setValue("previous_remaining", billData?.responseBody?.currentOutstanding);
       setValue("total", billData?.responseBody?.billTotal);
@@ -61,11 +66,11 @@ function VyapariBill() {
   }
 
   const saveBill = async () => {
-    let tableSnapshot=[];
+    let tableSnapshot = [];
     tableData?.forEach(element => {
       tableSnapshot.push(element[0]);
     });
-    const bill = {...getValues(), vyapariBillItems:tableSnapshot,vyapariId:getValues()?.vyapari_name?.partyId,vyapariName:getValues().vyapari_name?.name,billDate:getValues()?.date};
+    const bill = { ...getValues(), vyapariBillItems: tableSnapshot, vyapariId: getValues()?.vyapari_name?.partyId, vyapariName: getValues().vyapari_name?.name, billDate: getValues()?.date };
     delete bill.vyapari_name;
     delete bill.date;
     saveVyapariBill(bill);
@@ -80,122 +85,114 @@ function VyapariBill() {
       setValue("previous_remaining", billData?.responseBody?.currentOutstanding);
       setValue("total", billData?.responseBody?.billTotal);
     }
-    
+
   }
 
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid item xs={8} p={3}>
-          <Grid container spacing={2} justifyContent="space-between">
-            <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-              <Grid item xs={5}>
-                <Controller
-                  name="vyapari_name"
-                  control={control}
-                  rules={{ required: "Enter Patry Name" }}
-                  render={({ field }) => (
-                    <Autocomplete
-                      {...field}
-                      options={vyapariList}
-                      getOptionLabel={(option) => option.name}
-                      getOptionKey={(option) => option.partyId}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Vyapari Name"
-                          InputProps={{
-                            ...params.InputProps,
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <SearchIcon />
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      )}
-                      onChange={(event, value) => field.onChange(value)}
-                      disablePortal
-                      id="combo-box-demo"
-                    />
-                  )}
-                />
-                <p className='err-msg'>{errors.vyapari_name?.message}</p>
-              </Grid>
-              <Grid item xs={5}>
-                <Controller
-                  name="date"
-                  control={control}
-                  defaultValue=""
-                  rules={{ required: "Enter Date" }}
-                  render={({ field }) => (
+        <div className={styles.heading}>
+          <h1>VYAPARI BILL</h1>
+        </div>
+        <Grid container pt={2} pl={1} gap={1}>
+          {/* <Grid container spacing={2} justifyContent="space-between"> */}
+          {/* <Grid container item xs={12} spacing={2} justifyContent="flex-end"> */}
+          <Grid item xs={7} md={4}>
+            <Controller
+              name="vyapari_name"
+              control={control}
+              rules={{ required: "Enter Patry Name" }}
+              render={({ field }) => (
+                <Autocomplete
+                  {...field}
+                  options={vyapariList}
+                  getOptionLabel={(option) => option.name}
+                  getOptionKey={(option) => option.partyId}
+                  renderInput={(params) => (
                     <TextField
-                      {...field}
-                      variant="outlined"
-                      type='date'
+                      {...params}
+                      size='small'
+                      label="Vyapari Name"
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
                     />
                   )}
+                  onChange={(event, value) => field.onChange(value)}
+                  disablePortal
+                  id="combo-box-demo"
                 />
-                <p className='err-msg'>{errors.date?.message}</p>
-              </Grid>
-              <Grid item xs={2}>
-                <Button variant="contained" color="success" onClick={fetchBill} fullWidth>Fetch Bill</Button>
-              </Grid>
-            </Grid>
-            <Grid item xs={7}>
-              <PreviousBills billData={{id:getValues()?.vyapari_name?.partyId,date:getValues()?.date}} partyType={"vyapari"}/>
-            </Grid>
-            <Grid item xs={3}>
-              <TextField
-                {...register("previous_remaining", { required: "This field is required" })}
-                error={!!errors.previous_remaining}
-                helperText={errors.previous_remaining ? errors.previous_remaining.message : ""}
-                size="small"
-                sx={{ mb: 3 }}
-                defaultValue=""
-                fullWidth
-                label="Current Outstanding"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                variant="outlined"
-              />
-            </Grid>
+              )}
+            />
+            <p className='err-msg'>{errors.vyapari_name?.message}</p>
           </Grid>
-          <SharedTable columns={vyapariTableColumns} tableData={tableData} keyArray={keyArray} refreshBill={refreshBill}/>
-          <Grid container spacing={2} paddingTop={2}>
-            <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-              <Grid item xs={2}>
+          <Grid item xs={4} md={3}>
+            <Controller
+              name="date"
+              control={control}
+              rules={{ required: "Enter Date" }}
+              render={({ field }) => (
                 <TextField
-                  {...register("total", { required: "This field is required" })}
-                  error={!!errors.total}
-                  helperText={errors.total ? errors.total.message : ""}
-                  size="small"
-                  sx={{ mb: 3 }}
-                  defaultValue="1"
+                  {...field}
+                  defaultValue={currentDate}
+                  size='small'
                   fullWidth
-                  label="Total"
                   variant="outlined"
+                  type='date'
                 />
-              </Grid>
-            </Grid>
-            <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-              <Grid item xs={2}>
-                <Button variant="contained" color="primary" fullWidth onClick={saveBill}>Save Bill</Button>
-              </Grid>
-              <Grid item xs={2}>
-                <Button variant="contained" color="success" type='button' onClick={()=>printBill()} fullWidth>Print</Button>
-                <ReactToPrint
-                  trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
-                  content={() => componentRef.current}
-                />
-              </Grid>
-            </Grid>
+              )}
+            />
+            <p className='err-msg'>{errors.date?.message}</p>
+          </Grid>
+          <Grid item xs={6} md={2}>
+            <Button variant="contained" color="success" onClick={fetchBill} fullWidth>Fetch Bill</Button>
+          </Grid>
+          {/* </Grid> */}
+          <Grid item xs={5} md={2}>
+            <PreviousBills billData={{ id: getValues()?.vyapari_name?.partyId, date: getValues()?.date }} partyType={"vyapari"} />
+          </Grid>
+          <Grid item xs={10} md={4} pt={1}>
+            <b>CURRENT OUTSTANDING: {getValues().previous_remaining}</b>
+          </Grid>
+          {/* </Grid> */}
+        </Grid>
+        <div className={styles.billTable}>
+          <SharedTable columns={vyapariTableColumns} tableData={tableData} keyArray={keyArray} refreshBill={refreshBill} />
+        </div>
+        <Grid container p={1} gap={1} justifyContent="flex-end">
+          <Grid item xs={6} md={7}></Grid>
+          <Grid item xs={6} md={3}>
+            <TextField
+              {...register("total", { required: "This field is required" })}
+              error={!!errors.total}
+              helperText={errors.total ? errors.total.message : ""}
+              size="small"
+              // sx={{ mb: 3 }}
+              defaultValue="1"
+              fullWidth
+              label="Total"
+              variant="outlined"
+            />
+          </Grid>
+          <Grid item xs={4} md={2}>
+            <Button variant="contained" color="primary" fullWidth onClick={saveBill}>Save Bill</Button>
+          </Grid>
+          <Grid item xs={4} md={2}>
+            <Button variant="contained" color="success" type='button' onClick={() => printBill()} fullWidth>Print</Button>
+            <ReactToPrint
+              trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
+              content={() => componentRef.current}
+            />
           </Grid>
         </Grid>
       </form>
       <div style={{ display: 'none' }}>
-        <VyapariBillPrint ref={componentRef} tableData={tableData} formData={formData} restructureTable={true}/>
+        <VyapariBillPrint ref={componentRef} tableData={tableData} formData={formData} restructureTable={true} />
       </div>
     </div>
   );

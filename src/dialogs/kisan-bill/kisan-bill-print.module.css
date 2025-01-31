@@ -11,12 +11,35 @@
     display: grid;
     grid-template-columns: repeat(3, auto); /* 4 columns, each taking equal space */
     grid-template-rows: repeat(2, auto);   /* 2 rows, height will adjust based on content */
-    gap: 7px; /* Optional: Adds space between grid items */
+    gap: 1px; /* Optional: Adds space between grid items */
     justify-items: start;
     padding: 0 10px;
 }
 
-TableCell{
-    padding: 4px 8px; 
-    line-height: 1.5rem
+
+.table {
+    width: 100%;
+}
+
+td {
+    border: none;
+}
+
+tr {
+    border-bottom: 1px solid black;
+    /* Line between rows */
+}
+
+.table td {
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+    max-width: 150px;
+}
+
+
+@media print {
+    .container {
+        font-size: 11px;
+    }
 }

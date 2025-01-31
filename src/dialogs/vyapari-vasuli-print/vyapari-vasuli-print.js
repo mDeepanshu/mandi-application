@@ -33,6 +33,11 @@ const VyapariVasuliPrint = forwardRef((props, ref) => {
                         </tr>
                     ))}
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5">------------------------------------------------------------------------------------------------------</td>
+                    </tr>
+                </tfoot>
             </table>
             <div className={styles.totals}>
                 <div>OPENING TOTAL: {props.formData?.openingAmountSum}</div>

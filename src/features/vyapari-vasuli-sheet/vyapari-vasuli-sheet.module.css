@@ -1,15 +1,17 @@
-.container{
-    padding: 5px 15px;
+.container {
+    padding: 0px 15px;
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
 }
 
-h1{
+.heading {
     width: 100%;
+    padding: 0px 15px;
 }
 
-.date{
-    width: 30%;
+.date {
+    /* width: 100%; */
+    padding-right: 5px;
 }
 
 .tableContainer {
@@ -26,8 +28,54 @@ h1{
     margin-left: 5px;
 }
 
-.totals{
+.totals {
     display: flex;
     gap: 25px;
     padding: 5px 0;
+}
+
+.fulllabel {
+    font-weight: 600;
+}
+
+.shortlabel{
+    font-weight: 600;
+}
+
+.search{
+    width: 30%;
+    padding-top: 5px;
+}
+
+@media (min-width: 485px) {
+    .fulllabel {
+        display: inline;
+    }
+
+    .shortlabel {
+        display: none;
+    }
+}
+
+@media (max-width: 485px) {
+
+    .heading{
+        display: none;
+    }
+    
+    .totals{
+        justify-content: space-between;
+    }
+
+    .fulllabel {
+        display: none;
+    }
+
+    .shortlabel {
+        display: inline;
+    }
+
+    .search{
+        width: 100%;
+    }
 }

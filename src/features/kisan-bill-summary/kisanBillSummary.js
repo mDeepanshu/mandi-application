@@ -101,7 +101,7 @@ function KisanBillSummary() {
                   <th>PAKKA TOTAL</th>
                 </tr>
               </thead>
-              <tbody style={{ fontSize: '13px' }}>
+              <tbody style={{ fontSize: '10px' }}>
                 {tableData?.map((row, index) => (
                   <>
                     <tr key={index}>
@@ -138,6 +138,11 @@ function KisanBillSummary() {
                   </>
                 ))}
               </tbody>
+              <tfoot>
+                    <tr>
+                        <td colspan="2">------------------------------------------------------------------------------------------------------</td>
+                    </tr>
+                </tfoot>
             </table>
           </div>
         </div>

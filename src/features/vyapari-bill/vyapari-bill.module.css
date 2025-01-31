@@ -1,0 +1,17 @@
+.billTable{
+    min-height: 45vh;
+    width: 100%;
+    overflow-x: auto;
+}
+
+.heading {
+    padding: 0 15px;
+    padding-top: 0px;
+}
+
+@media (max-width: 485px) {
+
+    .heading{
+        display: none;
+    }
+}

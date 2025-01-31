@@ -26,8 +26,8 @@ const AuctionEdit = (props) => {
     const [buyItemsArr, setTableData] = useState([]);
     const kisanRef = useRef(null);
     const itemRef = useRef(null);
-    const [columns, setColumns] = useState(["INDEX", "VYAPARINAME", "RATE", "QUANTITY", "AMOUNT", "BAG","CHUNGI", "EDIT"]);
-    const [keyArray, setKeyArray] = useState(["index", "vyapariName", "rate", "quantity", "amount", "bag","chungi", "edit"]);
+    const [columns, setColumns] = useState(["INDEX", "VYAPARINAME", "RATE", "QUANTITY","BAGS W.", "AMOUNT", "BAG","CHUNGI", "EDIT"]);
+    const [keyArray, setKeyArray] = useState(["index", "vyapariName", "rate", "quantity","bagWiseQuantity", "amount", "bag","chungi", "edit"]);
 
     useEffect(() => {
         initKisanList();
@@ -62,6 +62,9 @@ const AuctionEdit = (props) => {
         setTableData((prevItems) => {
             const updatedItems = [...prevItems];
             updatedItems[index] = { ...updatedItems[index], ...newObject };
+            updatedItems[index].quantity = newObject.qtyTotal;
+            updatedItems[index].bagWiseQuantity = newObject.qtyArray.join(',');
+            updatedItems[index].bagWiseQuantityArray = newObject.qtyArray;
             return updatedItems;
         });
     }
@@ -85,9 +88,10 @@ const AuctionEdit = (props) => {
             editObj.addAuctionDtos[0].buyItems.push({
                 vyapariId: element.vyapariId,
                 rate: element.rate,
-                quantity: element.quantity,
                 bags: element.bag,
                 chungi: element.chungi,
+                quantity : element.qtyTotal,
+                bagWiseQuantity : element.qtyArray,
                 auctionDate: new Date(element.auctionDate).toISOString()
             })
         });

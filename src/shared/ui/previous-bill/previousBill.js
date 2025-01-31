@@ -45,7 +45,7 @@ function PreviousBills(props) {
                 <label for="cars">View Previous Printed Bill: </label>
             </div> */}
             <div>
-                <Button variant="contained" color="success" onClick={handleClickToOpen} fullWidth>View Previous Printed Bill</Button>
+                <Button variant="contained" color="success" onClick={handleClickToOpen} fullWidth>Previous Bill</Button>
             </div>
             <div>
                 <Dialog open={open} onClose={handleToClose}>

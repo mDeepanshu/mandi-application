@@ -31,3 +31,69 @@
     padding-right: 1rem;
     padding-top: 5px;
 }
+
+
+.quantitylist {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.horizontallist {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    width: 75%;
+    overflow-x: auto;
+    white-space: nowrap;
+    margin-bottom: 5px;
+}
+
+.addqtybtn {
+    width: 20%;
+    height: 2.5rem;
+}
+
+.qtybtn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-left: 1px solid #74b21e;
+    margin-left: 3px;
+}
+.qtytotal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 10%;
+    color: #3D5D18;
+    padding: 4px 5px;
+    background: #b8e76f;
+    border: 1px solid #74b21e;
+    height: 30px;
+    border-radius: 3px;
+    margin-right: 10px;
+  
+  }
+
+  .horizontallist li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px 5px 5px;
+    padding: 2px;
+    color: #3D5D18;
+    background: #b8e76f;
+    border: 1px solid #74b21e;
+    height: 20px;
+    border-radius: 3px;
+  }
+
+  
+.tableBody {
+    height: calc(100vh - 400px);
+    overflow-y: auto;
+}
+

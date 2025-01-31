@@ -11,6 +11,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { InputAdornment } from '@mui/material';
 import styles from "./ledger.module.css";
 import { getAllPartyList } from "../../gateway/comman-apis";
+import { useMediaQuery } from "@mui/material";
 
 function Ledger() {
 
@@ -25,12 +26,14 @@ function Ledger() {
   const twoDaysPrior = new Date();
   twoDaysPrior.setDate(twoDaysPrior.getDate() - 2);
   const priorDate = twoDaysPrior.toISOString().split('T')[0];
+  const vyapariRef = useRef(null); // Create a ref
+  const isSmallScreen = useMediaQuery("(max-width:485px)");
 
   const { register, control, handleSubmit, formState: { errors }, getValues, trigger, setValue } = useForm({
     defaultValues: {
       toDate: currentDate, // Set the default value to current date
       fromDate: priorDate, // Default to 2 days prior date
-      vyapariId:""
+      vyapariId: ""
     },
   });
 
@@ -39,7 +42,7 @@ function Ledger() {
     if (isValid) {
       const { fromDate, toDate } = data;
       getLedgerData(data.vyapari_id.partyId, fromDate, toDate);
-      setValue("vyapariId",data.vyapari_id.idNo);
+      setValue("vyapariId", data.vyapari_id.idNo);
     } else {
       console.log('Validation failed');
     }
@@ -56,7 +59,7 @@ function Ledger() {
       if (ledger.responseBody?.transactions?.length) {
         const transactionWithTotals = insertDateWiseTotal([...ledger.responseBody?.transactions]);
         setTableData(transactionWithTotals);
-      }else setTableData([]);
+      } else setTableData([]);
       setValue("closingAmount", ledger.responseBody?.closingAmount);
       setValue("openingAmount", ledger.responseBody?.openingAmount);
     }
@@ -64,11 +67,22 @@ function Ledger() {
   }
 
   useEffect(() => {
+    if (vyapariRef.current) {
+      setTimeout(() => {
+        vyapariRef.current.focus();
+      }, 0);
+    }
     getVyapariNames();
   }, []);
 
   const printLedger = () => {
     triggerRef.current.click();
+  }
+
+  const enterAction = () => {
+    setTimeout(() => {
+      fetch_ledger(getValues());
+    }, 0);
   }
 
   const insertDateWiseTotal = (transactions) => {
@@ -121,13 +135,21 @@ function Ledger() {
                         <TextField
                           {...params}
                           label="Vyapari Name"
+                          size={isSmallScreen ? "small" : "medium"}
                           InputProps={{
                             ...params.InputProps,
+                            inputRef: vyapariRef,
                             startAdornment: (
                               <InputAdornment position="start">
                                 <SearchIcon />
                               </InputAdornment>
                             ),
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              enterAction();
+                            }
                           }}
                         />
                       )}
@@ -137,7 +159,7 @@ function Ledger() {
                     />
                   )}
                 />
-                <p className='err-msg'>{errors.vyapari_id?.message}</p>
+                <p className={styles.errMsg}>{errors.vyapari_id?.message}</p>
               </div>
             </div>
             <div className={styles.date}>
@@ -150,6 +172,8 @@ function Ledger() {
                   <TextField
                     {...field}
                     label="FROM DATE"
+                    size={isSmallScreen ? "small" : "medium"}
+                    fullWidth
                     variant="outlined"
                     type='date'
                   />
@@ -167,6 +191,8 @@ function Ledger() {
                   <TextField
                     {...field}
                     label="TO DATE"
+                    size={isSmallScreen ? "small" : "medium"}
+                    fullWidth
                     variant="outlined"
                     type='date'
                   />
@@ -184,8 +210,20 @@ function Ledger() {
             />
           </div>
           <div className={styles.constants}>
-            <div>OPENING BALANCE: <input type='number'{...register('openingAmount')} disabled /></div>
-            <div>CLOSING BALANCE: <input type='number'{...register('closingAmount')} disabled /></div>
+            <div>
+              <b>
+                <span className={styles.fulllabel}>OPENING BALANCE: </span>
+                <span className={styles.shortlabel}>OPN: </span>
+                {getValues().openingAmount}
+              </b>
+            </div>
+            <div>
+              <b>
+                <span className={styles.fulllabel}>CLOSING BALANCE: </span>
+                <span className={styles.shortlabel}>CLS: </span>
+                {getValues().closingAmount}
+              </b>
+            </div>
           </div>
         </form>
         <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} />

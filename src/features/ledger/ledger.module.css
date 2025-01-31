@@ -1,31 +1,32 @@
-.container{
-    padding: 5px 15px;
-    display: flex;
-    flex-direction: column; 
+.container {
+    padding: 0 10px;
+    width: 95%;
 }
 
-h1{
+h1 {
     width: 100%;
 }
 
 .dateFields {
     width: 100%;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    gap: 10px;
     /* padding-bottom: 20px; */
 }
 
 .constants {
     width: 100%;
     display: flex;
-    padding-bottom: 5px;
-    justify-content: end;
-    gap: 4px;
+    padding: 15px 0;
+    /* justify-content: end; */
+    gap: 10px;
 }
 
-.date{
+.date {
     /* width: 15%; */
-    padding-right: 10px;
+    /* padding-right: 10px; */
 }
 
 .tableContainer {
@@ -39,7 +40,54 @@ h1{
     /* padding-left: 30px; */
 }
 
-.vyapariName{
-    width: 25%;
-    padding-right: 15px;
+.vyapariName {
+    width: 40%;
+}
+
+.errMsg {
+    color: red;
+}
+
+@media (min-width: 485px) {
+    .fulllabel {
+      display: inline;
+    }
+    .shortlabel {
+      display: none;
+    }
+  }
+
+@media (max-width: 485px) {
+
+    h1 {
+        width: 40%;
+        display: none;
+    }
+
+    .vyapariName {
+        padding-top: 10px;
+        width: 99%;
+    }
+
+    .date {
+        width: 48%;
+        /* padding-right: 10px; */
+    }
+
+    .constants {
+        width: 100%;
+        display: flex;
+        padding: 15px 0;
+        /* gap: 4px; */
+    }
+
+    .fulllabel {
+        display: none;
+    }
+
+    .shortlabel {
+        display: inline;
+    }
+
+
 }
