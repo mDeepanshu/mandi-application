@@ -248,7 +248,7 @@ function KisanBill() {
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={2} p={3}>
+        <Grid container spacing={2} p={3} pb={0}>
           <Grid item xs={2}>
             <Grid
               container

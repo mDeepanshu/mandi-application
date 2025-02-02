@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Grid } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import { TextField, Button,InputAdornment } from "@mui/material";
+import { TextField, Button, InputAdornment } from "@mui/material";
 import ReactToPrint from "react-to-print";
-import SearchIcon from '@mui/icons-material/Search';
+import SearchIcon from "@mui/icons-material/Search";
 import { getVyapariVasuliSheet } from "../../gateway/vyapari-vasuli-sheet-apis";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import VyapariVasuliPrint from "../../dialogs/vyapari-vasuli-print/vyapari-vasuli-print";
@@ -19,7 +19,7 @@ function VyapariVasuliSheet() {
   const [searchVal, setSearchVal] = useState("");
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
   const [ledgerColumns, setledgerColumns] = useState([
-    "INDEX",
+    "ID",
     "PARTY NAME",
     "OPENING AMOUNT",
     "DAY BILL",
@@ -27,7 +27,7 @@ function VyapariVasuliSheet() {
     "CLOSING AMOUNT",
   ]);
   const [keyArray, setKeyArray] = useState([
-    "index",
+    "vyapariIdNo",
     "partyName",
     "openingAmount",
     "dayBill",
@@ -101,8 +101,16 @@ function VyapariVasuliSheet() {
       tableData.filter(
         (elem) =>
           elem?.partyName?.toLowerCase().includes(search.toLowerCase()) ||
-          elem?.idNo?.toLowerCase().includes(search.toLowerCase())
+          elem?.vyapariIdNo?.toLowerCase().includes(search.toLowerCase())
       )
+    );
+  };
+
+  const findById = (event) => {
+    const search = event.target.value;
+    // Check if either id is a substring of the other
+    setTableDataFiltered(
+      tableData.filter((elem) => elem?.vyapariIdNo?.toString().includes(search.toString()))
     );
   };
 
@@ -170,27 +178,46 @@ function VyapariVasuliSheet() {
             <span>{totals.closingAmountSum}</span>
           </div>
         </div>
-        <div className={styles.search}>
-          <TextField
-            fullWidth
-            type="text"
-            size="small"
-            label="SEARCH"
-            variant="outlined"
-            inputProps={{
-              style: {
-                textTransform: "uppercase", // Ensure the input content is transformed
-              },
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-            onChange={find}
-          />
+        <div style={{display:"flex"}}>
+          <div className={styles.search}>
+            <TextField
+              fullWidth
+              type="number"
+              size="small"
+              label="SEARCH BY ID"
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              onChange={findById}
+            />
+          </div>
+          <div className={styles.search}>
+            <TextField
+              fullWidth
+              type="text"
+              size="small"
+              label="SEARCH"
+              variant="outlined"
+              inputProps={{
+                style: {
+                  textTransform: "uppercase", // Ensure the input content is transformed
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              onChange={find}
+            />
+          </div>
         </div>
         <MasterTable
           columns={ledgerColumns}

@@ -9,18 +9,27 @@ export const getAllPartyList = async (partyType) => {
   }
 };
 
-export const getAllPartyListTest = async () => {
+export const updateAuctionTransaction = async (updateObject) => {
   try {
-    const response = await axiosHttp.get(`https://mobileqacloud.dalmiabharat.com/csr/list-lever`);
+    const response = await axiosHttp.post(`/auction/edit-auction-transaction`,updateObject);
     return response.data;
   } catch (error) {
     console.error('Error posting data:', error);
   }
 };
 
-export const updateAuctionTransaction = async (updateObject) => {
+export const getTodaysVyapari = async (from,to) => {
   try {
-    const response = await axiosHttp.post(`/auction/edit-auction-transaction`,updateObject);
+    const response = await axiosHttp.get(`/vyapari/ledger-list-all-vyapari?startDate=${from}&endDate=${to}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error posting data:', error);
+  }
+};
+
+export const getEveryLedger = async (from,to,vyapariList) => {
+  try {
+    const response = await axiosHttp.post(`/vyapari/ledger-list?startDate=${from}&endDate=${to}`,vyapariList);
     return response.data;
   } catch (error) {
     console.error('Error posting data:', error);

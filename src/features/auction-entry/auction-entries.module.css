@@ -51,9 +51,10 @@ h1 {
   padding-left: 5rem;
 }
 
-.search {
-  width: 30%;
-  padding-top: 5px;
+.search{
+  padding: 5px 10px;
+  padding-left: 0;
+  width: 20%;
 }
 
 @media (max-width: 485px) {

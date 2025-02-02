@@ -54,6 +54,7 @@ function MasterTable(props) {
     "delete",
     "index",
     "navigation",
+    "date",
     "auctionDate",
     "deviceName",
     "bagWiseQuantity",
@@ -107,7 +108,7 @@ function MasterTable(props) {
   };
 
   useEffect(() => {
-    getVyapariNames();
+    if (keyArray.includes("vyapariName")) getVyapariNames();
   }, []);
 
   useEffect(() => {
@@ -155,8 +156,8 @@ function MasterTable(props) {
   };
 
   const updateRecord = async () => {
-    const isValid = await trigger(['partyName', 'rate']);
-    if(!isValid)return;
+    const isValid = await trigger(["partyName", "rate"]);
+    if (!isValid) return;
     let editedData = getValues();
     let finalEdit;
     if (editedData.vyapariName) {

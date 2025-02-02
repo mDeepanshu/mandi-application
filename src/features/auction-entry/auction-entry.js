@@ -20,7 +20,7 @@ function AuctionEntries() {
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
   const [auctionEntriesColumns, setAuctionEntriesColumns] = useState([
     "",
-    "INDEX",
+    "ID",
     "KISANNAME",
     "ITEMNAME",
     "VYAPARINAME",
@@ -34,7 +34,7 @@ function AuctionEntries() {
   ]);
   const [keyArray, setKeyArray] = useState([
     "checkbox",
-    "index",
+    "vyapariIdNo",
     "kisanName",
     "itemName",
     "vyapariName",
@@ -154,8 +154,6 @@ function AuctionEntries() {
     setCheckedEntries((prevArray) => {
       const updatedArray = [...prevArray];
       updatedArray[i] = e.target.checked;
-      console.log(`updatedArray`,updatedArray);
-      
       return updatedArray;
     });
   };
@@ -173,8 +171,15 @@ function AuctionEntries() {
           elem?.vyapariName?.toLowerCase().includes(search.toLowerCase()) ||
           elem?.kisanName?.toLowerCase().includes(search.toLowerCase()) ||
           elem?.itemName?.toLowerCase().includes(search.toLowerCase()) ||
-          elem?.idNo?.toLowerCase().includes(search.toLowerCase())
+          elem?.vyapariIdNo?.toLowerCase().includes(search.toLowerCase())
       )
+    );
+  };
+
+  const findById = (event) => {
+    const search = event.target.value;
+    setTableDataFiltered(
+      tableData.filter((elem) => elem?.vyapariIdNo?.toString().includes(search.toString()))
     );
   };
 
@@ -269,27 +274,46 @@ function AuctionEntries() {
             />
           </div>
         </form>
-        <div className={styles.search}>
-          <TextField
-            fullWidth
-            type="text"
-            size="small"
-            label="SEARCH"
-            variant="outlined"
-            inputProps={{
-              style: {
-                textTransform: "uppercase", // Ensure the input content is transformed
-              },
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-            onChange={find}
-          />
+        <div style={{display:"flex"}}>
+          <div className={styles.search}>
+            <TextField
+              fullWidth
+              type="number"
+              size="small"
+              label="SEARCH BY ID"
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              onChange={findById}
+            />
+          </div>
+          <div className={styles.search}>
+            <TextField
+              fullWidth
+              type="text"
+              size="small"
+              label="SEARCH"
+              variant="outlined"
+              inputProps={{
+                style: {
+                  textTransform: "uppercase", // Ensure the input content is transformed
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              onChange={find}
+            />
+          </div>
         </div>
         <div>
           <MasterTable

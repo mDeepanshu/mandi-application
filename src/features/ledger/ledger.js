@@ -1,39 +1,62 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from "react";
 import { Grid } from "@mui/material";
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
-import { getLedger } from '../../gateway/ledger-apis';
+import { getLedger } from "../../gateway/ledger-apis";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import LedgerPrint from "../../dialogs/ledger-print/ledger-print-dialog";
-import ReactToPrint from 'react-to-print';
-import Autocomplete from '@mui/material/Autocomplete';
-import SearchIcon from '@mui/icons-material/Search';
-import { InputAdornment } from '@mui/material';
+import ReactToPrint from "react-to-print";
+import Autocomplete from "@mui/material/Autocomplete";
+import SearchIcon from "@mui/icons-material/Search";
+import { InputAdornment } from "@mui/material";
 import styles from "./ledger.module.css";
 import { getAllPartyList } from "../../gateway/comman-apis";
 import { useMediaQuery } from "@mui/material";
+import PrintAllLedger from "../../dialogs/todays-all-ledger/todays-ledger";
 
 function Ledger() {
-
   const componentRef = useRef();
   const triggerRef = useRef();
 
   const [tableData, setTableData] = useState([]);
-  const [ledgerColumns, setledgerColumns] = useState(["DATE", "ITEM NAME", "CREDIT", "DEBIT"]);
-  const [keyArray, setKeyArray] = useState(["date", "itemName", "cr", "dr"]);
+  const [ledgerColumns, setledgerColumns] = useState([
+    "DATE",
+    "ITEM NAME",
+    "CREDIT",
+    "REMARK",
+    "DEBIT",
+  ]);
+  const [keyArray, setKeyArray] = useState([
+    "date",
+    "itemName",
+    "cr",
+    "remark",
+    "dr",
+  ]);
+
+  const [showAllLedgerPrint, setShowAllLedgerPrint] = useState(false);
+
   const [vyapariList, setVyapariList] = useState([]);
-  const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
+  const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
   const twoDaysPrior = new Date();
   twoDaysPrior.setDate(twoDaysPrior.getDate() - 2);
-  const priorDate = twoDaysPrior.toISOString().split('T')[0];
+  const priorDate = twoDaysPrior.toISOString().split("T")[0];
   const vyapariRef = useRef(null); // Create a ref
   const isSmallScreen = useMediaQuery("(max-width:485px)");
 
-  const { register, control, handleSubmit, formState: { errors }, getValues, trigger, setValue } = useForm({
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+    trigger,
+    setValue,
+  } = useForm({
     defaultValues: {
       toDate: currentDate, // Set the default value to current date
       fromDate: priorDate, // Default to 2 days prior date
-      vyapariId: ""
+      vyapariId: "",
     },
   });
 
@@ -44,27 +67,28 @@ function Ledger() {
       getLedgerData(data.vyapari_id.partyId, fromDate, toDate);
       setValue("vyapariId", data.vyapari_id.idNo);
     } else {
-      console.log('Validation failed');
+      console.log("Validation failed");
     }
-  }
+  };
 
   const getVyapariNames = async () => {
     const allVyapari = await getAllPartyList("VYAPARI");
     if (allVyapari?.responseBody) setVyapariList(allVyapari?.responseBody);
-  }
+  };
 
   const getLedgerData = async (vyapari_id, fromDate, toDate) => {
     const ledger = await getLedger(vyapari_id, fromDate, toDate);
     if (ledger) {
       if (ledger.responseBody?.transactions?.length) {
-        const transactionWithTotals = insertDateWiseTotal([...ledger.responseBody?.transactions]);
+        const transactionWithTotals = insertDateWiseTotal([
+          ...ledger.responseBody?.transactions,
+        ]);
         setTableData(transactionWithTotals);
       } else setTableData([]);
       setValue("closingAmount", ledger.responseBody?.closingAmount);
       setValue("openingAmount", ledger.responseBody?.openingAmount);
     }
-
-  }
+  };
 
   useEffect(() => {
     if (vyapariRef.current) {
@@ -77,13 +101,33 @@ function Ledger() {
 
   const printLedger = () => {
     triggerRef.current.click();
-  }
+  };
+
+  // const printAllLedger = () => {
+  //   const contentToPrintArray = [];
+  //   const contentToPrint = componentRef.current.innerHTML;
+  //   for (let index = 0; index < allLedgerData.length; index++) {
+  //     const element = array[index];
+  //   }
+
+  //   if (window.electron && window.electron.ipcRenderer) {
+  //     // Invoke a print action
+  //     window.electron.ipcRenderer
+  //       .invoke("print-all-ledger", contentToPrint)
+  //       .then(() => {
+  //         console.log(`done`);
+  //       })
+  //       .catch((err) => console.error("Print failed:", err));
+  //   } else {
+  //     console.warn("Electron IPC is not available.");
+  //   }
+  // };
 
   const enterAction = () => {
     setTimeout(() => {
       fetch_ledger(getValues());
     }, 0);
-  }
+  };
 
   const insertDateWiseTotal = (transactions) => {
     let date = transactions?.[0]?.date;
@@ -111,7 +155,9 @@ function Ledger() {
       dr: dateTotal,
     });
     return transactions;
-  }
+  };
+
+  const toggleState = (state) => setShowAllLedgerPrint(state);
 
   return (
     <>
@@ -175,7 +221,7 @@ function Ledger() {
                     size={isSmallScreen ? "small" : "medium"}
                     fullWidth
                     variant="outlined"
-                    type='date'
+                    type="date"
                   />
                 )}
               />
@@ -194,7 +240,7 @@ function Ledger() {
                     size={isSmallScreen ? "small" : "medium"}
                     fullWidth
                     variant="outlined"
-                    type='date'
+                    type="date"
                   />
                 )}
               />
@@ -202,10 +248,38 @@ function Ledger() {
             </div>
           </div>
           <div>
-            <Button variant="contained" color="success" type='button' onClick={() => fetch_ledger(getValues())} >FETCH LEDGER</Button>&nbsp;
-            <Button variant="contained" color="success" type='button' onClick={() => printLedger()} className={styles.print_btn}>PRINT LEDGER</Button>
+            <Button
+              variant="contained"
+              color="success"
+              type="button"
+              onClick={() => fetch_ledger(getValues())}
+            >
+              FETCH LEDGER
+            </Button>
+            &nbsp;
+            <Button
+              variant="contained"
+              color="success"
+              type="button"
+              onClick={() => printLedger()}
+              className={styles.print_btn}
+            >
+              PRINT LEDGER
+            </Button>
+            &nbsp;
+            <Button
+              variant="contained"
+              color="success"
+              type="button"
+              onClick={() => toggleState(true)}
+              className={styles.print_all_btn}
+            >
+              PRINT ALL LEDGER
+            </Button>
             <ReactToPrint
-              trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
+              trigger={() => (
+                <button style={{ display: "none" }} ref={triggerRef}></button>
+              )}
               content={() => componentRef.current}
             />
           </div>
@@ -226,10 +300,27 @@ function Ledger() {
             </div>
           </div>
         </form>
-        <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} />
+        <MasterTable
+          columns={ledgerColumns}
+          tableData={tableData}
+          keyArray={keyArray}
+        />
       </div>
-      <div style={{ display: 'none' }}>
-        <LedgerPrint ref={componentRef} tableData={[...tableData]} formData={getValues()} />
+      <div style={{ display: "none" }}>
+        <LedgerPrint
+          ref={componentRef}
+          tableData={[...tableData]}
+          formData={getValues()}
+        />
+      </div>
+      <div>
+        {/* {showAuctionEdit && <AuctionEdit/>} */}
+        <PrintAllLedger
+          open={showAllLedgerPrint}
+          onClose={() => toggleState(false)}
+          formData={getValues()}
+          // auctionToEdit={auctionToEdit}
+        />
       </div>
     </>
   );
