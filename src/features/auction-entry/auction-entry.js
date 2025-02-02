@@ -170,8 +170,7 @@ function AuctionEntries() {
         (elem) =>
           elem?.vyapariName?.toLowerCase().includes(search.toLowerCase()) ||
           elem?.kisanName?.toLowerCase().includes(search.toLowerCase()) ||
-          elem?.itemName?.toLowerCase().includes(search.toLowerCase()) ||
-          elem?.vyapariIdNo?.toLowerCase().includes(search.toLowerCase())
+          elem?.itemName?.toLowerCase().includes(search.toLowerCase())
       )
     );
   };

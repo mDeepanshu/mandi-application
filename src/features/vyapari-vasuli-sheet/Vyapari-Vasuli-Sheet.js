@@ -100,8 +100,7 @@ function VyapariVasuliSheet() {
     setTableDataFiltered(
       tableData.filter(
         (elem) =>
-          elem?.partyName?.toLowerCase().includes(search.toLowerCase()) ||
-          elem?.vyapariIdNo?.toLowerCase().includes(search.toLowerCase())
+          elem?.partyName?.toLowerCase().includes(search.toLowerCase())
       )
     );
   };

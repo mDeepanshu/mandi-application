@@ -109,7 +109,7 @@ function MasterTable(props) {
 
   useEffect(() => {
     if (keyArray.includes("vyapariName")) getVyapariNames();
-  }, []);
+  }, [keyArray]);
 
   useEffect(() => {
     setTableData(props.tableData?.slice(0, paginationLength));
@@ -163,8 +163,8 @@ function MasterTable(props) {
     if (editedData.vyapariName) {
       editedData.vyapariId = editedData.vyapariName.partyId;
       editedData.vyapariName = editedData.vyapariName.name;
-      editedData.qtyArray = qty;
-      editedData.qtyTotal = qtyTotal;
+      editedData.bagWiseQuantityArray = qty;
+      editedData.quantity = qtyTotal;
     }
     // delete editedData.vyapariName;
     if (editedData.itemTotal) {

@@ -62,9 +62,9 @@ const AuctionEdit = (props) => {
         setTableData((prevItems) => {
             const updatedItems = [...prevItems];
             updatedItems[index] = { ...updatedItems[index], ...newObject };
-            updatedItems[index].quantity = newObject.qtyTotal;
-            updatedItems[index].bagWiseQuantity = newObject.qtyArray.join(',');
-            updatedItems[index].bagWiseQuantityArray = newObject.qtyArray;
+            updatedItems[index].quantity = newObject.quantity;
+            updatedItems[index].bagWiseQuantity = newObject.bagWiseQuantityArray.join(',');
+            updatedItems[index].bagWiseQuantityArray = newObject.bagWiseQuantityArray;
             return updatedItems;
         });
     }
@@ -90,8 +90,8 @@ const AuctionEdit = (props) => {
                 rate: element.rate,
                 bags: element.bag,
                 chungi: element.chungi,
-                quantity : element.qtyTotal,
-                bagWiseQuantity : element.qtyArray,
+                quantity : element.quantity,
+                bagWiseQuantity : element.bagWiseQuantityArray,
                 auctionDate: new Date(element.auctionDate).toISOString()
             })
         });
