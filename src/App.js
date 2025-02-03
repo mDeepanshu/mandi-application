@@ -8,7 +8,7 @@ import SnackbarGlobal from "./shared/ui/snackbar/snackbar";
 
 function App() {
 	
-const [loginStatus, setLoginStatus] = useState(process.env.REACT_APP_PASS!="6789");
+const [loginStatus, setLoginStatus] = useState(true);
 const [snackbarData, setSnackbarData] = useState({});
 
 const changeLoginState = (value) => {
