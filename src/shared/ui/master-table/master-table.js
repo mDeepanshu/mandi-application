@@ -97,9 +97,10 @@ function MasterTable(props) {
   };
 
   const deleteFromTable = (index) => {
-    // const newRows = [...buyItemsArr];
+    // const newRows = [...tableData];
     // newRows.splice(index, 1);
     // setTableData(newRows);
+    if (props.deleteEntry) props.deleteEntry(index);
   };
 
   const getVyapariNames = async () => {

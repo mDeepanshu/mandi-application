@@ -28,7 +28,7 @@ import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { updateAuctionTransaction } from "../../../gateway/comman-apis";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import { getAllPartyList } from "../../../gateway/comman-apis";
+import { getAllPartyList, getItem } from "../../../gateway/comman-apis";
 import Autocomplete from "@mui/material/Autocomplete";
 import SearchIcon from "@mui/icons-material/Search";
 import { InputAdornment } from "@mui/material";
@@ -47,6 +47,7 @@ function SharedTable(props) {
   const [sync, setSync] = useState({});
   const [openSync, setOpenSync] = useState(false);
   const [vyapariList, setVyapariList] = useState([]);
+  const [itemList, setItemList] = useState([]);
   const [qty, setQty] = useState([]);
   const [qtyTotal, setQtyTotal] = useState(0);
   const {
@@ -67,10 +68,12 @@ function SharedTable(props) {
     "bagWiseQuantity",
     "bagWiseQuantityArray",
     "deviceName",
+    "itemName"
   ];
 
   useEffect(() => {
     getVyapariNames();
+    getItemNames();
   }, []);
 
   useEffect(() => {
@@ -100,6 +103,11 @@ function SharedTable(props) {
     if (allVyapari?.responseBody) setVyapariList(allVyapari?.responseBody);
   };
 
+  const getItemNames = async () => {
+    const allItems = await getItem();
+    if (allItems?.responseBody) setItemList(allItems?.responseBody);
+  };
+
   const editFromTable = (index, tranIdx) => {
     setEditingIndex(index);
     setOpen(true);
@@ -110,7 +118,7 @@ function SharedTable(props) {
             (option) => option.name == tableData[index]?.[tranIdx]?.partyName
           );
           setValue("partyName", defaultOption || null);
-        } else if (keyArray[int] == "quantity") {
+        }else if (keyArray[int] == "quantity") {
           setQtyTotal(tableData?.[index]?.[0]?.[keyArray[int]]);
           setQty(tableData?.[index]?.[0]?.bagWiseQuantityArray);
         } else
@@ -157,8 +165,8 @@ function SharedTable(props) {
   };
 
   const updateRecord = async (saveAndReflect) => {
-    const isValid = await trigger(['partyName', 'rate']);
-    if(!isValid)return;
+    const isValid = await trigger(["partyName", "rate"]);
+    if (!isValid) return;
     if (saveAndReflect) {
       let changedValues = {
         ...tableData[editingIndex][tableData[editingIndex]?.length - 1],
@@ -337,7 +345,7 @@ function SharedTable(props) {
           <DialogTitle>EDIT DATA</DialogTitle>
           <DialogContent>
             <div className={styles.editForm}>
-              {fieldDefinitions.map((fieldDef) => {
+              {fieldDefinitions.map((fieldDef, index) => {
                 if (fieldDef.name === "partyName") {
                   return (
                     <Controller

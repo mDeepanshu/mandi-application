@@ -178,7 +178,9 @@ function AuctionEntries() {
   const findById = (event) => {
     const search = event.target.value;
     setTableDataFiltered(
-      tableData.filter((elem) => elem?.vyapariIdNo?.toString().includes(search.toString()))
+      tableData.filter((elem) =>
+        elem?.vyapariIdNo?.toString().includes(search.toString())
+      )
     );
   };
 
@@ -273,7 +275,7 @@ function AuctionEntries() {
             />
           </div>
         </form>
-        <div style={{display:"flex"}}>
+        <div style={{ display: "flex" }}>
           <div className={styles.search}>
             <TextField
               fullWidth

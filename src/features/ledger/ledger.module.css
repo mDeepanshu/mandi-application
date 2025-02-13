@@ -44,6 +44,12 @@ h1 {
     width: 40%;
 }
 
+.tableLedger{
+    /* height: calc(100vh-400px); */
+    /* height: 30vh; */
+    background-color: black;
+}
+
 .errMsg {
     color: red;
 }

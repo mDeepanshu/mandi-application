@@ -300,11 +300,13 @@ function Ledger() {
             </div>
           </div>
         </form>
-        <MasterTable
-          columns={ledgerColumns}
-          tableData={tableData}
-          keyArray={keyArray}
-        />
+        {/* <div className={styles.tableLedger}> */}
+          <MasterTable
+            columns={ledgerColumns}
+            tableData={tableData}
+            keyArray={keyArray}
+          />
+        {/* </div> */}
       </div>
       <div style={{ display: "none" }}>
         <LedgerPrint

@@ -51,7 +51,7 @@
 }
 
 .tableBody {
-    max-height: 70vh;
+    height: calc(100vh - 370px);
     overflow-y: auto;
 }
 

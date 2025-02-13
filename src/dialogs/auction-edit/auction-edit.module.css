@@ -1,6 +1,7 @@
 .row_one{
     padding: 10px;
     display: flex;
+    align-items: start;
 }
 
 .row_one > * {

@@ -35,3 +35,14 @@ export const getEveryLedger = async (from,to,vyapariList) => {
     console.error('Error posting data:', error);
   }
 };
+
+export const getItem = async () => {
+  try {
+      const response = await axiosHttp.get('/listItems');
+      return response.data;
+  } catch (error) {
+      console.error('Error posting data:', error);
+          console.error('Not Throwing Error');
+
+  }
+};
