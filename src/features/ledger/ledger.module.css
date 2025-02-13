@@ -63,7 +63,7 @@ h1 {
     }
   }
 
-@media (max-width: 485px) {
+@media (max-width: 495px) {
 
     h1 {
         width: 40%;
@@ -93,6 +93,10 @@ h1 {
 
     .shortlabel {
         display: inline;
+    }
+
+    .print_all_btn{
+        display: none;
     }
 
 

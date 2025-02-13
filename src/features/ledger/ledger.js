@@ -22,16 +22,16 @@ function Ledger() {
   const [ledgerColumns, setledgerColumns] = useState([
     "DATE",
     "ITEM NAME",
+    "DEBIT",
     "CREDIT",
     "REMARK",
-    "DEBIT",
   ]);
   const [keyArray, setKeyArray] = useState([
     "date",
-    "itemName",
+    "itemNameWithCheckbox",
+    "dr",
     "cr",
     "remark",
-    "dr",
   ]);
 
   const [showAllLedgerPrint, setShowAllLedgerPrint] = useState(false);

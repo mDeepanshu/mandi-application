@@ -52,8 +52,6 @@ const PrintAllLedger = (props) => {
 
   const fetch_vyapari_list = async () => {
     const vyapariList = await getTodaysVyapari(props.formData.fromDate, props.formData.toDate);
-    console.log("vyapariList", vyapariList);
-
     if (vyapariList?.responseBody?.length) {
       setVyapariList(vyapariList?.responseBody);
       setTableDataFiltered(vyapariList?.responseBody);
@@ -61,20 +59,18 @@ const PrintAllLedger = (props) => {
   };
 
   useEffect(() => {
-    console.log(";;;;;;;;;;;;;;;;");
-    
     fetch_vyapari_list();
-  }, []);
+  }, [props.open]);
 
   const find = (event) => {
     const search = event.target.value;
-    setTableDataFiltered(vyapariList.filter((elem) => elem?.partyName?.toLowerCase().includes(search.toLowerCase())));
+    setTableDataFiltered(vyapariList.filter((elem) => elem?.name?.toLowerCase().startsWith(search.toLowerCase())));
   };
 
   const findById = (event) => {
     const search = event.target.value;
     // Check if either id is a substring of the other
-    setTableDataFiltered(vyapariList.filter((elem) => elem?.vyapariIdNo?.toString().includes(search.toString())));
+    setTableDataFiltered(vyapariList.filter((elem) => elem?.idNo?.toString().includes(search.toString())));
   };
 
   const onSelectEntry = (e, i) => {
@@ -84,6 +80,8 @@ const PrintAllLedger = (props) => {
       return updatedArray;
     });
   };
+
+  const selectAll = (e) => setCheckedEntries(new Array(tableDataFiltered.length).fill(e.target.checked));
 
   return (
     <>
@@ -102,7 +100,7 @@ const PrintAllLedger = (props) => {
       >
         <DialogTitle>
           <div style={{ display: "flex",alignItems: "center" }}>
-            <div className={styles.select_all}><input type="checkbox" /> SELECT ALL</div>
+            <div className={styles.select_all}><input type="checkbox" onChange={selectAll}/> SELECT ALL</div>
             <div className={styles.search}>
               <TextField
                 fullWidth

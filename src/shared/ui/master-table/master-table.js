@@ -1,27 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@mui/material";
-import {
-  Delete,
-  Edit,
-  ArrowForwardIos,
-  ArrowBackIos,
-} from "@mui/icons-material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { Delete, Edit, ArrowForwardIos, ArrowBackIos } from "@mui/icons-material";
 import { Button } from "@mui/material";
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-} from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import styles from "./masterTable.module.css";
 import Pagination from "@mui/material/Pagination";
 import { useForm, Controller } from "react-hook-form";
@@ -49,17 +30,7 @@ function MasterTable(props) {
   const [paginationLength, setPaginationLength] = useState(10);
   const [qty, setQty] = useState([]);
   const [qtyTotal, setQtyTotal] = useState(0);
-  const excludeArr = [
-    "edit",
-    "delete",
-    "index",
-    "navigation",
-    "date",
-    "auctionDate",
-    "deviceName",
-    "bagWiseQuantity",
-    "bagWiseQuantityArray",
-  ];
+  const excludeArr = ["edit", "delete", "index", "navigation", "date", "auctionDate", "deviceName", "bagWiseQuantity", "bagWiseQuantityArray"];
 
   const {
     control,
@@ -70,6 +41,20 @@ function MasterTable(props) {
   } = useForm();
 
   const handleClose = () => setOpen(false);
+
+  const [checkedItems, setCheckedItems] = useState({});
+
+  // Reset checked checkboxes when table data changes
+  useEffect(() => {
+    setCheckedItems({});
+  }, [props.tableData]);
+
+  const handleCheckboxChange = (id) => {
+    setCheckedItems((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   useEffect(() => {
     const sum = qty?.reduce((accumulator, currentValue) => {
@@ -83,9 +68,7 @@ function MasterTable(props) {
     for (let int = 0; int < props.keyArray?.length; int++) {
       if (!excludeArr.includes(props.keyArray[int])) {
         if (keyArray[int] == "vyapariName") {
-          const defaultOption = vyapariList.find(
-            (option) => option.name == tableData[index]?.vyapariName
-          );
+          const defaultOption = vyapariList.find((option) => option.name == tableData[index]?.vyapariName);
           setValue("vyapariName", defaultOption || null);
         } else if (keyArray[int] == "quantity") {
           setQtyTotal(tableData?.[index]?.[keyArray[int]]);
@@ -140,12 +123,8 @@ function MasterTable(props) {
 
   const handleChange = (event, value) => {
     setPage(value);
-    setTableData(
-      allTableData.slice(
-        (value - 1) * paginationLength,
-        (value - 1) * paginationLength + paginationLength
-      )
-    );
+    setTableData(allTableData.slice((value - 1) * paginationLength, (value - 1) * paginationLength + paginationLength));
+    setCheckedItems({});
   };
 
   const handleSelectChange = (event) => {
@@ -203,9 +182,7 @@ function MasterTable(props) {
 
   const unCheckAllBoxes = () => {
     setAuctionEntryKisanId({ kisanId: null, count: 0 });
-    const checkboxes = document.querySelectorAll(
-      '.table_cell input[type="checkbox"]'
-    );
+    const checkboxes = document.querySelectorAll('.table_cell input[type="checkbox"]');
     checkboxes?.forEach((checkbox) => {
       checkbox.checked = false;
     });
@@ -254,11 +231,7 @@ function MasterTable(props) {
               {tableData?.map((rowData, index) => (
                 <TableRow key={index} className="table_cell">
                   {keyArray?.map((key, i) => (
-                    <TableCell
-                      key={i}
-                      align="left"
-                      sx={{ padding: "4px 8px", lineHeight: "1.2rem" }}
-                    >
+                    <TableCell key={i} align="left" sx={{ padding: "4px 8px", lineHeight: "1.2rem" }}>
                       {(() => {
                         switch (key) {
                           case "edit":
@@ -278,9 +251,7 @@ function MasterTable(props) {
                               <Button
                                 disabled={rowData?.status === `APPROVED`}
                                 sx={{ borderRadius: "15px" }}
-                                onClick={() =>
-                                  props.changeStatus(`APPROVED`, rowData?.id)
-                                }
+                                onClick={() => props.changeStatus(`APPROVED`, rowData?.id)}
                                 className={styles.deviceControlBtn}
                                 variant="contained"
                                 color="success"
@@ -293,9 +264,7 @@ function MasterTable(props) {
                               <Button
                                 disabled={rowData?.status === `REJECTED`}
                                 sx={{ borderRadius: "15px" }}
-                                onClick={() =>
-                                  props.changeStatus(`REJECTED`, rowData?.id)
-                                }
+                                onClick={() => props.changeStatus(`REJECTED`, rowData?.id)}
                                 className={styles.deviceControlBtn}
                                 variant="contained"
                                 color="error"
@@ -309,44 +278,16 @@ function MasterTable(props) {
                             return (
                               <input
                                 type="checkbox"
-                                checked={
-                                  props.checkedEntries[
-                                    (page - 1) * paginationLength + index
-                                  ]
-                                }
+                                checked={props.checkedEntries[(page - 1) * paginationLength + index]}
                                 key={(page - 1) * paginationLength + index}
-                                onChange={(e) =>
-                                  auctionEntryChecked(
-                                    e,
-                                    (page - 1) * paginationLength + index,
-                                    rowData?.kisanId
-                                  )
-                                }
-                                disabled={
-                                  rowData?.kisanId !=
-                                    auctionEntryKisanId.kisanId &&
-                                  auctionEntryKisanId.count > 0
-                                }
+                                onChange={(e) => auctionEntryChecked(e, (page - 1) * paginationLength + index, rowData?.kisanId)}
+                                disabled={rowData?.kisanId != auctionEntryKisanId.kisanId && auctionEntryKisanId.count > 0}
                               />
                             );
                           case "date":
-                            return rowData[key] === "TOTAL" ? (
-                              <b>TOTAL</b>
-                            ) : (
-                              new Date(rowData[key]).toLocaleString(
-                                "en-IN",
-                                dateFormat
-                              )
-                            );
+                            return rowData[key] === "TOTAL" ? <b>TOTAL</b> : new Date(rowData[key]).toLocaleString("en-IN", dateFormat);
                           case "auctionDate":
-                            return rowData[key] === "TOTAL" ? (
-                              <b>TOTAL</b>
-                            ) : (
-                              new Date(rowData[key]).toLocaleString(
-                                "en-IN",
-                                dateTimeFormat
-                              )
-                            );
+                            return rowData[key] === "TOTAL" ? <b>TOTAL</b> : new Date(rowData[key]).toLocaleString("en-IN", dateTimeFormat);
                           case "navigation":
                             return (
                               <>
@@ -359,23 +300,11 @@ function MasterTable(props) {
                               </>
                             );
                           case "daysExceded":
-                            return (
-                              <div
-                                className={`${styles.myClass} ${
-                                  rowData[key] > 0
-                                    ? styles.daysExceded
-                                    : styles.daysNotExceded
-                                }`}
-                              >
-                                {rowData[key]}
-                              </div>
-                            );
+                            return <div className={`${styles.myClass} ${rowData[key] > 0 ? styles.daysExceded : styles.daysNotExceded}`}>{rowData[key]}</div>;
+                          case "itemNameWithCheckbox":
+                            return rowData.itemName ? <><input type="checkbox" checked={!!checkedItems[index]} onChange={() => handleCheckboxChange(index)}/> {rowData.itemName}</> : "";
                           default:
-                            return rowData.date === "TOTAL" ? (
-                              <b>{rowData[key]}</b>
-                            ) : (
-                              rowData[key]
-                            );
+                            return rowData.date === "TOTAL" ? <b>{rowData[key]}</b> : rowData[key];
                         }
                       })()}
                     </TableCell>
@@ -386,12 +315,7 @@ function MasterTable(props) {
           </Table>
         </div>
         <div className={styles.paninator}>
-          <select
-            value={paginationLength}
-            onChange={handleSelectChange}
-            id="paginationLengthSelect"
-            className={styles.selectLength}
-          >
+          <select value={paginationLength} onChange={handleSelectChange} id="paginationLengthSelect" className={styles.selectLength}>
             <option value="10">10</option>
             <option value="20">20</option>
             <option value="50">50</option>
@@ -424,20 +348,13 @@ function MasterTable(props) {
                               {...params}
                               label="Vyapari Name"
                               onKeyDown={(e) => {
-                                if (
-                                  e.key === "Enter" &&
-                                  fieldDef.name === "quantity"
-                                ) {
+                                if (e.key === "Enter" && fieldDef.name === "quantity") {
                                   //   e.preventDefault();
                                   newQty(e);
                                 }
                               }}
                               error={!!errors[fieldDef.name]}
-                              helperText={
-                                errors[fieldDef.name]
-                                  ? errors[fieldDef.name].message
-                                  : ""
-                              }
+                              helperText={errors[fieldDef.name] ? errors[fieldDef.name].message : ""}
                               InputProps={{
                                 ...params.InputProps,
                                 shrink: true,
@@ -501,10 +418,7 @@ function MasterTable(props) {
                               {qty.map((item, index) => (
                                 <li key={index}>
                                   {item}
-                                  <button
-                                    className={styles.qtybtn}
-                                    onClick={(event) => removeQty(event, index)}
-                                  >
+                                  <button className={styles.qtybtn} onClick={(event) => removeQty(event, index)}>
                                     x
                                   </button>
                                 </li>
