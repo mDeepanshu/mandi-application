@@ -23,7 +23,7 @@ const LedgerPrint = forwardRef((props, ref) => {
     return (
         <div ref={ref} className={styles.container}>
             <div className={styles.constants} style={{ fontSize: '11px' }}>
-                <div><b>{props.formData?.vyapari_id?.name} | </b>ID: <b>{props.formData?.vyapari_id?.idNo}</b></div>
+                <div><b>{props.formData?.vyapari_id?.name}{props.formData?.vyapariName} | </b>ID: <b>{props.formData?.vyapari_id?.idNo}{props.formData?.vyapariIdNo}</b></div>
             </div>
             <table border="1" style={{fontSize: '10px'}}>
                 <thead>

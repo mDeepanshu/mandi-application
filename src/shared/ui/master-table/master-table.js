@@ -11,6 +11,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { InputAdornment } from "@mui/material";
 import { getAllPartyList } from "../../../gateway/comman-apis";
 import { dateFormat, dateTimeFormat } from "../../../constants/config";
+import { useMediaQuery } from "@mui/material";
 
 function MasterTable(props) {
   const [open, setOpen] = useState(false);
@@ -31,6 +32,8 @@ function MasterTable(props) {
   const [qty, setQty] = useState([]);
   const [qtyTotal, setQtyTotal] = useState(0);
   const excludeArr = ["edit", "delete", "index", "navigation", "date", "auctionDate", "deviceName", "bagWiseQuantity", "bagWiseQuantityArray"];
+  const [adjustHeight, setAdjustHeight] = useState("370px");
+  const isSmallScreen = useMediaQuery("(max-width:495px)");
 
   const {
     control,
@@ -46,6 +49,8 @@ function MasterTable(props) {
 
   // Reset checked checkboxes when table data changes
   useEffect(() => {
+    if (props.customHeight) setAdjustHeight(props.customHeight);
+    if (isSmallScreen) setAdjustHeight(`370px`);
     setCheckedItems({});
   }, [props.tableData]);
 
@@ -216,7 +221,7 @@ function MasterTable(props) {
   return (
     <div>
       <TableContainer component={Paper} className={styles.table}>
-        <div className={styles.tableBody}>
+        <div className={styles.tableBody} style={{height:`calc(100vh - ${adjustHeight})`}}>
           <Table stickyHeader aria-label="simple table">
             <TableHead>
               <TableRow>

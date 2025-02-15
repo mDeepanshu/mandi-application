@@ -117,7 +117,7 @@ function NavBar(props) {
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar component="nav">
-        <Toolbar sx={{ display: { xs: "none", sm: "flex" } }}>
+        <Toolbar sx={{ display: { xs: "none", sm: "flex" } }} variant="dense">
           <Typography
             variant="h6"
             component="div"

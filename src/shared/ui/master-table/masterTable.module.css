@@ -51,8 +51,9 @@
 }
 
 .tableBody {
-    height: calc(100vh - 370px);
+    /* height: calc(100vh - 370px); */
     overflow-y: auto;
+    min-width: 29rem;
 }
 
 .grantBtn {

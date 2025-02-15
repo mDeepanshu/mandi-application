@@ -1,103 +1,152 @@
+.wrapper {
+  display: flex;
+}
+
 .container {
-    padding: 0 10px;
-    width: 98%;
+  padding: 0 10px;
+  width: 25%;
+}
+
+.table_section {
+  width: 70%;
 }
 
 h1 {
-    width: 100%;
+  width: 100%;
 }
 
 .dateFields {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-    /* padding-bottom: 20px; */
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  /* padding-bottom: 20px; */
 }
 
 .constants {
-    width: 100%;
-    display: flex;
-    padding: 15px 0;
-    /* justify-content: end; */
-    gap: 10px;
-}
-
-.date {
-    /* width: 15%; */
-    /* padding-right: 10px; */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 15px 0;
+  /* justify-content: end; */
+  gap: 10px;
 }
 
 .tableContainer {
-    width: 100%;
+  width: 100%;
 }
 
+.btns {
+  display: flex;
+  gap: 7px;
+}
 
-.print_btn {
-    /* padding-left: 5px; */
-    margin-left: 5px;
-    /* padding-left: 30px; */
+.print_btns {
+  display: flex;
+  gap: 7px;
 }
 
 .vyapariName {
-    width: 40%;
+  width: 100%;
 }
 
-.tableLedger{
-    /* height: calc(100vh-400px); */
-    /* height: 30vh; */
-    background-color: black;
+.tableLedger {
+  /* height: calc(100vh-400px); */
+  /* height: 30vh; */
+  background-color: black;
 }
 
 .errMsg {
-    color: red;
+  color: red;
+}
+
+.date {
+  width: 100%;
 }
 
 @media (min-width: 485px) {
-    .fulllabel {
-      display: inline;
-    }
-    .shortlabel {
-      display: none;
-    }
+  .constants {
+    /* width: 100%; */
+    display: flex;
+    /* flex-direction: row-reverse; */
+    /* padding: 15px 0; */
+    /* gap: 4px; */
   }
 
+  .fulllabel {
+    display: inline;
+  }
+
+  .shortlabel {
+    display: none;
+  }
+}
+
+@media (min-width: 1150px) {
+  .date {
+    width: 47%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .btns {
+    flex-direction: column;
+  }
+  .print_btn{
+    width: 49%;
+  }
+  .print_all_btn{
+    width: 49%;
+  }
+}
+
 @media (max-width: 495px) {
+  .wrapper {
+    display: flex;
+    padding: 0 5px;
+    flex-direction: column;
+  }
 
-    h1 {
-        width: 40%;
-        display: none;
-    }
+  .container {
+    width: 95%;
+  }
 
-    .vyapariName {
-        padding-top: 10px;
-        width: 99%;
-    }
+  .table_section {
+    width: 96%;
+  }
 
-    .date {
-        width: 48%;
-        /* padding-right: 10px; */
-    }
+  h1 {
+    display: none;
+  }
 
-    .constants {
-        width: 100%;
-        display: flex;
-        padding: 15px 0;
-        /* gap: 4px; */
-    }
+  .vyapariName {
+    padding-top: 10px;
+    width: 99%;
+  }
 
-    .fulllabel {
-        display: none;
-    }
+  .date {
+    width: 48%;
+    /* padding-right: 10px; */
+  }
 
-    .shortlabel {
-        display: inline;
-    }
+  .constants {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 15px 0;
+    gap: 20px;
+  }
 
-    .print_all_btn{
-        display: none;
-    }
+  .fulllabel {
+    display: none;
+  }
 
+  .shortlabel {
+    display: inline;
+  }
 
+  .print_btns {
+    display: none;
+  }
 }
