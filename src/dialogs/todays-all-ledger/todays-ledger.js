@@ -18,6 +18,7 @@ const PrintAllLedger = (props) => {
   const [dataArray, setDataArray] = useState([]);
   const printRefs = useRef([]);
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
+  let printIndex = 0;
 
   const print = async () => {
     const vyapariIdList = [];
@@ -29,26 +30,20 @@ const PrintAllLedger = (props) => {
   };
 
   const printHandler = useReactToPrint({
-    content: () => printRefs.current[0], // This will be updated dynamically in the loop
+    content: () => printRefs.current[printIndex], // This will be updated dynamically in the loop
+    onAfterPrint: () => {
+      if (printIndex < dataArray.length - 1) {
+        setTimeout(() => printHandler({ content: () => printRefs.current[printIndex] }), 0); // Move to the next index after delay
+        printIndex += 1;
+      } else printIndex = 0;
+    },
   });
 
-  // Use useEffect to trigger printing after dataArray updates
   useEffect(() => {
-    const printSequentially = async () => {
-      for (let i = 0; i < dataArray.length; i++) {
-        if (printRefs.current[i]) {
-          await new Promise((resolve) => {
-            printHandler({ content: () => printRefs.current[i] });
-            setTimeout(resolve, 1000); // Adding a delay to ensure print completion
-          });
-        }
-      }
-    };
-
-    if (dataArray.length > 0) {
-      printSequentially();
-    }
-  }, [dataArray, printHandler]);
+    setTimeout(() => {
+      if (dataArray.length > 0) printHandler();
+    }, 2000);
+  }, [dataArray]);
 
   const fetch_vyapari_list = async () => {
     const vyapariList = await getTodaysVyapari(props.formData.fromDate, props.formData.toDate);
@@ -99,8 +94,10 @@ const PrintAllLedger = (props) => {
         }}
       >
         <DialogTitle>
-          <div style={{ display: "flex",alignItems: "center" }}>
-            <div className={styles.select_all}><input type="checkbox" onChange={selectAll}/> SELECT ALL</div>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <div className={styles.select_all}>
+              <input type="checkbox" onChange={selectAll} /> SELECT ALL
+            </div>
             <div className={styles.search}>
               <TextField
                 fullWidth

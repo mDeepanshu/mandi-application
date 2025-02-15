@@ -19,20 +19,8 @@ function Ledger() {
   const triggerRef = useRef();
 
   const [tableData, setTableData] = useState([]);
-  const [ledgerColumns, setledgerColumns] = useState([
-    "DATE",
-    "ITEM NAME",
-    "DEBIT",
-    "CREDIT",
-    "REMARK",
-  ]);
-  const [keyArray, setKeyArray] = useState([
-    "date",
-    "itemNameWithCheckbox",
-    "dr",
-    "cr",
-    "remark",
-  ]);
+  const [ledgerColumns, setledgerColumns] = useState(["DATE", "ITEM NAME", "DEBIT", "CREDIT", "REMARK"]);
+  const [keyArray, setKeyArray] = useState(["date", "itemNameWithCheckbox", "dr", "cr", "remark"]);
 
   const [showAllLedgerPrint, setShowAllLedgerPrint] = useState(false);
 
@@ -42,7 +30,8 @@ function Ledger() {
   twoDaysPrior.setDate(twoDaysPrior.getDate() - 2);
   const priorDate = twoDaysPrior.toISOString().split("T")[0];
   const vyapariRef = useRef(null); // Create a ref
-  const isSmallScreen = useMediaQuery("(max-width:485px)");
+  const isSmallScreen = useMediaQuery("(max-width:495px)");
+  let customTableHeight = "120px";
 
   const {
     register,
@@ -80,9 +69,7 @@ function Ledger() {
     const ledger = await getLedger(vyapari_id, fromDate, toDate);
     if (ledger) {
       if (ledger.responseBody?.transactions?.length) {
-        const transactionWithTotals = insertDateWiseTotal([
-          ...ledger.responseBody?.transactions,
-        ]);
+        const transactionWithTotals = insertDateWiseTotal([...ledger.responseBody?.transactions]);
         setTableData(transactionWithTotals);
       } else setTableData([]);
       setValue("closingAmount", ledger.responseBody?.closingAmount);
@@ -161,6 +148,7 @@ function Ledger() {
 
   return (
     <>
+    <div className={styles.wrapper}>
       <div className={styles.container}>
         <h1>LEDGER</h1>
         <form onSubmit={(e) => e.preventDefault()}>
@@ -214,16 +202,7 @@ function Ledger() {
                 control={control}
                 rules={{ required: "Enter From Date" }}
                 defaultValue=""
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="FROM DATE"
-                    size={isSmallScreen ? "small" : "medium"}
-                    fullWidth
-                    variant="outlined"
-                    type="date"
-                  />
-                )}
+                render={({ field }) => <TextField {...field} label="FROM DATE" size={isSmallScreen ? "small" : "medium"} fullWidth variant="outlined" type="date" />}
               />
               <p className="error">{errors.fromDate?.message}</p>
             </div>
@@ -233,55 +212,24 @@ function Ledger() {
                 control={control}
                 rules={{ required: "Enter To Date" }}
                 defaultValue=""
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="TO DATE"
-                    size={isSmallScreen ? "small" : "medium"}
-                    fullWidth
-                    variant="outlined"
-                    type="date"
-                  />
-                )}
+                render={({ field }) => <TextField {...field} label="TO DATE" size={isSmallScreen ? "small" : "medium"} fullWidth variant="outlined" type="date" />}
               />
               <p className="error">{errors.toDate?.message}</p>
             </div>
           </div>
-          <div>
-            <Button
-              variant="contained"
-              color="success"
-              type="button"
-              onClick={() => fetch_ledger(getValues())}
-            >
-              FETCH LEDGER
+          <div className={styles.btns}>
+            <Button variant="contained" color="success" type="button" onClick={() => fetch_ledger(getValues())}>
+              FETCH
             </Button>
-            &nbsp;
-            <Button
-              variant="contained"
-              color="success"
-              type="button"
-              onClick={() => printLedger()}
-              className={styles.print_btn}
-            >
-              PRINT LEDGER
-            </Button>
-            &nbsp;
-            <Button
-              variant="contained"
-              color="success"
-              type="button"
-              onClick={() => toggleState(true)}
-              className={styles.print_all_btn}
-            >
-              PRINT ALL LEDGER
-            </Button>
-            <ReactToPrint
-              trigger={() => (
-                <button style={{ display: "none" }} ref={triggerRef}></button>
-              )}
-              content={() => componentRef.current}
-            />
+            <div className={styles.print_btns}>
+              <Button className={styles.print_btn} variant="contained" color="success" type="button" onClick={() => printLedger()}>
+                PRINT
+              </Button>
+              <Button className={styles.print_all_btn} variant="contained" color="success" type="button" onClick={() => toggleState(true)}>
+                PRINT ALL
+              </Button>
+            </div>
+            <ReactToPrint trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>} content={() => componentRef.current} />
           </div>
           <div className={styles.constants}>
             <div>
@@ -301,19 +249,14 @@ function Ledger() {
           </div>
         </form>
         {/* <div className={styles.tableLedger}> */}
-          <MasterTable
-            columns={ledgerColumns}
-            tableData={tableData}
-            keyArray={keyArray}
-          />
         {/* </div> */}
       </div>
+      <div className={styles.table_section}>
+        <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} customHeight={customTableHeight}/>
+      </div>
+      </div>
       <div style={{ display: "none" }}>
-        <LedgerPrint
-          ref={componentRef}
-          tableData={[...tableData]}
-          formData={getValues()}
-        />
+        <LedgerPrint ref={componentRef} tableData={[...tableData]} formData={getValues()} />
       </div>
       <div>
         {/* {showAuctionEdit && <AuctionEdit/>} */}
