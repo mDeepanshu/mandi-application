@@ -31,7 +31,7 @@ function MasterTable(props) {
   const [paginationLength, setPaginationLength] = useState(10);
   const [qty, setQty] = useState([]);
   const [qtyTotal, setQtyTotal] = useState(0);
-  const excludeArr = ["edit", "delete", "index", "navigation", "date", "auctionDate", "deviceName", "bagWiseQuantity", "bagWiseQuantityArray"];
+  const excludeArr = ["edit", "delete", "index", "navigation", "date", "auctionDate", "deviceName", "bagWiseQuantity", "bagWiseQuantityArray","lastVasuliDate","idNo","daysExceded","owedAmount"];
   const [adjustHeight, setAdjustHeight] = useState("370px");
   const isSmallScreen = useMediaQuery("(max-width:495px)");
 
@@ -69,6 +69,8 @@ function MasterTable(props) {
   }, [qty]);
 
   const editFromTable = (index) => {
+    console.log(`obj`,tableData[index]);
+    
     setEditingIndex(index);
     for (let int = 0; int < props.keyArray?.length; int++) {
       if (!excludeArr.includes(props.keyArray[int])) {
@@ -141,6 +143,20 @@ function MasterTable(props) {
   };
 
   const updateRecord = async () => {
+    if (props.editParty) {
+      const editedData = {
+        ...allTableData[editingIndex],
+        ...getValues(),
+      }
+
+      delete editedData.lastVasuliDate;
+      delete editedData.daysExceded;
+      delete editedData.idNo;
+      delete editedData.owedAmount;
+
+      props.editParty(editedData);
+      return;
+    }
     const isValid = await trigger(["partyName", "rate"]);
     if (!isValid) return;
     let editedData = getValues();
@@ -393,7 +409,7 @@ function MasterTable(props) {
                           <TextField
                             {...field}
                             label={fieldDef.label}
-                            type="number"
+                            // type="number"
                             variant="outlined"
                             sx={{ mb: 3 }}
                             InputLabelProps={{
