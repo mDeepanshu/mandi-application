@@ -148,10 +148,12 @@ function MasterTable(props) {
         ...allTableData[editingIndex],
         ...getValues(),
       }
+      editedData.id = editedData.partyId;
 
       delete editedData.lastVasuliDate;
       delete editedData.daysExceded;
       delete editedData.idNo;
+      delete editedData.partyId;
       delete editedData.owedAmount;
 
       props.editParty(editedData);
