@@ -15,7 +15,7 @@ import styles from "./party-master.module.css";
 import PartyPrint from "../../dialogs/party-print/party-print-dialog";
 import ReactToPrint from "react-to-print";
 import Alert from "@mui/material/Alert";
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext } from "react-router-dom";
 
 const PartyMaster = () => {
   // const { handleSubmit, control, getValues } = useForm();
@@ -81,8 +81,15 @@ const PartyMaster = () => {
   };
 
   const onPartyInput = (event, field) => {
+
     field.onChange(event); // Update the value in react-hook-form
-    setTableDataFiltered(tableData.filter((elem) => elem.name.toLowerCase().includes(event.target.value.toLowerCase())));
+    const handler = setTimeout(() => {
+      setTableDataFiltered(tableData.filter((elem) => elem.name.toLowerCase().includes(event.target.value.toLowerCase())));
+    }, 1000); // Adjust the delay as needed (300ms here)
+
+    return () => {
+      clearTimeout(handler);
+    };
   };
 
   useEffect(() => {
@@ -154,16 +161,17 @@ const PartyMaster = () => {
   const editParty = async (data) => {
     let editRes = await editPartyGlobal(data);
     if (editRes.responseCode == "200") {
+      fetchItems();
       snackbarChange({
         open: true,
         alertType: "success",
-        alertMsg: "EDIT SUCCESS"
+        alertMsg: "EDIT SUCCESS",
       });
-    }else{
+    } else {
       snackbarChange({
         open: true,
         alertType: "error",
-        alertMsg: editRes.responseBody
+        alertMsg: editRes.responseBody,
       });
     }
     // console.log(`editRes`, editRes);

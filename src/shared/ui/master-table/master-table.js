@@ -157,6 +157,7 @@ function MasterTable(props) {
       delete editedData.owedAmount;
 
       props.editParty(editedData);
+      handleClose();
       return;
     }
     const isValid = await trigger(["partyName", "rate"]);
