@@ -1,9 +1,27 @@
-.container{
-    padding: 10px 20px;
-    font-size: 12px;
+.container {
+  padding: 10px 20px;
+  font-size: 12px;
 }
 
 .tbd:nth-child(6) {
-    max-width: 50px;
-    word-wrap: break-word;
-  }
+  max-width: 90px;
+  word-wrap: break-word;
+}
+
+.tbd:nth-child(1) {
+  max-width: 120px;
+  word-wrap: break-word;
+}
+
+.tbd:nth-child(3) {
+  max-width: 120px;
+  word-wrap: break-word;
+}
+
+.tbd:nth-child(2) {
+  min-width: 70px;
+}
+
+.tbd:nth-child(10) {
+  min-width: 150px;
+}
