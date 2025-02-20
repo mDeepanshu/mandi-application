@@ -47,15 +47,14 @@ const PrintAllLedger = (props) => {
 
   const fetch_vyapari_list = async () => {
     const vyapariList = await getTodaysVyapari(props.formData.fromDate, props.formData.toDate);
-    if (vyapariList?.responseBody?.length) {
+    if (vyapariList?.responseBody) {
       setVyapariList(vyapariList?.responseBody);
       setTableDataFiltered(vyapariList?.responseBody);
     }
   };
 
   useEffect(() => {
-    if (props.open) 
-    fetch_vyapari_list();
+    if (props.open) fetch_vyapari_list();
   }, [props.open]);
 
   const find = (event) => {
