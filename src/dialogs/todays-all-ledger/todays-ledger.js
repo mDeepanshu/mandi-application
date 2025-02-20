@@ -54,6 +54,7 @@ const PrintAllLedger = (props) => {
   };
 
   useEffect(() => {
+    if (props.open) 
     fetch_vyapari_list();
   }, [props.open]);
 

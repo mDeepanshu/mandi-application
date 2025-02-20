@@ -49,10 +49,6 @@ function VasuliList() {
     }
   }
 
-  const printLedger = () => {
-    triggerRef.current.click();
-  }
-
   const editEntry = async (editingIndex, finalEdit) => {
     const editObject = {
       ...tableData[editingIndex],

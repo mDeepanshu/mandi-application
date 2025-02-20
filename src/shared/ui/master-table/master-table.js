@@ -71,12 +71,12 @@ function MasterTable(props) {
     for (let int = 0; int < props.keyArray?.length; int++) {
       if (!excludeArr.includes(props.keyArray[int])) {
         if (keyArray[int] == "vyapariName") {
-          const defaultOption = vyapariList.find((option) => option.name == tableData[index]?.vyapariName);
+          const defaultOption = vyapariList.find((option) => option.name == allTableData[index]?.vyapariName);
           setValue("vyapariName", defaultOption || null);
         } else if (keyArray[int] == "quantity") {
-          setQtyTotal(tableData?.[index]?.[keyArray[int]]);
-          setQty(tableData?.[index]?.bagWiseQuantityArray);
-        } else setValue(keyArray[int], tableData?.[index]?.[keyArray[int]]);
+          setQtyTotal(allTableData?.[index]?.[keyArray[int]]);
+          setQty(allTableData?.[index]?.bagWiseQuantityArray);
+        } else setValue(keyArray[int], allTableData?.[index]?.[keyArray[int]]);
       }
     }
     setOpen(true);
@@ -253,13 +253,13 @@ function MasterTable(props) {
                         switch (key) {
                           case "edit":
                             return (
-                              <Button onClick={() => editFromTable(index)}>
+                              <Button onClick={() => editFromTable((page - 1) * paginationLength + index)}>
                                 <Edit />
                               </Button>
                             );
                           case "delete":
                             return (
-                              <Button onClick={() => deleteFromTable(index)}>
+                              <Button onClick={() => deleteFromTable((page - 1) * paginationLength + index)}>
                                 <Delete />
                               </Button>
                             );
