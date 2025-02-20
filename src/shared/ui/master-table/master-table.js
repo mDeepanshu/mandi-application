@@ -6,12 +6,10 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@m
 import styles from "./masterTable.module.css";
 import Pagination from "@mui/material/Pagination";
 import { useForm, Controller } from "react-hook-form";
-import Autocomplete from "@mui/material/Autocomplete";
-import SearchIcon from "@mui/icons-material/Search";
-import { InputAdornment } from "@mui/material";
 import { getAllPartyList } from "../../../gateway/comman-apis";
 import { dateFormat, dateTimeFormat } from "../../../constants/config";
 import { useMediaQuery } from "@mui/material";
+import VyapariField from "../../elements/VyapariField";
 
 function MasterTable(props) {
   const [open, setOpen] = useState(false);
@@ -31,7 +29,7 @@ function MasterTable(props) {
   const [paginationLength, setPaginationLength] = useState(10);
   const [qty, setQty] = useState([]);
   const [qtyTotal, setQtyTotal] = useState(0);
-  const excludeArr = ["edit", "delete", "index", "navigation", "date", "auctionDate", "deviceName", "bagWiseQuantity", "bagWiseQuantityArray","lastVasuliDate","idNo","daysExceded","owedAmount"];
+  const excludeArr = ["edit", "delete", "index", "navigation", "date", "auctionDate", "deviceName", "bagWiseQuantity", "bagWiseQuantityArray", "lastVasuliDate", "idNo", "daysExceded", "owedAmount","partyType"];
   const [adjustHeight, setAdjustHeight] = useState("370px");
   const isSmallScreen = useMediaQuery("(max-width:495px)");
 
@@ -69,8 +67,6 @@ function MasterTable(props) {
   }, [qty]);
 
   const editFromTable = (index) => {
-    console.log(`obj`,tableData[index]);
-    
     setEditingIndex(index);
     for (let int = 0; int < props.keyArray?.length; int++) {
       if (!excludeArr.includes(props.keyArray[int])) {
@@ -87,9 +83,6 @@ function MasterTable(props) {
   };
 
   const deleteFromTable = (index) => {
-    // const newRows = [...tableData];
-    // newRows.splice(index, 1);
-    // setTableData(newRows);
     if (props.deleteEntry) props.deleteEntry(index);
   };
 
@@ -147,7 +140,7 @@ function MasterTable(props) {
       const editedData = {
         ...allTableData[editingIndex],
         ...getValues(),
-      }
+      };
       editedData.id = editedData.partyId;
 
       delete editedData.lastVasuliDate;
@@ -240,7 +233,7 @@ function MasterTable(props) {
   return (
     <div>
       <TableContainer component={Paper} className={styles.table}>
-        <div className={styles.tableBody} style={{height:`calc(100vh - ${adjustHeight})`}}>
+        <div className={styles.tableBody} style={{ height: `calc(100vh - ${adjustHeight})` }}>
           <Table stickyHeader aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -326,7 +319,13 @@ function MasterTable(props) {
                           case "daysExceded":
                             return <div className={`${styles.myClass} ${rowData[key] > 0 ? styles.daysExceded : styles.daysNotExceded}`}>{rowData[key]}</div>;
                           case "itemNameWithCheckbox":
-                            return rowData.itemName ? <><input type="checkbox" checked={!!checkedItems[index]} onChange={() => handleCheckboxChange(index)}/> {rowData.itemName}</> : "";
+                            return rowData.itemName ? (
+                              <>
+                                <input type="checkbox" checked={!!checkedItems[index]} onChange={() => handleCheckboxChange(index)} /> {rowData.itemName}
+                              </>
+                            ) : (
+                              ""
+                            );
                           default:
                             return rowData.date === "TOTAL" ? <b>{rowData[key]}</b> : rowData[key];
                         }
@@ -354,52 +353,8 @@ function MasterTable(props) {
           <DialogContent>
             <div className={styles.editForm}>
               {fieldDefinitions.map((fieldDef) => {
-                if (fieldDef.name === "vyapariName") {
-                  return (
-                    <Controller
-                      key={fieldDef.partyId}
-                      name={fieldDef.name}
-                      control={control}
-                      rules={{ required: "Enter Patry Name" }}
-                      render={({ field }) => (
-                        <Autocomplete
-                          {...field}
-                          options={vyapariList}
-                          getOptionLabel={(option) => option.name}
-                          getOptionKey={(option) => option.partyId}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label="Vyapari Name"
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter" && fieldDef.name === "quantity") {
-                                  //   e.preventDefault();
-                                  newQty(e);
-                                }
-                              }}
-                              error={!!errors[fieldDef.name]}
-                              helperText={errors[fieldDef.name] ? errors[fieldDef.name].message : ""}
-                              InputProps={{
-                                ...params.InputProps,
-                                shrink: true,
-                                startAdornment: (
-                                  <InputAdornment position="start">
-                                    <SearchIcon />
-                                  </InputAdornment>
-                                ),
-                              }}
-                              size="small"
-                            />
-                          )}
-                          onChange={(event, value) => field.onChange(value)}
-                          disablePortal
-                          id="combo-box-demo"
-                          sx={{ width: "100%", paddingBottom: "10px" }} // Ensures Autocomplete is 100% wide
-                        />
-                      )}
-                    />
-                  );
-                } else {
+                if (fieldDef.name === "vyapariName") return <VyapariField name="vyapariName" control={control} errors={errors} size="small"/>;
+                else {
                   return (
                     <>
                       <Controller

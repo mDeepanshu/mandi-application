@@ -54,9 +54,9 @@ function AuctionEntries() {
   const [total, setTotal] = useState([]);
   const [checkedEntries, setCheckedEntries] = useState([]);
   const [auctionEntriesColumnsPrint, setAuctionEntriesColumnsPrint] = useState([
-    "KISANNAME",
-    "ITEMNAME",
-    "VYAPARINAME",
+    "KISAN",
+    "ITEM",
+    "VYAPARI",
     "RATE",
     "Q",
     "B.W.",
@@ -329,7 +329,7 @@ function AuctionEntries() {
       <div style={{ display: "none" }}>
         <AuctionPrint
           ref={componentRef}
-          tableData={tableData}
+          tableData={tableDataFiltered}
           keyArray={keyArrayPrint}
           columns={auctionEntriesColumnsPrint}
         />

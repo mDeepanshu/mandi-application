@@ -1,34 +1,53 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from "react";
 import { Grid } from "@mui/material";
 import { TextField, Button } from "@mui/material";
-import { InputAdornment } from '@mui/material';
-import { saveVyapariBill, getVyapariBill } from '../../gateway/vyapari-bill-apis';
-import { useForm, Controller } from 'react-hook-form';
+import { saveVyapariBill, getVyapariBill } from "../../gateway/vyapari-bill-apis";
+import { useForm, Controller } from "react-hook-form";
 import { getAllPartyList } from "../../gateway/comman-apis";
-import Autocomplete from '@mui/material/Autocomplete';
-import SearchIcon from '@mui/icons-material/Search';
 import VyapariBillPrint from "../../dialogs/vyapari-bill/vyapari-bill-print";
 import styles from "./vyapari-bill.module.css";
-import ReactToPrint from 'react-to-print';
+import ReactToPrint from "react-to-print";
 import SharedTable from "../../shared/ui/table/table";
 import PreviousBills from "../../shared/ui/previous-bill/previousBill";
+import VyapariField from "../../shared/elements/VyapariField";
 
 function VyapariBill() {
-
   const componentRef = useRef();
   const triggerRef = useRef();
-  const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
+  const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
 
-  const { register, handleSubmit, control, formState: { errors }, getValues, trigger, setValue } = useForm({
-    defaultValues:{
-      date:currentDate
-    }
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    getValues,
+    trigger,
+    setValue,
+  } = useForm({
+    defaultValues: {
+      date: currentDate,
+    },
   });
   const [vyapariList, setVyapariList] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const [vyapariTableColumns, setVyapariTableColumns] = useState(["Item Name", "Bag", "Chungi", "Rate", "Quantity", "Bags W.", "Item Total", "Date", "Kisan Name", "DEVICE NAME", "Edit", "Delete", "Updated Tran."]);
+  const [vyapariTableColumns, setVyapariTableColumns] = useState([
+    "Item Name",
+    "Bag",
+    "Chungi",
+    "Rate",
+    "Quantity",
+    "Bags W.",
+    "Item Total",
+    "Date",
+    "Kisan Name",
+    "DEVICE NAME",
+    "Edit",
+    "Delete",
+    "Updated Tran.",
+  ]);
   const [formData, setFormData] = useState();
-  const [keyArray, setKeyArray] = useState(["itemName", "bag", "chungi", "rate", "quantity", "bagWiseQuantity", 'itemTotal', "auctionDate", "partyName", "deviceName", "edit", "delete", "navigation"]);
+  const [keyArray, setKeyArray] = useState(["itemName", "bag", "chungi", "rate", "quantity", "bagWiseQuantity", "itemTotal", "auctionDate", "partyName", "deviceName", "edit", "delete", "navigation"]);
 
   useEffect(() => {
     getVyapariNames();
@@ -37,14 +56,13 @@ function VyapariBill() {
   const onSubmit = async (data) => {
     const billDetails = {
       ...data,
-      tableData
+      tableData,
     };
     setFormData(billDetails);
-
   };
 
   const fetchBill = async () => {
-    const isValid = await trigger(['vyapari_name', 'date']);
+    const isValid = await trigger(["vyapari_name", "date"]);
     if (isValid) {
       const formValues = getValues();
       const billData = await getVyapariBill(formValues.vyapari_name.partyId, formValues.date);
@@ -53,28 +71,27 @@ function VyapariBill() {
       setValue("previous_remaining", billData?.responseBody?.currentOutstanding);
       setValue("total", billData?.responseBody?.billTotal);
     }
-  }
+  };
 
   const getVyapariNames = async () => {
     const allVyapari = await getAllPartyList("VYAPARI");
     if (allVyapari?.responseBody) setVyapariList(allVyapari?.responseBody);
-  }
+  };
 
   const printBill = () => {
     triggerRef.current.click();
-
-  }
+  };
 
   const saveBill = async () => {
     let tableSnapshot = [];
-    tableData?.forEach(element => {
+    tableData?.forEach((element) => {
       tableSnapshot.push(element[0]);
     });
     const bill = { ...getValues(), vyapariBillItems: tableSnapshot, vyapariId: getValues()?.vyapari_name?.partyId, vyapariName: getValues().vyapari_name?.name, billDate: getValues()?.date };
     delete bill.vyapari_name;
     delete bill.date;
     saveVyapariBill(bill);
-  }
+  };
 
   const refreshBill = async () => {
     let formValues = getValues();
@@ -85,8 +102,7 @@ function VyapariBill() {
       setValue("previous_remaining", billData?.responseBody?.currentOutstanding);
       setValue("total", billData?.responseBody?.billTotal);
     }
-
-  }
+  };
 
   return (
     <div>
@@ -95,62 +111,22 @@ function VyapariBill() {
           <h1>VYAPARI BILL</h1>
         </div>
         <Grid container pt={2} pl={1} gap={1}>
-          {/* <Grid container spacing={2} justifyContent="space-between"> */}
-          {/* <Grid container item xs={12} spacing={2} justifyContent="flex-end"> */}
           <Grid item xs={7} md={4}>
-            <Controller
-              name="vyapari_name"
-              control={control}
-              rules={{ required: "Enter Patry Name" }}
-              render={({ field }) => (
-                <Autocomplete
-                  {...field}
-                  options={vyapariList}
-                  getOptionLabel={(option) => option.name}
-                  getOptionKey={(option) => option.partyId}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      size='small'
-                      label="Vyapari Name"
-                      InputProps={{
-                        ...params.InputProps,
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <SearchIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  )}
-                  onChange={(event, value) => field.onChange(value)}
-                  disablePortal
-                  id="combo-box-demo"
-                />
-              )}
-            />
-            <p className='err-msg'>{errors.vyapari_name?.message}</p>
+            <VyapariField name="vyapari_name" control={control} errors={errors} size="small" />
           </Grid>
           <Grid item xs={4} md={3}>
             <Controller
               name="date"
               control={control}
               rules={{ required: "Enter Date" }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  defaultValue={currentDate}
-                  size='small'
-                  fullWidth
-                  variant="outlined"
-                  type='date'
-                />
-              )}
+              render={({ field }) => <TextField {...field} defaultValue={currentDate} size="small" fullWidth variant="outlined" type="date" />}
             />
-            <p className='err-msg'>{errors.date?.message}</p>
+            <p className="err-msg">{errors.date?.message}</p>
           </Grid>
           <Grid item xs={6} md={2}>
-            <Button variant="contained" color="success" onClick={fetchBill} fullWidth>Fetch Bill</Button>
+            <Button variant="contained" color="success" onClick={fetchBill} fullWidth>
+              Fetch Bill
+            </Button>
           </Grid>
           {/* </Grid> */}
           <Grid item xs={5} md={2}>
@@ -180,18 +156,19 @@ function VyapariBill() {
             />
           </Grid>
           <Grid item xs={4} md={2}>
-            <Button variant="contained" color="primary" fullWidth onClick={saveBill}>Save Bill</Button>
+            <Button variant="contained" color="primary" fullWidth onClick={saveBill}>
+              Save Bill
+            </Button>
           </Grid>
           <Grid item xs={4} md={2}>
-            <Button variant="contained" color="success" type='button' onClick={() => printBill()} fullWidth>Print</Button>
-            <ReactToPrint
-              trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
-              content={() => componentRef.current}
-            />
+            <Button variant="contained" color="success" type="button" onClick={() => printBill()} fullWidth>
+              Print
+            </Button>
+            <ReactToPrint trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>} content={() => componentRef.current} />
           </Grid>
         </Grid>
       </form>
-      <div style={{ display: 'none' }}>
+      <div style={{ display: "none" }}>
         <VyapariBillPrint ref={componentRef} tableData={tableData} formData={formData} restructureTable={true} />
       </div>
     </div>
