@@ -33,6 +33,7 @@ function SnackbarGlobal({snackbarData}) {
             <Snackbar
                 open={alertData.open}
                 autoHideDuration={4000}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }} // Change position
                 onClose={handleClose}
             >
                 <Alert

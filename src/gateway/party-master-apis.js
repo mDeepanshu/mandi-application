@@ -11,6 +11,17 @@ export const addPartyGlobal = async (data) => {
     }
 };
 
+export const editPartyGlobal = async (data) => {
+    try {
+        const response = await axiosHttp.patch('/party', data);
+        return response.data;
+    } catch (error) {
+        console.error('Error posting data:', error);
+        console.error('Not Throwing Error');
+
+    }
+};
+
 export const getPartyGlobal = async () => {
     try {
         const response = await axiosHttp.get('party/listAllParties');

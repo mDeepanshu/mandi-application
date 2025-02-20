@@ -6,13 +6,10 @@ import { getLedger } from "../../gateway/ledger-apis";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import LedgerPrint from "../../dialogs/ledger-print/ledger-print-dialog";
 import ReactToPrint from "react-to-print";
-import Autocomplete from "@mui/material/Autocomplete";
-import SearchIcon from "@mui/icons-material/Search";
-import { InputAdornment } from "@mui/material";
 import styles from "./ledger.module.css";
-import { getAllPartyList } from "../../gateway/comman-apis";
 import { useMediaQuery } from "@mui/material";
 import PrintAllLedger from "../../dialogs/todays-all-ledger/todays-ledger";
+import VyapariField from "../../shared/elements/VyapariField";
 
 function Ledger() {
   const componentRef = useRef();
@@ -21,15 +18,11 @@ function Ledger() {
   const [tableData, setTableData] = useState([]);
   const [ledgerColumns, setledgerColumns] = useState(["DATE", "ITEM NAME", "DEBIT", "CREDIT", "REMARK"]);
   const [keyArray, setKeyArray] = useState(["date", "itemNameWithCheckbox", "dr", "cr", "remark"]);
-
   const [showAllLedgerPrint, setShowAllLedgerPrint] = useState(false);
-
-  const [vyapariList, setVyapariList] = useState([]);
   const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
   const twoDaysPrior = new Date();
   twoDaysPrior.setDate(twoDaysPrior.getDate() - 2);
   const priorDate = twoDaysPrior.toISOString().split("T")[0];
-  const vyapariRef = useRef(null); // Create a ref
   const isSmallScreen = useMediaQuery("(max-width:495px)");
   let customTableHeight = "120px";
 
@@ -60,11 +53,6 @@ function Ledger() {
     }
   };
 
-  const getVyapariNames = async () => {
-    const allVyapari = await getAllPartyList("VYAPARI");
-    if (allVyapari?.responseBody) setVyapariList(allVyapari?.responseBody);
-  };
-
   const getLedgerData = async (vyapari_id, fromDate, toDate) => {
     const ledger = await getLedger(vyapari_id, fromDate, toDate);
     if (ledger) {
@@ -77,38 +65,9 @@ function Ledger() {
     }
   };
 
-  useEffect(() => {
-    if (vyapariRef.current) {
-      setTimeout(() => {
-        vyapariRef.current.focus();
-      }, 0);
-    }
-    getVyapariNames();
-  }, []);
-
   const printLedger = () => {
     triggerRef.current.click();
   };
-
-  // const printAllLedger = () => {
-  //   const contentToPrintArray = [];
-  //   const contentToPrint = componentRef.current.innerHTML;
-  //   for (let index = 0; index < allLedgerData.length; index++) {
-  //     const element = array[index];
-  //   }
-
-  //   if (window.electron && window.electron.ipcRenderer) {
-  //     // Invoke a print action
-  //     window.electron.ipcRenderer
-  //       .invoke("print-all-ledger", contentToPrint)
-  //       .then(() => {
-  //         console.log(`done`);
-  //       })
-  //       .catch((err) => console.error("Print failed:", err));
-  //   } else {
-  //     console.warn("Electron IPC is not available.");
-  //   }
-  // };
 
   const enterAction = () => {
     setTimeout(() => {
@@ -146,114 +105,81 @@ function Ledger() {
 
   const toggleState = (state) => setShowAllLedgerPrint(state);
 
+  const onVyapariKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      enterAction();
+    }
+  };
+
   return (
     <>
-    <div className={styles.wrapper}>
-      <div className={styles.container}>
-        <h1>LEDGER</h1>
-        <form onSubmit={(e) => e.preventDefault()}>
-          <div className={styles.dateFields}>
-            <div className={styles.vyapariName}>
-              <div>
+      <div className={styles.wrapper}>
+        <div className={styles.container}>
+          <h1>LEDGER</h1>
+          <form onSubmit={(e) => e.preventDefault()}>
+            <div className={styles.dateFields}>
+              <div className={styles.vyapariName}>
+                <div>
+                  <VyapariField name="vyapari_id" control={control} errors={errors} size={isSmallScreen ? "small" : "medium"} onKeyDownFunc={onVyapariKeyDown} />
+                </div>
+              </div>
+              <div className={styles.date}>
                 <Controller
-                  name="vyapari_id"
+                  name="fromDate"
                   control={control}
-                  rules={{ required: "Enter Patry Name" }}
-                  render={({ field }) => (
-                    <Autocomplete
-                      {...field}
-                      options={vyapariList}
-                      getOptionLabel={(option) => option.name}
-                      getOptionKey={(option) => option.partyId}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Vyapari Name"
-                          size={isSmallScreen ? "small" : "medium"}
-                          InputProps={{
-                            ...params.InputProps,
-                            inputRef: vyapariRef,
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <SearchIcon />
-                              </InputAdornment>
-                            ),
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              enterAction();
-                            }
-                          }}
-                        />
-                      )}
-                      onChange={(event, value) => field.onChange(value)}
-                      disablePortal
-                      id="combo-box-demo"
-                    />
-                  )}
+                  rules={{ required: "Enter From Date" }}
+                  defaultValue=""
+                  render={({ field }) => <TextField {...field} label="FROM DATE" size={isSmallScreen ? "small" : "medium"} fullWidth variant="outlined" type="date" />}
                 />
-                <p className={styles.errMsg}>{errors.vyapari_id?.message}</p>
+                <p className="error">{errors.fromDate?.message}</p>
+              </div>
+              <div className={styles.date}>
+                <Controller
+                  name="toDate"
+                  control={control}
+                  rules={{ required: "Enter To Date" }}
+                  defaultValue=""
+                  render={({ field }) => <TextField {...field} label="TO DATE" size={isSmallScreen ? "small" : "medium"} fullWidth variant="outlined" type="date" />}
+                />
+                <p className="error">{errors.toDate?.message}</p>
               </div>
             </div>
-            <div className={styles.date}>
-              <Controller
-                name="fromDate"
-                control={control}
-                rules={{ required: "Enter From Date" }}
-                defaultValue=""
-                render={({ field }) => <TextField {...field} label="FROM DATE" size={isSmallScreen ? "small" : "medium"} fullWidth variant="outlined" type="date" />}
-              />
-              <p className="error">{errors.fromDate?.message}</p>
-            </div>
-            <div className={styles.date}>
-              <Controller
-                name="toDate"
-                control={control}
-                rules={{ required: "Enter To Date" }}
-                defaultValue=""
-                render={({ field }) => <TextField {...field} label="TO DATE" size={isSmallScreen ? "small" : "medium"} fullWidth variant="outlined" type="date" />}
-              />
-              <p className="error">{errors.toDate?.message}</p>
-            </div>
-          </div>
-          <div className={styles.btns}>
-            <Button variant="contained" color="success" type="button" onClick={() => fetch_ledger(getValues())}>
-              FETCH
-            </Button>
-            <div className={styles.print_btns}>
-              <Button className={styles.print_btn} variant="contained" color="success" type="button" onClick={() => printLedger()}>
-                PRINT
+            <div className={styles.btns}>
+              <Button variant="contained" color="success" type="button" onClick={() => fetch_ledger(getValues())}>
+                FETCH
               </Button>
-              <Button className={styles.print_all_btn} variant="contained" color="success" type="button" onClick={() => toggleState(true)}>
-                PRINT ALL
-              </Button>
+              <div className={styles.print_btns}>
+                <Button className={styles.print_btn} variant="contained" color="success" type="button" onClick={() => printLedger()}>
+                  PRINT
+                </Button>
+                <Button className={styles.print_all_btn} variant="contained" color="success" type="button" onClick={() => toggleState(true)}>
+                  PRINT ALL
+                </Button>
+              </div>
+              <ReactToPrint trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>} content={() => componentRef.current} />
             </div>
-            <ReactToPrint trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>} content={() => componentRef.current} />
-          </div>
-          <div className={styles.constants}>
-            <div>
-              <b>
-                <span className={styles.fulllabel}>OPENING BALANCE: </span>
-                <span className={styles.shortlabel}>OPN: </span>
-                {getValues().openingAmount}
-              </b>
+            <div className={styles.constants}>
+              <div>
+                <b>
+                  <span className={styles.fulllabel}>OPENING BALANCE: </span>
+                  <span className={styles.shortlabel}>OPN: </span>
+                  {getValues().openingAmount}
+                </b>
+              </div>
+              <div>
+                <b>
+                  <span className={styles.fulllabel}>CLOSING BALANCE: </span>
+                  <span className={styles.shortlabel}>CLS: </span>
+                  {getValues().closingAmount}
+                </b>
+              </div>
             </div>
-            <div>
-              <b>
-                <span className={styles.fulllabel}>CLOSING BALANCE: </span>
-                <span className={styles.shortlabel}>CLS: </span>
-                {getValues().closingAmount}
-              </b>
-            </div>
-          </div>
-        </form>
-        {/* <div className={styles.tableLedger}> */}
-        {/* </div> */}
-      </div>
-      <div className={styles.table_section}>
-        <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} customHeight={customTableHeight}/>
-      </div>
+          </form>
+        </div>
+        <div className={styles.table_section}>
+          <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} customHeight={customTableHeight} />
+        </div>
       </div>
       <div style={{ display: "none" }}>
         <LedgerPrint ref={componentRef} tableData={[...tableData]} formData={getValues()} />
