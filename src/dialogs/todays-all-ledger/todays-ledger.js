@@ -23,7 +23,7 @@ const PrintAllLedger = (props) => {
   const print = async () => {
     const vyapariIdList = [];
     for (let i = 0; i < checkedEntries.length; i++) {
-      if (checkedEntries[i]) vyapariIdList.push(vyapariList[i].partyId);
+      if (checkedEntries[i]) vyapariIdList.push(tableDataFiltered[i].partyId);
     }
     const allLedgerData = await getEveryLedger(props.formData.fromDate, props.formData.toDate, vyapariIdList);
     setDataArray(allLedgerData?.responseBody);
@@ -140,7 +140,7 @@ const PrintAllLedger = (props) => {
           </div>
         </DialogTitle>
         <DialogContent>
-          <MasterTable columns={ledgerColumns} tableData={tableDataFiltered} keyArray={keyArray} onSelectEntry={(e, i) => onSelectEntry(e, i)} checkedEntries={checkedEntries}></MasterTable>
+          <MasterTable columns={ledgerColumns} tableData={tableDataFiltered} keyArray={keyArray} onSelectEntry={(e, i) => onSelectEntry(e, i)} checkedEntries={checkedEntries} customHeight={`300px`}></MasterTable>
         </DialogContent>
         <DialogActions>
           <Button onClick={print} color="success" variant="contained">

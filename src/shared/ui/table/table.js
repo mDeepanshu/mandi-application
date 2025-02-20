@@ -1,28 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@mui/material";
-import {
-  Delete,
-  Edit,
-  ArrowForwardIos,
-  ArrowBackIos,
-} from "@mui/icons-material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { Delete, Edit, ArrowForwardIos, ArrowBackIos } from "@mui/icons-material";
 import { Button } from "@mui/material";
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  TextField,
-} from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import styles from "./table.module.css";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { updateAuctionTransaction } from "../../../gateway/comman-apis";
@@ -32,6 +12,7 @@ import { getAllPartyList, getItem } from "../../../gateway/comman-apis";
 import Autocomplete from "@mui/material/Autocomplete";
 import SearchIcon from "@mui/icons-material/Search";
 import { InputAdornment } from "@mui/material";
+import VyapariField from "../../elements/VyapariField";
 
 function SharedTable(props) {
   const [open, setOpen] = useState(false);
@@ -59,17 +40,7 @@ function SharedTable(props) {
   } = useForm();
   const [rowVariables, setRowVariables] = useState([]);
 
-  const excludeArr = [
-    "edit",
-    "delete",
-    "index",
-    "navigation",
-    "auctionDate",
-    "bagWiseQuantity",
-    "bagWiseQuantityArray",
-    "deviceName",
-    "itemName"
-  ];
+  const excludeArr = ["edit", "delete", "index", "navigation", "auctionDate", "bagWiseQuantity", "bagWiseQuantityArray", "deviceName", "itemName"];
 
   useEffect(() => {
     getVyapariNames();
@@ -114,15 +85,12 @@ function SharedTable(props) {
     for (let int = 0; int < props.keyArray.length; int++) {
       if (!excludeArr.includes(props.keyArray[int]))
         if (keyArray[int] == "partyName") {
-          const defaultOption = vyapariList.find(
-            (option) => option.name == tableData[index]?.[tranIdx]?.partyName
-          );
+          const defaultOption = vyapariList.find((option) => option.name == tableData[index]?.[tranIdx]?.partyName);
           setValue("partyName", defaultOption || null);
-        }else if (keyArray[int] == "quantity") {
+        } else if (keyArray[int] == "quantity") {
           setQtyTotal(tableData?.[index]?.[0]?.[keyArray[int]]);
           setQty(tableData?.[index]?.[0]?.bagWiseQuantityArray);
-        } else
-          setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
+        } else setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
     }
   };
 
@@ -269,20 +237,12 @@ function SharedTable(props) {
             return (
               <TableRow key={index}>
                 {keyArray.map((key, i) => (
-                  <TableCell
-                    key={i}
-                    align="left"
-                    sx={{ padding: "4px 8px", lineHeight: "1rem" }}
-                  >
+                  <TableCell key={i} align="left" sx={{ padding: "4px 8px", lineHeight: "1rem" }}>
                     {(() => {
                       switch (key) {
                         case "edit":
                           return (
-                            <Button
-                              onClick={() =>
-                                editFromTable(index, rowData?.length - 1)
-                              }
-                            >
+                            <Button onClick={() => editFromTable(index, rowData?.length - 1)}>
                               <Edit />
                             </Button>
                           );
@@ -298,22 +258,10 @@ function SharedTable(props) {
                           if (rowData?.length > 1) {
                             return (
                               <>
-                                <Button
-                                  disabled={rowVariables[index] === 0}
-                                  onClick={() =>
-                                    handleNavigationClick(index, -1)
-                                  }
-                                >
+                                <Button disabled={rowVariables[index] === 0} onClick={() => handleNavigationClick(index, -1)}>
                                   <ArrowBackIos />
                                 </Button>
-                                <Button
-                                  disabled={
-                                    rowVariables[index] === rowData?.length - 1
-                                  }
-                                  onClick={() =>
-                                    handleNavigationClick(index, +1)
-                                  }
-                                >
+                                <Button disabled={rowVariables[index] === rowData?.length - 1} onClick={() => handleNavigationClick(index, +1)}>
                                   <ArrowForwardIos />
                                 </Button>
                               </>
@@ -322,15 +270,9 @@ function SharedTable(props) {
                             return "No Edit History";
                           }
                         case "auctionDate":
-                          return handleConvertDate(
-                            rowData?.[
-                              rowData?.length - 1 - rowVariables?.[index]
-                            ]?.[key]
-                          );
+                          return handleConvertDate(rowData?.[rowData?.length - 1 - rowVariables?.[index]]?.[key]);
                         default:
-                          return rowData?.[
-                            rowData?.length - 1 - rowVariables?.[index]
-                          ]?.[key];
+                          return rowData?.[rowData?.length - 1 - rowVariables?.[index]]?.[key];
                       }
                     })()}
                   </TableCell>
@@ -346,49 +288,8 @@ function SharedTable(props) {
           <DialogContent>
             <div className={styles.editForm}>
               {fieldDefinitions.map((fieldDef, index) => {
-                if (fieldDef.name === "partyName") {
-                  return (
-                    <Controller
-                      key={fieldDef.partyId}
-                      name={fieldDef.name}
-                      control={control}
-                      rules={{ required: "Enter Patry Name" }}
-                      render={({ field }) => (
-                        <Autocomplete
-                          {...field}
-                          options={vyapariList}
-                          getOptionLabel={(option) => option.name}
-                          getOptionKey={(option) => option.partyId}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label="Vyapari Name"
-                              error={!!errors[fieldDef.name]}
-                              helperText={
-                                errors[fieldDef.name]
-                                  ? errors[fieldDef.name].message
-                                  : ""
-                              }
-                              InputProps={{
-                                ...params.InputProps,
-                                shrink: true,
-                                startAdornment: (
-                                  <InputAdornment position="start">
-                                    <SearchIcon />
-                                  </InputAdornment>
-                                ),
-                              }}
-                            />
-                          )}
-                          onChange={(event, value) => field.onChange(value)}
-                          disablePortal
-                          id="combo-box-demo"
-                          sx={{ width: "100%" }} // Ensures Autocomplete is 100% wide
-                        />
-                      )}
-                    />
-                  );
-                } else {
+                if (fieldDef.name === "partyName") return <VyapariField name="partyName" control={control} errors={errors} size="small"/>;
+                else {
                   return (
                     <>
                       <Controller
@@ -414,10 +315,7 @@ function SharedTable(props) {
                             //     : ""
                             // }
                             onKeyDown={(e) => {
-                              if (
-                                e.key === "Enter" &&
-                                fieldDef.name === "quantity"
-                              ) {
+                              if (e.key === "Enter" && fieldDef.name === "quantity") {
                                 //   e.preventDefault();
                                 newQty(e);
                               }
@@ -439,10 +337,7 @@ function SharedTable(props) {
                               {qty?.map((item, index) => (
                                 <li key={index}>
                                   {item}
-                                  <button
-                                    className={styles.qtybtn}
-                                    onClick={(event) => removeQty(event, index)}
-                                  >
+                                  <button className={styles.qtybtn} onClick={(event) => removeQty(event, index)}>
                                     x
                                   </button>
                                 </li>
@@ -469,17 +364,8 @@ function SharedTable(props) {
         </Dialog>
       </div>
       <div>
-        <Snackbar
-          open={openSync}
-          autoHideDuration={5000}
-          onClose={closeSnackbar}
-        >
-          <Alert
-            onClose={closeSnackbar}
-            severity={sync.syncSeverity}
-            variant="filled"
-            sx={{ width: "100%" }}
-          >
+        <Snackbar open={openSync} autoHideDuration={5000} onClose={closeSnackbar}>
+          <Alert onClose={closeSnackbar} severity={sync.syncSeverity} variant="filled" sx={{ width: "100%" }}>
             {sync.syncStatus}
           </Alert>
         </Snackbar>

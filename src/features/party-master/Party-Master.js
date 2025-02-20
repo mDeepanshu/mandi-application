@@ -297,7 +297,7 @@ const PartyMaster = () => {
         </Grid>
       </Grid>
       <div style={{ display: "none" }}>
-        <PartyPrint ref={componentRef} columns={["INDEX", "PARTY NAME", "OWED AMOUNT"]} tableData={printTableData} keyArray={["index", "name", "owedAmount"]} />
+        <PartyPrint ref={componentRef} columns={["PARTY NAME", "CONTACT", "OWED AMOUNT"]} tableData={printTableData} keyArray={["name", "contact", "owedAmount"]} />
       </div>
       <div>
         <Snackbar open={alertData.open} autoHideDuration={4000} onClose={handleClose}>

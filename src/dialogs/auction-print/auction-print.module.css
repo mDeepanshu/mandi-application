@@ -1,4 +1,9 @@
 .container{
     padding: 10px 20px;
-    font-size: 14px;
+    font-size: 12px;
 }
+
+.tbd:nth-child(6) {
+    max-width: 50px;
+    word-wrap: break-word;
+  }
