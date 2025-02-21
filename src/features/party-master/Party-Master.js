@@ -150,7 +150,7 @@ const PartyMaster = () => {
   };
 
   const print = () => {
-    const table = tableDataFiltered.filter((elem) => elem.daysExceded > 0);
+    const table = tableDataFiltered.filter((elem) => elem.daysExceded > 0 && elem.owedAmount>0);
     setPrintTableData(table);
   };
 
