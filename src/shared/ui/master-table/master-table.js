@@ -87,7 +87,7 @@ function MasterTable(props) {
       let fields = [];
       for (let int = 0; int < props.keyArray?.length; int++) {
         if (!excludeArr.includes(props.keyArray[int])) {
-          if ((props.keyArray[int] == "bag" && allTableData?.[index]?.bagWiseQuantityArray.length == 0) || (props.keyArray[int] == "chungi" && allTableData?.[index]?.bagWiseQuantityArray.length != 0))
+          if ((props.keyArray[int] == "bag" && allTableData?.[index]?.bag == null) || (props.keyArray[int] == "chungi" && allTableData?.[index]?.bag != null))
             continue;
           else {
             if (props.keyArray[int] == "quantity") setQtyTotal();
@@ -138,9 +138,7 @@ function MasterTable(props) {
           const defaultOption = vyapariList.find((option) => option.name == allTableData[editingIndex]?.vyapariName);
           setValue("vyapariName", defaultOption || null);
         } else if (keyArray[int] == "quantity") {
-          console.log(props.keyArray[int], allTableData?.[editingIndex]?.bagWiseQuantityArray.length);
-          if (allTableData?.[editingIndex]?.bagWiseQuantityArray.length == 0) {
-            console.log([allTableData?.[editingIndex]?.[keyArray[int]]]);
+          if (allTableData?.[editingIndex]?.bag == null) {
             setQty([allTableData?.[editingIndex]?.[keyArray[int]]]);
           } else setQty(allTableData?.[editingIndex]?.bagWiseQuantityArray);
         } else setValue(keyArray[int], allTableData?.[editingIndex]?.[keyArray[int]]);
