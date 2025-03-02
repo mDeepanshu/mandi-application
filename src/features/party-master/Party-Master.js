@@ -42,8 +42,8 @@ const PartyMaster = () => {
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
   const [alertData, setAlertData] = useState({});
 
-  const [partyColumns, setPartyColumns] = useState(["INDEX", "CONTACT", "ID NO", "PARTY NAME", "OWED AMOUNT", "MAX LOAN DAYS", "Last Vasuli Date", "Days Exceded", "PARTY TYPE", "EDIT"]);
-  const [keyArray, setKeyArray] = useState(["index", "contact", "idNo", "name", "owedAmount", "maxLoanDays", "lastVasuliDate", "daysExceded", "partyType", "edit"]);
+  const [partyColumns, setPartyColumns] = useState(["INDEX", "CONTACT", "ID NO", "PARTY NAME", "OWED AMOUNT", "MAX LOAN DAYS", "Last Vasuli Date", "Ledger Order", "Days Exceded", "PARTY TYPE", "EDIT"]);
+  const [keyArray, setKeyArray] = useState(["index", "contact", "idNo", "name", "owedAmount", "maxLoanDays", "lastVasuliDate", "ledgerOrder", "daysExceded", "partyType", "edit"]);
   const currentPartyType = watch("partyType", "KISAN");
 
   const partyTypeSelected = watch("partyType", "KISAN");
@@ -220,7 +220,7 @@ const PartyMaster = () => {
                 />
                 <p className="err-msg">{errors.name?.message}</p>
               </Grid>
-              <Grid item xs={6} sm={2}>
+              <Grid item xs={2} sm={2}>
                 <Controller
                   name="partyType"
                   control={control}
@@ -237,6 +237,16 @@ const PartyMaster = () => {
                   )}
                 />
                 <p className="err-msg">{errors.partyType?.message}</p>
+              </Grid>
+              <Grid item xs={4} sm={2}>
+                <Controller
+                  name="ledgerOrder"
+                  control={control}
+                  rules={vasuliDayLimitValidation}
+                  defaultValue=""
+                  render={({ field }) => <TextField {...field} fullWidth label="LEDGER INDEX" variant="outlined" disabled={currentPartyType == "KISAN"} />}
+                />
+                <p className="err-msg">{errors.maxLoanDays?.message}</p>
               </Grid>
               <Grid item xs={6} sm={2}>
                 <Controller

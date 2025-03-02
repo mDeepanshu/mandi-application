@@ -13,12 +13,12 @@ import VyapariField from "../../elements/VyapariField";
 
 function MasterTable(props) {
   const [open, setOpen] = useState(false);
-  const [editingIndex, setEditingIndex] = useState(0);
+  const [editingIndex, setEditingIndex] = useState(-1);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [vyapariList, setVyapariList] = useState([]);
-  const [auctionEntryKisanId, setAuctionEntryKisanId] = useState({
-    kisanId: null,
+  const [auctionEntryTransactionId, setAuctionEntryTransactionId] = useState({
+    auctionId: null,
     count: 0,
   });
   const [columns, setColumns] = useState([]);
@@ -29,7 +29,22 @@ function MasterTable(props) {
   const [paginationLength, setPaginationLength] = useState(10);
   const [qty, setQty] = useState([]);
   const [qtyTotal, setQtyTotal] = useState(0);
-  const excludeArr = ["edit", "delete", "index", "navigation", "date", "auctionDate", "deviceName", "bagWiseQuantity", "bagWiseQuantityArray", "lastVasuliDate", "idNo", "daysExceded", "owedAmount","partyType"];
+  const excludeArr = [
+    "edit",
+    "delete",
+    "index",
+    "navigation",
+    "date",
+    "auctionDate",
+    "deviceName",
+    "bagWiseQuantity",
+    "bagWiseQuantityArray",
+    "lastVasuliDate",
+    "idNo",
+    "daysExceded",
+    "owedAmount",
+    "partyType",
+  ];
   const [adjustHeight, setAdjustHeight] = useState("370px");
   const isSmallScreen = useMediaQuery("(max-width:495px)");
 
@@ -68,18 +83,25 @@ function MasterTable(props) {
 
   const editFromTable = (index) => {
     setEditingIndex(index);
-    for (let int = 0; int < props.keyArray?.length; int++) {
-      if (!excludeArr.includes(props.keyArray[int])) {
-        if (keyArray[int] == "vyapariName") {
-          const defaultOption = vyapariList.find((option) => option.name == allTableData[index]?.vyapariName);
-          setValue("vyapariName", defaultOption || null);
-        } else if (keyArray[int] == "quantity") {
-          setQtyTotal(allTableData?.[index]?.[keyArray[int]]);
-          setQty(allTableData?.[index]?.bagWiseQuantityArray);
-        } else setValue(keyArray[int], allTableData?.[index]?.[keyArray[int]]);
+    if (index != -1) {
+      let fields = [];
+      for (let int = 0; int < props.keyArray?.length; int++) {
+        if (!excludeArr.includes(props.keyArray[int])) {
+          if ((props.keyArray[int] == "bag" && allTableData?.[index]?.bagWiseQuantityArray.length == 0) || (props.keyArray[int] == "chungi" && allTableData?.[index]?.bagWiseQuantityArray.length != 0))
+            continue;
+          else {
+            if (props.keyArray[int] == "quantity") setQtyTotal();
+            fields.push({
+              name: props.keyArray[int],
+              label: columns[int],
+              defaultValue: "",
+              validation: { required: `${columns[int]} is required` },
+            });
+          }
+        }
       }
+      setFieldDefinitions(fields);
     }
-    setOpen(true);
   };
 
   const deleteFromTable = (index) => {
@@ -106,20 +128,26 @@ function MasterTable(props) {
   useEffect(() => {
     setColumns(props.columns);
     setKeyArray(props.keyArray);
-    let fields = [];
+  }, [props]);
+
+  useEffect(() => {
+    if (editingIndex == -1) return;
     for (let int = 0; int < props.keyArray?.length; int++) {
       if (!excludeArr.includes(props.keyArray[int])) {
-        if (props.keyArray[int] == "quantity") setQtyTotal();
-        fields.push({
-          name: props.keyArray[int],
-          label: columns[int],
-          defaultValue: "",
-          validation: { required: `${columns[int]} is required` },
-        });
+        if (keyArray[int] == "vyapariName") {
+          const defaultOption = vyapariList.find((option) => option.name == allTableData[editingIndex]?.vyapariName);
+          setValue("vyapariName", defaultOption || null);
+        } else if (keyArray[int] == "quantity") {
+          console.log(props.keyArray[int], allTableData?.[editingIndex]?.bagWiseQuantityArray.length);
+          if (allTableData?.[editingIndex]?.bagWiseQuantityArray.length == 0) {
+            console.log([allTableData?.[editingIndex]?.[keyArray[int]]]);
+            setQty([allTableData?.[editingIndex]?.[keyArray[int]]]);
+          } else setQty(allTableData?.[editingIndex]?.bagWiseQuantityArray);
+        } else setValue(keyArray[int], allTableData?.[editingIndex]?.[keyArray[int]]);
       }
     }
-    setFieldDefinitions(fields);
-  }, [props]);
+    setOpen(true);
+  }, [fieldDefinitions]);
 
   const handleChange = (event, value) => {
     setPage(value);
@@ -182,23 +210,23 @@ function MasterTable(props) {
     handleClose();
   };
 
-  const auctionEntryChecked = (e, index, kisanId) => {
+  const auctionEntryChecked = (e, index, auctionId) => {
     props.onSelectEntry(e, index);
     if (!e.target.checked) {
-      setAuctionEntryKisanId((prevState) => ({
-        kisanId: kisanId,
+      setAuctionEntryTransactionId((prevState) => ({
+        auctionId: auctionId,
         count: prevState.count - 1,
       }));
     } else {
-      setAuctionEntryKisanId((prevState) => ({
-        kisanId: kisanId,
+      setAuctionEntryTransactionId((prevState) => ({
+        auctionId: auctionId,
         count: prevState.count + 1,
       }));
     }
   };
 
   const unCheckAllBoxes = () => {
-    setAuctionEntryKisanId({ kisanId: null, count: 0 });
+    setAuctionEntryTransactionId({ auctionId: null, count: 0 });
     const checkboxes = document.querySelectorAll('.table_cell input[type="checkbox"]');
     checkboxes?.forEach((checkbox) => {
       checkbox.checked = false;
@@ -297,8 +325,8 @@ function MasterTable(props) {
                                 type="checkbox"
                                 checked={props.checkedEntries[(page - 1) * paginationLength + index]}
                                 key={(page - 1) * paginationLength + index}
-                                onChange={(e) => auctionEntryChecked(e, (page - 1) * paginationLength + index, rowData?.kisanId)}
-                                disabled={rowData?.kisanId != auctionEntryKisanId.kisanId && auctionEntryKisanId.count > 0}
+                                onChange={(e) => auctionEntryChecked(e, (page - 1) * paginationLength + index, rowData?.auctionId)}
+                                disabled={rowData?.auctionId != auctionEntryTransactionId.auctionId && auctionEntryTransactionId.count > 0}
                               />
                             );
                           case "date":
@@ -353,7 +381,7 @@ function MasterTable(props) {
           <DialogContent>
             <div className={styles.editForm}>
               {fieldDefinitions.map((fieldDef) => {
-                if (fieldDef.name === "vyapariName") return <VyapariField name="vyapariName" control={control} errors={errors} size="small"/>;
+                if (fieldDef.name === "vyapariName") return <VyapariField name="vyapariName" control={control} errors={errors} size="small" />;
                 else {
                   return (
                     <>

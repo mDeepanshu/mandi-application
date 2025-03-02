@@ -27,7 +27,6 @@ const AuctionEdit = (props) => {
 
   const [itemsList, setItemsList] = useState([]);
   const [kisanList, setKisanList] = useState([]);
-  const [vyapariList, setVyapariList] = useState([]);
   const [buyItemsArr, setTableData] = useState([]);
   const kisanRef = useRef(null);
   const itemRef = useRef(null);
@@ -38,7 +37,6 @@ const AuctionEdit = (props) => {
   useEffect(() => {
     initKisanList();
     initItemList();
-    // initVyapariList();
   }, []);
 
   useEffect(() => {
@@ -46,6 +44,7 @@ const AuctionEdit = (props) => {
     setValue("itemName", selectedItem || null);
     const selectedKisan = kisanList.find((option) => option.partyId == props.auctionToEdit?.[0]?.kisanId);
     setValue("kisaan", selectedKisan || null);
+    if (props.auctionToEdit?.[0]?.auctionSubmitDate) setValue("auctionSubmitDate", new Date(props.auctionToEdit?.[0]?.auctionSubmitDate).toISOString().split("T")[0] || null);
     setTableData([...props.auctionToEdit]);
     let entriesToDeleteTemp = [];
     props.auctionToEdit.forEach((element) => entriesToDeleteTemp.push(element.auctionTransactionId));
@@ -55,11 +54,6 @@ const AuctionEdit = (props) => {
   const initKisanList = async () => {
     let kisan_list = await getAllPartyList("KISAN");
     if (kisan_list?.responseBody) setKisanList(kisan_list?.responseBody);
-  };
-
-  const initVyapariList = async () => {
-    let vyapari_list = await getAllPartyList("VYAPARI");
-    if (vyapari_list?.responseBody) setVyapariList(vyapari_list?.responseBody);
   };
 
   const initItemList = async () => {
@@ -72,14 +66,13 @@ const AuctionEdit = (props) => {
       const updatedItems = [...prevItems];
       updatedItems[index] = { ...updatedItems[index], ...newObject };
       updatedItems[index].quantity = newObject.quantity;
-      updatedItems[index].bagWiseQuantity = newObject.bagWiseQuantityArray.join(",");
+      updatedItems[index].bagWiseQuantity = newObject?.bagWiseQuantityArray?.join(",");
       updatedItems[index].bagWiseQuantityArray = newObject.bagWiseQuantityArray;
       return updatedItems;
     });
   };
 
   const save = async () => {
-
     let editObj = {
       deleteAuctionTransactionDto: {
         auctionTransactionIds: entriesToDelete,
@@ -90,27 +83,26 @@ const AuctionEdit = (props) => {
           itemId: getValues().itemName.itemId,
           bag: null,
           buyItems: [],
-          auctionDate: new Date(props.auctionToEdit?.[0]?.auctionSubmitDate).toISOString(),
+          auctionDate: new Date(getValues().auctionSubmitDate).toISOString().split("T")[0]+`T`+new Date(props.auctionToEdit?.[0]?.auctionSubmitDate).toISOString().split("T")[1],
         },
       ],
     };
 
-    console.log(`consolelog`,buyItemsArr);
-    
-    if (buyItemsArr.length==0) {
+    if (buyItemsArr.length == 0) {
       editObj.addAuctionDtos = [];
-    } else buyItemsArr.forEach((element) => {
-      // editObj.deleteAuctionTransactionDto.auctionTransactionIds.push(element.auctionTransactionId);
-      editObj.addAuctionDtos[0].buyItems.push({
-        vyapariId: element.vyapariId,
-        rate: element.rate,
-        bags: element.bag,
-        chungi: element.chungi,
-        quantity: element.quantity,
-        bagWiseQuantity: element.bagWiseQuantityArray,
-        auctionDate: new Date(element.auctionDate).toISOString(),
+    } else
+      buyItemsArr.forEach((element) => {
+        // editObj.deleteAuctionTransactionDto.auctionTransactionIds.push(element.auctionTransactionId);
+        editObj.addAuctionDtos[0].buyItems.push({
+          vyapariId: element.vyapariId,
+          rate: element.rate,
+          bags: element.bag,
+          chungi: element.chungi,
+          quantity: element.quantity,
+          bagWiseQuantity: element.bagWiseQuantityArray,
+          auctionDate: new Date(getValues().auctionSubmitDate).toISOString().split("T")[0]+"T"+new Date(element.auctionDate).toISOString().split("T")[1],
+        });
       });
-    });
     const device_id = buyItemsArr[0]?.deviceId == null ? 1 : buyItemsArr[0].deviceId;
     const editRes = await editAuction(editObj, device_id);
     if (editRes) {
@@ -241,116 +233,30 @@ const AuctionEdit = (props) => {
             />
             <p className="err-msg">{errors.itemName?.message}</p>
           </div>
-          {/* <div>
-                    <Controller
-                        name="totalBag"
-                        control={control}
-                        defaultValue=""
-                        rules={{ required: "Enter Total Bags" }}
-                        render={({ field, fieldState: { error } }) => (
-                            <TextField
-                                {...field}
-                                fullWidth
-                                label="Total Bags"
-                                placeholder="Total Bags"
-                                type="number"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                variant="outlined"
-                                error={!!error}
-                            />
-                        )}
-                    />
-                    <p className="err-msg">{errors.totalBag?.message}</p>
-                </div> */}
+          <div>
+            <Controller
+              name="auctionSubmitDate"
+              control={control}
+              defaultValue=""
+              rules={{ required: "Enter Date" }}
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="DATE"
+                  placeholder="DATE"
+                  type="date"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  variant="outlined"
+                  error={!!error}
+                />
+              )}
+            />
+            <p className="err-msg">{errors.auctionSubmitDate?.message}</p>
+          </div>
         </div>
-        {/* <div className={styles.row_two}>
-                <div>
-                    <Controller
-                        name="vyapari"
-                        control={control}
-                        rules={{ required: "Enter Vyapari Name" }}
-                        render={({ field }) => (
-                            <Autocomplete
-                                {...field}
-                                value={field.value || null}
-                                options={vyapariList}
-                                getOptionLabel={(option) => `${option.idNo} | ${option.name}`}
-                                renderOption={(props, option) => (
-                                    <li {...props}>
-                                        <div style={{ display: "flex", alignItems: "center" }}>
-                                            <span>
-                                                <strong>ID:</strong> {option.idNo} | <strong>Name:</strong> {option.name}
-                                            </span>
-                                        </div>
-                                    </li>
-                                )}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        label="VYAPARI"
-                                        InputProps={{
-                                            ...params.InputProps,
-                                        }}
-                                        inputProps={{
-                                            ...params.inputProps,
-                                            style: {
-                                                textTransform: "uppercase", // Ensure uppercase transformation here
-                                            },
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <SearchIcon />
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                    />
-                                )}
-                                onChange={(event, value) => {
-                                    field.onChange(value); // Updates the React Hook Form state
-                                    setFocus('quantity');
-                                }}
-                                disablePortal
-                                id="combo-box-demo"
-                            />
-                        )}
-                    />
-                    <p className='err-msg'>{errors.vyapari?.message}</p>
-                </div>
-                <div>
-                    <TextField
-                        {...register("quantity", { required: "Enter Quantity" })}
-                        fullWidth
-                        label="QUANTITY"
-                        type="number"
-                        variant="outlined"
-                    />
-                    <p className='err-msg'>{errors.quantity?.message}</p>
-                </div>
-                <div>
-                    <TextField
-                        {...register("rate", { required: "Rate is required" })}
-                        fullWidth
-                        label="Rate"
-                        type="number"
-                        variant="outlined"
-                    />
-                    {errors.rate && <p className='err-msg'>{errors.rate.message}</p>}
-                </div>
-                <div>
-                    <div className='bag'>
-                        <TextField
-                            {...register("bags", { required: "Bags is required" })}
-                            fullWidth
-                            label="Bags"
-                            placeholder='Bags'
-                            type="number"
-                            variant="outlined"
-                        />
-                        <p className='err-msg'>{errors.bags?.message}</p>
-                    </div>
-                </div>
-            </div> */}
         <div className={styles.table}>
           <MasterTable columns={columns} tableData={buyItemsArr} keyArray={keyArray} editEntry={editEntry} deleteEntry={deleteEntry} />
         </div>
