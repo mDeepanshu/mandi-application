@@ -153,7 +153,7 @@ const PrintAllLedger = (props) => {
       </Dialog>
       <div style={{ display: "none" }}>
         {dataArray?.map((item, index) => (
-          <LedgerPrint ref={(el) => (printRefs.current[index] = el)} tableData={item.transactions} formData={item} />
+          <LedgerPrint ref={(el) => (printRefs.current[index] = el)} tableData={item.transactions} formData={item} fromAllLedger={true}/>
         ))}
       </div>
     </>

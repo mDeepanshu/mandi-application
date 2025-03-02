@@ -8,17 +8,48 @@ const LedgerPrint = forwardRef((props, ref) => {
 
     useEffect(() => {
         if (props.tableData.length) {
-            props.tableData.unshift({
+            let transactionWithTotals;
+            if (props.fromAllLedger) transactionWithTotals = insertDateWiseTotal(props.tableData);
+            else transactionWithTotals = props.tableData;
+            transactionWithTotals.unshift({
                 date: "OPN AMOUNT",
                 dr: props.formData?.openingAmount,
             });
-            props.tableData.push({
+            transactionWithTotals.push({
                 date: "CLS AMOUNT",
                 dr: props.formData?.closingAmount,
             });
-            setTableData(props.tableData);
+            setTableData(transactionWithTotals);
         }
     }, [props.tableData])
+
+    const insertDateWiseTotal = (transactions) => {
+        let date = transactions?.[0]?.date;
+        let dateTotal = transactions?.[0]?.dr;
+        for (let i = 1; i < transactions.length; i++) {
+          if (transactions[i].date == date) {
+            dateTotal += transactions[i].dr;
+          } else {
+            date = transactions?.[i]?.date;
+            const amt = transactions?.[i]?.dr;
+            transactions.splice(i, 0, {
+              date: "TOTAL",
+              itemName: "",
+              cr: "",
+              dr: dateTotal,
+            });
+            dateTotal = amt;
+            i++;
+          }
+        }
+        transactions.push({
+          date: "TOTAL",
+          itemName: "",
+          cr: "",
+          dr: dateTotal,
+        });
+        return transactions;
+      };
 
     return (
         <div ref={ref} className={styles.container}>
