@@ -18,7 +18,7 @@ export const getActiveDevices = async () => {
   }
 };
 
-export const editAuction = async (obj,deviceId) => {
+export const editAuction = async (obj) => {
   try {
     const response = await axiosHttp.patch(`/auction/edit-auction`,obj);
     return response.data;

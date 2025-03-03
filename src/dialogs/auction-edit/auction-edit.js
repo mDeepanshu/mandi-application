@@ -83,6 +83,7 @@ const AuctionEdit = (props) => {
           itemId: getValues().itemName.itemId,
           bag: null,
           buyItems: [],
+          deviceId:buyItemsArr[0].deviceId,
           auctionDate: new Date(getValues().auctionSubmitDate).toISOString().split("T")[0]+`T`+new Date(props.auctionToEdit?.[0]?.auctionSubmitDate).toISOString().split("T")[1],
         },
       ],
