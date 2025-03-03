@@ -79,12 +79,12 @@ const AuctionEdit = (props) => {
       },
       addAuctionDtos: [
         {
-          kisanId: getValues().kisaan.partyId,
-          itemId: getValues().itemName.itemId,
+          kisanId: getValues()?.kisaan?.partyId,
+          itemId: getValues()?.itemName?.itemId,
           bag: null,
           buyItems: [],
-          deviceId:buyItemsArr[0].deviceId,
-          auctionDate: new Date(getValues().auctionSubmitDate).toISOString().split("T")[0]+`T`+new Date(props.auctionToEdit?.[0]?.auctionSubmitDate).toISOString().split("T")[1],
+          deviceId:buyItemsArr?.[0]?.deviceId,
+          auctionDate: new Date(getValues()?.auctionSubmitDate).toISOString().split("T")[0]+`T`+new Date(props.auctionToEdit?.[0]?.auctionSubmitDate).toISOString().split("T")[1],
         },
       ],
     };
