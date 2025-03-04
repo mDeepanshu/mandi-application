@@ -1,3 +1,9 @@
+.btns{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+}
 
 .search{
     padding: 5px 10px 0 0;
