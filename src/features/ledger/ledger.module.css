@@ -65,13 +65,19 @@ h1 {
   width: 100%;
 }
 
+.btns {
+  flex-direction: column;
+}
+.print_btn {
+  width: 49%;
+}
+.print_all_btn {
+  width: 49%;
+}
+
 @media (min-width: 485px) {
   .constants {
-    /* width: 100%; */
     display: flex;
-    /* flex-direction: row-reverse; */
-    /* padding: 15px 0; */
-    /* gap: 4px; */
   }
 
   .fulllabel {
@@ -81,23 +87,15 @@ h1 {
   .shortlabel {
     display: none;
   }
+
+  .vasuliBtn {
+    display: none !important;
+  }
 }
 
 @media (min-width: 1150px) {
   .date {
     width: 47%;
-  }
-}
-
-@media (max-width: 1200px) {
-  .btns {
-    flex-direction: column;
-  }
-  .print_btn{
-    width: 49%;
-  }
-  .print_all_btn{
-    width: 49%;
   }
 }
 
@@ -149,4 +147,19 @@ h1 {
   .print_btns {
     display: none;
   }
+
+  .actionBtns {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .actionBtns > * {
+    display: block;
+    width: 100%;
+  }
+  
+  /* .vasuliBtn{
+    display: block;
+  } */
+
 }
