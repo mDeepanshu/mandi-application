@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Grid } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
-import { getLedger } from "../../gateway/ledger-apis";
+import { getLedger, makeVasuli } from "../../gateway/ledger-apis";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import LedgerPrint from "../../dialogs/ledger-print/ledger-print-dialog";
 import ReactToPrint from "react-to-print";
@@ -10,7 +10,7 @@ import styles from "./ledger.module.css";
 import { useMediaQuery } from "@mui/material";
 import PrintAllLedger from "../../dialogs/todays-all-ledger/todays-ledger";
 import VyapariField from "../../shared/elements/VyapariField";
-
+import { useOutletContext } from "react-router-dom";
 function Ledger() {
   const componentRef = useRef();
   const triggerRef = useRef();
@@ -25,7 +25,7 @@ function Ledger() {
   const priorDate = twoDaysPrior.toISOString().split("T")[0];
   const isSmallScreen = useMediaQuery("(max-width:495px)");
   let customTableHeight = "120px";
-
+  const { snackbarChange } = useOutletContext();
   const {
     register,
     control,
@@ -112,6 +112,29 @@ function Ledger() {
     }
   };
 
+  const make_vasuli = async () => {
+    const vyapariValid = await trigger(`vyapari_id`);
+    if (!vyapariValid) return;
+    let vasuliData = [
+      {
+        amount: null,
+        date: new Date(),
+        vyapariId: getValues().vyapari_id?.partyId,
+        remark: null,
+        name: getValues()?.vyapari_id?.name,
+      },
+    ];
+
+    const vasuliRes = await makeVasuli(vasuliData);
+    if (vasuliRes) {
+      snackbarChange({
+        open: true,
+        alertType: "success",
+        alertMsg: "SUCCESS",
+      });
+    }
+  };
+
   return (
     <>
       <div className={styles.wrapper}>
@@ -146,9 +169,14 @@ function Ledger() {
               </div>
             </div>
             <div className={styles.btns}>
-              <Button variant="contained" color="success" type="button" onClick={() => fetch_ledger(getValues())}>
-                FETCH
-              </Button>
+              <div className={`${styles.btns} ${styles.actionBtns}`}>
+                <Button variant="contained" color="success" type="button" onClick={() => fetch_ledger(getValues())}>
+                  FETCH
+                </Button>
+                <Button className={styles.vasuliBtn} variant="contained" color="success" type="button" onClick={() => make_vasuli()}>
+                  VASULI
+                </Button>
+              </div>
               <div className={styles.print_btns}>
                 <Button className={styles.print_btn} variant="contained" color="success" type="button" onClick={() => printLedger()}>
                   PRINT
