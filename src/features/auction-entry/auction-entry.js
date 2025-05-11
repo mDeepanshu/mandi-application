@@ -281,7 +281,7 @@ function AuctionEntries() {
               fullWidth
               type="number"
               size="small"
-              label="SEARCH BY ID"
+              label="SEARCH BY IDX"
               variant="outlined"
               InputProps={{
                 startAdornment: (
