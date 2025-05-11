@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button, InputAdornment } from "@mui/material";
-import { getAuctionEntriesList, getActiveDevices } from "../../gateway/auction-entries-api";
+import {
+  getAuctionEntriesList,
+  getActiveDevices,
+} from "../../gateway/auction-entries-api";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import ReactToPrint from "react-to-print";
 import styles from "./auction-entries.module.css";
@@ -15,8 +18,36 @@ function AuctionEntries() {
   const componentRef = useRef();
   const [tableData, setTableData] = useState([]);
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
-  const [auctionEntriesColumns, setAuctionEntriesColumns] = useState(["", "ID", "KISANNAME", "ITEMNAME", "VYAPARINAME", "RATE", "QUANTITY", "BAGS W.", "CHUNGI", "AMOUNT", "BAG", "DATE"]);
-  const [keyArray, setKeyArray] = useState(["checkbox", "vyapariIdNo", "kisanName", "itemName", "vyapariName", "rate", "quantity", "bagWiseQuantity", "chungi", "amount", "bag", "auctionDate"]);
+  const [auctionEntriesColumns, setAuctionEntriesColumns] = useState([
+    "",
+    "IDX",
+    "ID",
+    "KISANNAME",
+    "ITEMNAME",
+    "VYAPARINAME",
+    "RATE",
+    "QUANTITY",
+    "BAGS W.",
+    "CHUNGI",
+    "AMOUNT",
+    "BAG",
+    "DATE",
+  ]);
+  const [keyArray, setKeyArray] = useState([
+    "checkbox",
+    "txnNo",
+    "vyapariIdNo",
+    "kisanName",
+    "itemName",
+    "vyapariName",
+    "rate",
+    "quantity",
+    "bagWiseQuantity",
+    "chungi",
+    "amount",
+    "bag",
+    "auctionDate",
+  ]);
   const [tabletList, setTabletList] = useState([]);
   const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
   const [selectedTablet, setSelectedTablet] = useState(null);
@@ -24,8 +55,30 @@ function AuctionEntries() {
   const [auctionToEdit, setAuctionToEdit] = useState([]);
   const [total, setTotal] = useState([]);
   const [checkedEntries, setCheckedEntries] = useState([]);
-  const [auctionEntriesColumnsPrint, setAuctionEntriesColumnsPrint] = useState(["KISAN", "ITEM", "VYAPARI", "RATE", "Q", "B.W.", "C", "T", "BAG", "DATE"]);
-  const [keyArrayPrint, setKeyArrayPrint] = useState(["kisanName", "itemName", "vyapariName", "rate", "quantity", "bagWiseQuantity", "chungi", "amount", "bag", "auctionDate"]);
+  const [auctionEntriesColumnsPrint, setAuctionEntriesColumnsPrint] = useState([
+    "KISAN",
+    "ITEM",
+    "VYAPARI",
+    "RATE",
+    "Q",
+    "B.W.",
+    "C",
+    "T",
+    "BAG",
+    "DATE",
+  ]);
+  const [keyArrayPrint, setKeyArrayPrint] = useState([
+    "kisanName",
+    "itemName",
+    "vyapariName",
+    "rate",
+    "quantity",
+    "bagWiseQuantity",
+    "chungi",
+    "amount",
+    "bag",
+    "auctionDate",
+  ]);
 
   let auctionToEditIndex = [];
 
@@ -84,12 +137,14 @@ function AuctionEntries() {
   }, []);
 
   useEffect(() => {
-    setCheckedEntries(Array(tableDataFiltered.length).fill(false));
+    if (tableDataFiltered && tableDataFiltered.length > 0)
+      setCheckedEntries(Array(tableDataFiltered?.length).fill(false));
   }, [tableDataFiltered]);
 
   const edit = () => {
     let arr = [];
-    for (let i = 0; i < checkedEntries.length; i++) if (checkedEntries[i]) arr.push(tableDataFiltered[i]);
+    for (let i = 0; i < checkedEntries.length; i++)
+      if (checkedEntries[i]) arr.push(tableDataFiltered[i]);
 
     setAuctionToEdit(arr);
     setShowAuctionEdit(true);
@@ -125,7 +180,8 @@ function AuctionEntries() {
 
   const findById = (event) => {
     const search = event.target.value;
-    setTableDataFiltered(tableData.filter((elem) => elem?.vyapariIdNo?.toString().includes(search.toString())));
+    if (search === "") setTableDataFiltered(tableData);
+    else setTableDataFiltered([tableData.find((elem) => Number(elem?.txnNo) == search)]);
   };
 
   return (
@@ -141,7 +197,14 @@ function AuctionEntries() {
                 control={control}
                 rules={{ required: "Enter From Date" }}
                 defaultValue=""
-                render={({ field }) => <TextField {...field} label="FROM DATE" variant="outlined" type="date" />}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="FROM DATE"
+                    variant="outlined"
+                    type="date"
+                  />
+                )}
               />
               <p className="error">{errors.fromDate?.message}</p>
             </div>
@@ -151,7 +214,14 @@ function AuctionEntries() {
                 control={control}
                 rules={{ required: "Enter To Date" }}
                 defaultValue=""
-                render={({ field }) => <TextField {...field} label="TO DATE" variant="outlined" type="date" />}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="TO DATE"
+                    variant="outlined"
+                    type="date"
+                  />
+                )}
               />
               <p className="error">{errors.toDate?.message}</p>
             </div>
@@ -170,18 +240,39 @@ function AuctionEntries() {
           </div>
           {/* </div> */}
           <div className={styles.btns}>
-            <Button variant="contained" color="success" type="button" onClick={() => fetch_auctionEntriesList()}>
+            <Button
+              variant="contained"
+              color="success"
+              type="button"
+              onClick={() => fetch_auctionEntriesList()}
+            >
               FETCH
             </Button>
             &nbsp;
-            <Button variant="contained" color="secondary" type="button" onClick={() => edit()}>
+            <Button
+              variant="contained"
+              color="secondary"
+              type="button"
+              onClick={() => edit()}
+            >
               EDIT
             </Button>
             &nbsp;
-            <Button variant="contained" color="success" type="button" onClick={printLedger} className={styles.print_btn}>
+            <Button
+              variant="contained"
+              color="success"
+              type="button"
+              onClick={printLedger}
+              className={styles.print_btn}
+            >
               PRINT
             </Button>
-            <ReactToPrint trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>} content={() => componentRef.current} />
+            <ReactToPrint
+              trigger={() => (
+                <button style={{ display: "none" }} ref={triggerRef}></button>
+              )}
+              content={() => componentRef.current}
+            />
           </div>
         </form>
         <div style={{ display: "flex" }}>
@@ -226,15 +317,30 @@ function AuctionEntries() {
           </div>
         </div>
         <div>
-          <MasterTable columns={auctionEntriesColumns} tableData={tableDataFiltered} keyArray={keyArray} onSelectEntry={(e, i) => onSelectEntry(e, i)} checkedEntries={checkedEntries} />
+          <MasterTable
+            columns={auctionEntriesColumns}
+            tableData={tableDataFiltered}
+            keyArray={keyArray}
+            onSelectEntry={(e, i) => onSelectEntry(e, i)}
+            checkedEntries={checkedEntries}
+          />
         </div>
       </div>
       <div style={{ display: "none" }}>
-        <AuctionPrint ref={componentRef} tableData={tableDataFiltered} keyArray={keyArrayPrint} columns={auctionEntriesColumnsPrint} />
+        <AuctionPrint
+          ref={componentRef}
+          tableData={tableDataFiltered}
+          keyArray={keyArrayPrint}
+          columns={auctionEntriesColumnsPrint}
+        />
       </div>
       <div>
         {/* {showAuctionEdit && <AuctionEdit/>} */}
-        <AuctionEdit open={showAuctionEdit} onClose={(refreshTable) => handleToClose(refreshTable)} auctionToEdit={auctionToEdit} />
+        <AuctionEdit
+          open={showAuctionEdit}
+          onClose={(refreshTable) => handleToClose(refreshTable)}
+          auctionToEdit={auctionToEdit}
+        />
       </div>
     </>
   );
