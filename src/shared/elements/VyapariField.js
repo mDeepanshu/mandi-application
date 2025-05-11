@@ -5,7 +5,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { getAllPartyList } from "../../gateway/comman-apis";
 import styles from "./vyapari_field.module.css";
 
-const VyapariField = ({ name, control, errors, size, onKeyDownFunc }) => {
+const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelect = () => {} }) => {
   const [vyapariList, setVyapariList] = useState([]);
   const vyapariRef = useRef(null); // Create a ref
 
@@ -66,6 +66,7 @@ const VyapariField = ({ name, control, errors, size, onKeyDownFunc }) => {
             disablePortal
             id="combo-box-demo"
             sx={{ width: "100%", paddingBottom: "10px" }}
+            onSelect={customOnSelect}
           />
         )}
       />

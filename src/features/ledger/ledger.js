@@ -11,6 +11,9 @@ import { useMediaQuery } from "@mui/material";
 import PrintAllLedger from "../../dialogs/todays-all-ledger/todays-ledger";
 import VyapariField from "../../shared/elements/VyapariField";
 import { useOutletContext } from "react-router-dom";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+
 function Ledger() {
   const componentRef = useRef();
   const triggerRef = useRef();
@@ -25,7 +28,12 @@ function Ledger() {
   const priorDate = twoDaysPrior.toISOString().split("T")[0];
   const isSmallScreen = useMediaQuery("(max-width:495px)");
   let customTableHeight = "120px";
-  const { snackbarChange } = useOutletContext();
+
+  const [alertData, setAlertData] = useState({
+    open: false,
+    alertType: "",
+    alertMsg: "",
+  });
   const {
     register,
     control,
@@ -127,12 +135,23 @@ function Ledger() {
 
     const vasuliRes = await makeVasuli(vasuliData);
     if (vasuliRes) {
-      snackbarChange({
+      setAlertData({
         open: true,
         alertType: "success",
         alertMsg: "SUCCESS",
       });
     }
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setAlertData({
+      open: false,
+      alertType: "",
+      alertMsg: "",
+    });
   };
 
   return (
@@ -144,7 +163,14 @@ function Ledger() {
             <div className={styles.dateFields}>
               <div className={styles.vyapariName}>
                 <div>
-                  <VyapariField name="vyapari_id" control={control} errors={errors} size={isSmallScreen ? "small" : "medium"} onKeyDownFunc={onVyapariKeyDown} />
+                  <VyapariField
+                    name="vyapari_id"
+                    control={control}
+                    errors={errors}
+                    size={isSmallScreen ? "small" : "medium"}
+                    onKeyDownFunc={onVyapariKeyDown}
+                    customOnSelect={handleClose}
+                  />
                 </div>
               </div>
               <div className={styles.date}>
@@ -153,7 +179,16 @@ function Ledger() {
                   control={control}
                   rules={{ required: "Enter From Date" }}
                   defaultValue=""
-                  render={({ field }) => <TextField {...field} label="FROM DATE" size={isSmallScreen ? "small" : "medium"} fullWidth variant="outlined" type="date" />}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="FROM DATE"
+                      size={isSmallScreen ? "small" : "medium"}
+                      fullWidth
+                      variant="outlined"
+                      type="date"
+                    />
+                  )}
                 />
                 <p className="error">{errors.fromDate?.message}</p>
               </div>
@@ -163,7 +198,16 @@ function Ledger() {
                   control={control}
                   rules={{ required: "Enter To Date" }}
                   defaultValue=""
-                  render={({ field }) => <TextField {...field} label="TO DATE" size={isSmallScreen ? "small" : "medium"} fullWidth variant="outlined" type="date" />}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="TO DATE"
+                      size={isSmallScreen ? "small" : "medium"}
+                      fullWidth
+                      variant="outlined"
+                      type="date"
+                    />
+                  )}
                 />
                 <p className="error">{errors.toDate?.message}</p>
               </div>
@@ -173,19 +217,40 @@ function Ledger() {
                 <Button variant="contained" color="success" type="button" onClick={() => fetch_ledger(getValues())}>
                   FETCH
                 </Button>
-                <Button className={styles.vasuliBtn} variant="contained" color="success" type="button" onClick={() => make_vasuli()}>
+                <Button
+                  className={styles.vasuliBtn}
+                  variant="contained"
+                  color="success"
+                  type="button"
+                  onClick={() => make_vasuli()}
+                >
                   VASULI
                 </Button>
               </div>
               <div className={styles.print_btns}>
-                <Button className={styles.print_btn} variant="contained" color="success" type="button" onClick={() => printLedger()}>
+                <Button
+                  className={styles.print_btn}
+                  variant="contained"
+                  color="success"
+                  type="button"
+                  onClick={() => printLedger()}
+                >
                   PRINT
                 </Button>
-                <Button className={styles.print_all_btn} variant="contained" color="success" type="button" onClick={() => toggleState(true)}>
+                <Button
+                  className={styles.print_all_btn}
+                  variant="contained"
+                  color="success"
+                  type="button"
+                  onClick={() => toggleState(true)}
+                >
                   PRINT ALL
                 </Button>
               </div>
-              <ReactToPrint trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>} content={() => componentRef.current} />
+              <ReactToPrint
+                trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>}
+                content={() => componentRef.current}
+              />
             </div>
             <div className={styles.constants}>
               <div>
@@ -206,7 +271,12 @@ function Ledger() {
           </form>
         </div>
         <div className={styles.table_section}>
-          <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} customHeight={customTableHeight} />
+          <MasterTable
+            columns={ledgerColumns}
+            tableData={tableData}
+            keyArray={keyArray}
+            customHeight={customTableHeight}
+          />
         </div>
       </div>
       <div style={{ display: "none" }}>
@@ -220,6 +290,17 @@ function Ledger() {
           formData={getValues()}
           // auctionToEdit={auctionToEdit}
         />
+      </div>
+      <div>
+        <Snackbar
+          open={alertData.open}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }} // Change position
+          onClose={handleClose}
+        >
+          <Alert onClose={handleClose} severity={alertData.alertType} variant="filled" sx={{ width: "100%" }}>
+            {alertData.alertMsg}
+          </Alert>
+        </Snackbar>
       </div>
     </>
   );
