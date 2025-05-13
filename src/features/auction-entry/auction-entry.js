@@ -177,8 +177,8 @@ function AuctionEntries() {
     const search = event.target.value;
     if (search === "") setTableDataFiltered(tableData);
     else {
-      const match = tableData.find((elem) => Number(elem?.txnNo) === Number(search));
-      setTableDataFiltered(match ? [match] : []);
+      const match = tableData.filter((elem) => Number(elem?.txnNo) === Number(search));
+      setTableDataFiltered(match ? match : []);
     }
   };
 
