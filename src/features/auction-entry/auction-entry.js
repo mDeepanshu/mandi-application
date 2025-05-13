@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button, InputAdornment } from "@mui/material";
-import {
-  getAuctionEntriesList,
-  getActiveDevices,
-} from "../../gateway/auction-entries-api";
+import { getAuctionEntriesList, getActiveDevices } from "../../gateway/auction-entries-api";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import ReactToPrint from "react-to-print";
 import styles from "./auction-entries.module.css";
@@ -137,14 +134,12 @@ function AuctionEntries() {
   }, []);
 
   useEffect(() => {
-    if (tableDataFiltered && tableDataFiltered.length > 0)
-      setCheckedEntries(Array(tableDataFiltered?.length).fill(false));
+    if (tableDataFiltered && tableDataFiltered.length > 0) setCheckedEntries(Array(tableDataFiltered?.length).fill(false));
   }, [tableDataFiltered]);
 
   const edit = () => {
     let arr = [];
-    for (let i = 0; i < checkedEntries.length; i++)
-      if (checkedEntries[i]) arr.push(tableDataFiltered[i]);
+    for (let i = 0; i < checkedEntries.length; i++) if (checkedEntries[i]) arr.push(tableDataFiltered[i]);
 
     setAuctionToEdit(arr);
     setShowAuctionEdit(true);
@@ -181,7 +176,10 @@ function AuctionEntries() {
   const findById = (event) => {
     const search = event.target.value;
     if (search === "") setTableDataFiltered(tableData);
-    else setTableDataFiltered([tableData.find((elem) => Number(elem?.txnNo) == search)]);
+    else {
+      const match = tableData.filter((elem) => Number(elem?.txnNo) === Number(search));
+      setTableDataFiltered(match ? match : []);
+    }
   };
 
   return (
@@ -197,14 +195,7 @@ function AuctionEntries() {
                 control={control}
                 rules={{ required: "Enter From Date" }}
                 defaultValue=""
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="FROM DATE"
-                    variant="outlined"
-                    type="date"
-                  />
-                )}
+                render={({ field }) => <TextField {...field} label="FROM DATE" variant="outlined" type="date" />}
               />
               <p className="error">{errors.fromDate?.message}</p>
             </div>
@@ -214,14 +205,7 @@ function AuctionEntries() {
                 control={control}
                 rules={{ required: "Enter To Date" }}
                 defaultValue=""
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="TO DATE"
-                    variant="outlined"
-                    type="date"
-                  />
-                )}
+                render={({ field }) => <TextField {...field} label="TO DATE" variant="outlined" type="date" />}
               />
               <p className="error">{errors.toDate?.message}</p>
             </div>
@@ -240,37 +224,19 @@ function AuctionEntries() {
           </div>
           {/* </div> */}
           <div className={styles.btns}>
-            <Button
-              variant="contained"
-              color="success"
-              type="button"
-              onClick={() => fetch_auctionEntriesList()}
-            >
+            <Button variant="contained" color="success" type="button" onClick={() => fetch_auctionEntriesList()}>
               FETCH
             </Button>
             &nbsp;
-            <Button
-              variant="contained"
-              color="secondary"
-              type="button"
-              onClick={() => edit()}
-            >
+            <Button variant="contained" color="secondary" type="button" onClick={() => edit()}>
               EDIT
             </Button>
             &nbsp;
-            <Button
-              variant="contained"
-              color="success"
-              type="button"
-              onClick={printLedger}
-              className={styles.print_btn}
-            >
+            <Button variant="contained" color="success" type="button" onClick={printLedger} className={styles.print_btn}>
               PRINT
             </Button>
             <ReactToPrint
-              trigger={() => (
-                <button style={{ display: "none" }} ref={triggerRef}></button>
-              )}
+              trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>}
               content={() => componentRef.current}
             />
           </div>
@@ -327,20 +293,11 @@ function AuctionEntries() {
         </div>
       </div>
       <div style={{ display: "none" }}>
-        <AuctionPrint
-          ref={componentRef}
-          tableData={tableDataFiltered}
-          keyArray={keyArrayPrint}
-          columns={auctionEntriesColumnsPrint}
-        />
+        <AuctionPrint ref={componentRef} tableData={tableDataFiltered} keyArray={keyArrayPrint} columns={auctionEntriesColumnsPrint} />
       </div>
       <div>
         {/* {showAuctionEdit && <AuctionEdit/>} */}
-        <AuctionEdit
-          open={showAuctionEdit}
-          onClose={(refreshTable) => handleToClose(refreshTable)}
-          auctionToEdit={auctionToEdit}
-        />
+        <AuctionEdit open={showAuctionEdit} onClose={(refreshTable) => handleToClose(refreshTable)} auctionToEdit={auctionToEdit} />
       </div>
     </>
   );
