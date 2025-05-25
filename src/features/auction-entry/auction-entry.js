@@ -32,7 +32,7 @@ function AuctionEntries() {
   ]);
   const [keyArray, setKeyArray] = useState([
     "checkbox",
-    "txnNo",
+    "entryIdx",
     "vyapariIdNo",
     "kisanName",
     "itemName",
@@ -77,16 +77,12 @@ function AuctionEntries() {
     "auctionDate",
   ]);
 
-  let auctionToEditIndex = [];
 
   const {
-    register,
     control,
-    handleSubmit,
     formState: { errors },
     getValues,
     trigger,
-    setValue,
   } = useForm({
     defaultValues: {
       toDate: currentDate, // Set the default value to current date
@@ -109,6 +105,9 @@ function AuctionEntries() {
 
     const vasuliList = await getAuctionEntriesList(fromDate, toDate, deviceId);
     if (vasuliList) {
+      vasuliList.responseBody.forEach((obj, index) => {
+        obj.entryIdx = index + 1;
+      });
       setTableData(vasuliList.responseBody);
       setTableDataFiltered(vasuliList.responseBody);
       setCheckedEntries(Array(vasuliList.responseBody.length).fill(false));
@@ -177,8 +176,8 @@ function AuctionEntries() {
     const search = event.target.value;
     if (search === "") setTableDataFiltered(tableData);
     else {
-      const match = tableData.filter((elem) => Number(elem?.txnNo) === Number(search));
-      setTableDataFiltered(match ? match : []);
+      // const match = tableData.filter((elem) => Number(elem?.txnNo) === Number(search));
+      setTableDataFiltered(tableData[search - 1] ? [tableData[search - 1]] : []);
     }
   };
 
