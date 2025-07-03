@@ -9,9 +9,9 @@ export const getLedger = async (vyapariId, startDate, endDate) => {
   }
 };
 
-export const makeVasuli = async (data) => {
+export const makeVasuli = async (data, confirmDuplicate) => {
   try {
-    const response = await axiosHttp.post(`party/vasuliTrasaction`, data);
+    const response = await axiosHttp.post(`party/vasuliTrasaction?confirmDuplicate=${confirmDuplicate}`, data);
     return response.data;
   } catch (error) {
     return "error";

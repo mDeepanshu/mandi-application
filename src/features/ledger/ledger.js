@@ -9,6 +9,8 @@ import ReactToPrint from "react-to-print";
 import styles from "./ledger.module.css";
 import { useMediaQuery } from "@mui/material";
 import PrintAllLedger from "../../dialogs/todays-all-ledger/todays-ledger";
+import DuplicateVasuli from "../../dialogs/duplicate-vasuli/duplicate-vasuli";
+
 import VyapariField from "../../shared/elements/VyapariField";
 import { useOutletContext } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
@@ -22,6 +24,7 @@ function Ledger() {
   const [ledgerColumns, setledgerColumns] = useState(["DATE", "ITEM NAME", "DEBIT", "CREDIT", "REMARK"]);
   const [keyArray, setKeyArray] = useState(["date", "itemNameWithCheckbox", "dr", "cr", "remark"]);
   const [showAllLedgerPrint, setShowAllLedgerPrint] = useState(false);
+  const [showDuplicateVasuli, setShowDuplicateVasuli] = useState({display:false,message:""});
   const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
   const twoDaysPrior = new Date();
   twoDaysPrior.setDate(twoDaysPrior.getDate() - 2);
@@ -120,7 +123,7 @@ function Ledger() {
     }
   };
 
-  const make_vasuli = async () => {
+  const make_vasuli = async (allowDuplicate = false) => {
     const vyapariValid = await trigger(`vyapari_id`);
     if (!vyapariValid) return;
     let vasuliData = [
@@ -132,8 +135,12 @@ function Ledger() {
         name: getValues()?.vyapari_id?.name,
       },
     ];
-
-    const vasuliRes = await makeVasuli(vasuliData);
+    const vasuliRes = await makeVasuli(vasuliData,allowDuplicate);
+    
+    if (vasuliRes?.responseCode == "400") {
+      setShowDuplicateVasuli({display:true,message:vasuliRes.responseBody});
+      return;
+    }
     if (vasuliRes) {
       setAlertData({
         open: true,
@@ -152,6 +159,13 @@ function Ledger() {
       alertType: "",
       alertMsg: "",
     });
+  };
+
+  const closeDuplicateVasuli = () => setShowDuplicateVasuli({display:false,message:""});
+
+  const continueDuplicateVasuli = () => {
+    make_vasuli(true);
+    setShowDuplicateVasuli({display:false,message:""});
   };
 
   return (
@@ -217,24 +231,12 @@ function Ledger() {
                 <Button variant="contained" color="success" type="button" onClick={() => fetch_ledger(getValues())}>
                   FETCH
                 </Button>
-                <Button
-                  className={styles.vasuliBtn}
-                  variant="contained"
-                  color="success"
-                  type="button"
-                  onClick={() => make_vasuli()}
-                >
+                <Button className={styles.vasuliBtn} variant="contained" color="success" type="button" onClick={() => make_vasuli()}>
                   VASULI
                 </Button>
               </div>
               <div className={styles.print_btns}>
-                <Button
-                  className={styles.print_btn}
-                  variant="contained"
-                  color="success"
-                  type="button"
-                  onClick={() => printLedger()}
-                >
+                <Button className={styles.print_btn} variant="contained" color="success" type="button" onClick={() => printLedger()}>
                   PRINT
                 </Button>
                 <Button
@@ -271,25 +273,17 @@ function Ledger() {
           </form>
         </div>
         <div className={styles.table_section}>
-          <MasterTable
-            columns={ledgerColumns}
-            tableData={tableData}
-            keyArray={keyArray}
-            customHeight={customTableHeight}
-          />
+          <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} customHeight={customTableHeight} />
         </div>
       </div>
       <div style={{ display: "none" }}>
         <LedgerPrint ref={componentRef} tableData={[...tableData]} formData={getValues()} />
       </div>
       <div>
-        {/* {showAuctionEdit && <AuctionEdit/>} */}
-        <PrintAllLedger
-          open={showAllLedgerPrint}
-          onClose={() => toggleState(false)}
-          formData={getValues()}
-          // auctionToEdit={auctionToEdit}
-        />
+        <PrintAllLedger open={showAllLedgerPrint} onClose={() => toggleState(false)} formData={getValues()} />
+      </div>
+      <div>
+        <DuplicateVasuli open={showDuplicateVasuli} continue={continueDuplicateVasuli} onClose={closeDuplicateVasuli} />
       </div>
       <div>
         <Snackbar
