@@ -1,0 +1,14 @@
+.container {
+  padding: 5px 10px;
+}
+
+.message {
+  color: #f00;
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+.footer{
+  display: flex;
+  gap: 10px;
+}
