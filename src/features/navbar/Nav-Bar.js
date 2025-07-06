@@ -20,6 +20,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import { getAllPartyList,getItem } from "../../gateway/comman-apis";
 
 const navItems = [
   // { name: '', label: 'Home' },
@@ -87,6 +88,26 @@ function NavBar(props) {
     });
   };
 
+  const syncPartyItem = async () => {
+    const [partyList, itemList] = await Promise.all([
+      getAllPartyList("VYAPARI", false),
+      getItem(false)
+    ]);
+    if (partyList && itemList) {
+      setAlertData({
+        open: true,
+        alertType: "success",
+        alertMsg: "Party & Item Synced Successfully",
+      });
+    } else {
+      setAlertData({
+        open: true,
+        alertType: "error",
+        alertMsg: "Error in Syncing Party & Item List",
+      });
+    }
+  };
+
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2 }}>
@@ -107,6 +128,15 @@ function NavBar(props) {
             </ListItem>
           </Link>
         ))}
+        <ListItem
+          key="syncPartyList"
+          disablePadding
+          onClick={syncPartyItem}
+        >
+          <ListItemButton sx={{ textAlign: "left" }}>
+            <ListItemText primary="SYNC PARTY & ITEM LIST" />
+          </ListItemButton>
+        </ListItem>
       </List>
     </Box>
   );
@@ -159,6 +189,9 @@ function NavBar(props) {
                   </Link>
                 </MenuItem>
               ))}
+              <MenuItem onClick={syncPartyItem}>
+                <Button>Sync Party & Item List</Button>
+              </MenuItem>
             </Menu>
           </Box>
         </Toolbar>
