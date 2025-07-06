@@ -50,7 +50,7 @@ function VyapariBill() {
   const [keyArray, setKeyArray] = useState(["itemName", "bag", "chungi", "rate", "quantity", "bagWiseQuantity", "itemTotal", "auctionDate", "partyName", "deviceName", "edit", "delete", "navigation"]);
 
   useEffect(() => {
-    getVyapariNames();
+    // getVyapariNames();
   }, []);
 
   const onSubmit = async (data) => {

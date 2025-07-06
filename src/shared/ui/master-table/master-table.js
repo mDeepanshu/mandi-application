@@ -26,7 +26,7 @@ function MasterTable(props) {
   const [allTableData, setAllTableData] = useState([]);
   const [keyArray, setKeyArray] = useState([]);
   const [fieldDefinitions, setFieldDefinitions] = useState([]);
-  const [paginationLength, setPaginationLength] = useState(10);
+  const [paginationLength, setPaginationLength] = useState(100);
   const [qty, setQty] = useState([]);
   const [qtyTotal, setQtyTotal] = useState(0);
   const excludeArr = [
