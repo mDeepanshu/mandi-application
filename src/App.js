@@ -10,6 +10,7 @@ function App() {
 	
 const [loginStatus, setLoginStatus] = useState(true);
 const [snackbarData, setSnackbarData] = useState({});
+const [syncComplete, setSyncComplete] = useState("");
 
 const changeLoginState = (value) => {
 	setLoginStatus(value)
@@ -24,9 +25,9 @@ const snackbarChange = (data) => {
 			{
 				loginStatus ? (<Login changeLoginState={changeLoginState} />) : (
 					<>
-						<NavBar></NavBar>
+						<NavBar setSyncComplete={setSyncComplete} />
 						<Box component="main" sx={{ mt: 8 }}>
-							<Outlet context={{snackbarChange}}/>
+							<Outlet context={{snackbarChange, syncComplete}}/>
 						</Box>
 						<SnackbarGlobal snackbarData={snackbarData}/>
 					</>

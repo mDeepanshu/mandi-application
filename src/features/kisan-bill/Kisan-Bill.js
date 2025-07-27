@@ -1,123 +1,149 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from "react";
 import { Grid } from "@mui/material";
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
-import { TableContainer, Paper, InputAdornment } from '@mui/material';
-import { getKisanBill, saveKisanBill } from '../../gateway/kisan-bill-apis';
+import { TableContainer, Paper, InputAdornment } from "@mui/material";
+import { getKisanBill, saveKisanBill } from "../../gateway/kisan-bill-apis";
 import { getAllPartyList } from "../../gateway/comman-apis";
-import Autocomplete from '@mui/material/Autocomplete';
-import SearchIcon from '@mui/icons-material/Search';
-import ReactToPrint from 'react-to-print';
+import Autocomplete from "@mui/material/Autocomplete";
+import SearchIcon from "@mui/icons-material/Search";
+import ReactToPrint from "react-to-print";
 import KisanBillPrint from "../../dialogs/kisan-bill/kisan-bill-print";
 import "./kisan-bill.module.css";
 import SharedTable from "../../shared/ui/table/table";
 import PreviousBills from "../../shared/ui/previous-bill/previousBill";
-import Snackbar from '@mui/material/Snackbar';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import Alert from '@mui/material/Alert';
+import Snackbar from "@mui/material/Snackbar";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import Alert from "@mui/material/Alert";
+import { useOutletContext } from "react-router-dom";
 
 function KisanBill() {
+  const { snackbarChange, syncComplete } = useOutletContext();
 
   const componentRef = useRef();
   const triggerRef = useRef();
-  const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'YYYY-MM-DD' format
+  const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
 
-  const { handleSubmit, control, formState: { errors }, getValues, trigger, reset } = useForm();
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+    getValues,
+    trigger,
+    reset,
+  } = useForm();
   const [kisanList, setKisanList] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
   const [noEntries, setNoEntries] = useState(false);
 
-  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(["Item Name", "Bag", "Rate", "Quantity", "Item Total", "Date", "Vyapari Name", "Edit", "Previuos Edits"]);
-  const [keyArray, setKeyArray] = useState(["itemName", "bag", "rate", "quantity", "itemTotal", "auctionDate", "partyName", "edit", "navigation"]);
+  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState([
+    "Item Name",
+    "Bag",
+    "Rate",
+    "Quantity",
+    "Item Total",
+    "Date",
+    "Vyapari Name",
+    "Edit",
+    "Previuos Edits",
+  ]);
+  const [keyArray, setKeyArray] = useState([
+    "itemName",
+    "bag",
+    "rate",
+    "quantity",
+    "itemTotal",
+    "auctionDate",
+    "partyName",
+    "edit",
+    "navigation",
+  ]);
   const [open, setOpen] = useState(false);
   // const today = new Date().toISOString().split('T')[0];
   const todayd = new Date();
-  const today = new Date(todayd.getTime() - todayd.getTimezoneOffset() * 60000)
-    .toISOString()
-    .split('T')[0];
+  const today = new Date(todayd.getTime() - todayd.getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
   const [fieldDefinitions] = useState([
     {
-      name: 'mandiKharcha',
-      label: 'Mandi Kharch',
-      defaultValue: '',
-      validation: { required: 'Mandi Kharch is required' },
+      name: "mandiKharcha",
+      label: "Mandi Kharch",
+      defaultValue: "",
+      validation: { required: "Mandi Kharch is required" },
     },
     {
-      name: 'hammali',
-      label: 'Hammali',
-      defaultValue: '',
+      name: "hammali",
+      label: "Hammali",
+      defaultValue: "",
       validation: {
-        required: 'Hammali is required',
+        required: "Hammali is required",
       },
     },
     {
-      name: 'nagarPalikaTaxRate',
-      label: 'Nagar Palika Tax Rate',
-      defaultValue: '',
+      name: "nagarPalikaTaxRate",
+      label: "Nagar Palika Tax Rate",
+      defaultValue: "",
       validation: {
-        required: 'Nagar Palika Tax is required',
+        required: "Nagar Palika Tax is required",
       },
     },
     {
-      name: 'nagarPalikaTax',
-      label: 'Nagar Palika Tax',
-      defaultValue: '',
+      name: "nagarPalikaTax",
+      label: "Nagar Palika Tax",
+      defaultValue: "",
       validation: {
-        required: 'Nagar Palika Tax is required',
+        required: "Nagar Palika Tax is required",
       },
     },
     {
-      name: 'bhada',
-      label: 'Bhada',
-      defaultValue: '',
+      name: "bhada",
+      label: "Bhada",
+      defaultValue: "",
       validation: {
-        required: 'Bhada is required',
+        required: "Bhada is required",
       },
     },
     {
-      name: 'driver',
-      label: 'Driver Inaam',
-      defaultValue: '',
+      name: "driver",
+      label: "Driver Inaam",
+      defaultValue: "",
       validation: {
-        required: 'Driver Inaam is required',
+        required: "Driver Inaam is required",
       },
     },
     {
-      name: 'nagdi',
-      label: 'Nagdi',
-      defaultValue: '',
+      name: "nagdi",
+      label: "Nagdi",
+      defaultValue: "",
       validation: {
-        required: 'Nagdi is required',
+        required: "Nagdi is required",
       },
     },
     {
-      name: 'commissionRate',
-      label: 'Commission Rate',
-      defaultValue: '',
+      name: "commissionRate",
+      label: "Commission Rate",
+      defaultValue: "",
       validation: {
-        required: 'Commission is required',
+        required: "Commission is required",
       },
     },
     {
-      name: 'commission',
-      label: 'Commission',
-      defaultValue: '',
+      name: "commission",
+      label: "Commission",
+      defaultValue: "",
       validation: {
-        required: 'Commission is required',
+        required: "Commission is required",
       },
     },
     {
-      name: 'bags',
-      label: 'Bags',
-      defaultValue: '',
+      name: "bags",
+      label: "Bags",
+      defaultValue: "",
       validation: {
-        required: 'Bags is required',
+        required: "Bags is required",
       },
     },
-
   ]);
 
   const onSubmit = async (data) => {
@@ -129,13 +155,13 @@ function KisanBill() {
 
   const fetchBill = async () => {
     setNoEntries(false);
-    const isValid = await trigger(['kisan', 'date']);
+    const isValid = await trigger(["kisan", "date"]);
     if (isValid) {
       let formValues = getValues();
       const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
       if (billData) {
         const auctionList = billData?.responseBody?.bills;
-        
+
         if (billData?.responseBody?.bills?.length === 0) {
           setNoEntries(true);
         }
@@ -149,17 +175,16 @@ function KisanBill() {
         }
       }
     }
-  }
+  };
 
   const getKisanNames = async () => {
     const allKisan = await getAllPartyList("KISAN");
     if (allKisan?.responseBody) setKisanList(allKisan?.responseBody);
-
-  }
+  };
 
   useEffect(() => {
     getKisanNames();
-  }, []);
+  }, [syncComplete]);
 
   useEffect(() => {
     if (formData) {
@@ -169,19 +194,17 @@ function KisanBill() {
     }
   }, [formData]);
 
-  const editFromTable = (index) => {
-  }
+  const editFromTable = (index) => {};
 
-  const deleteFromTable = (index) => {
-  }
+  const deleteFromTable = (index) => {};
 
   const saveBill = async () => {
     // const saveRes = saveKisanBill();
     let tableSnapshot = [];
-    tableData.forEach(element => {
+    tableData.forEach((element) => {
       tableSnapshot.push({ ...element[element.length - 1] });
     });
-    // 
+    //
     let mergedTable = [];
     mergedTable.push({ ...tableSnapshot[0] });
     if (tableSnapshot.length) {
@@ -202,16 +225,21 @@ function KisanBill() {
         flag = true;
       }
     }
-    // 
-    const bill = { ...getValues(), kisanBillItems: mergedTable, kisanId: getValues().kisan.partyId, kisanName: getValues().kisan.name, billDate: getValues().date };
+    //
+    const bill = {
+      ...getValues(),
+      kisanBillItems: mergedTable,
+      kisanId: getValues().kisan.partyId,
+      kisanName: getValues().kisan.name,
+      billDate: getValues().date,
+    };
     delete bill.kisan;
     delete bill.date;
     const saveRes = await saveKisanBill(bill);
     if (saveRes.responseCode == "200") {
       setOpen(true);
     }
-
-  }
+  };
 
   const refreshBill = async () => {
     let formValues = getValues();
@@ -222,10 +250,10 @@ function KisanBill() {
       delete billConstant.bills;
       reset({ ...getValues(), ...billConstant });
     }
-  }
+  };
 
   const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setOpen(false);
@@ -233,29 +261,18 @@ function KisanBill() {
 
   const action = (
     <React.Fragment>
-      <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
-        onClick={handleClose}
-      >
+      <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
         <CloseIcon fontSize="small" />
       </IconButton>
     </React.Fragment>
   );
-
 
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={2} p={3} pb={0}>
           <Grid item xs={2}>
-            <Grid
-              container
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-            >
+            <Grid container direction="column" justifyContent="center" alignItems="center">
               {fieldDefinitions.map((fieldDef) => (
                 <Controller
                   key={fieldDef.name}
@@ -271,7 +288,7 @@ function KisanBill() {
                       sx={{ mb: 3 }}
                       fullWidth
                       error={!!errors[field.name]}
-                      helperText={errors[field.name] ? errors[field.name].message : ''}
+                      helperText={errors[field.name] ? errors[field.name].message : ""}
                       size="small"
                     />
                   )}
@@ -313,7 +330,7 @@ function KisanBill() {
                     />
                   )}
                 />
-                <p className='err-msg'>{errors.kisan?.message}</p>
+                <p className="err-msg">{errors.kisan?.message}</p>
               </Grid>
               <Grid item xs={4}>
                 <Controller
@@ -321,18 +338,14 @@ function KisanBill() {
                   control={control}
                   rules={{ required: "Enter Date" }}
                   defaultValue={today}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      variant="outlined"
-                      type='date'
-                    />
-                  )}
+                  render={({ field }) => <TextField {...field} variant="outlined" type="date" />}
                 />
-                <p className='err-msg'>{errors.date?.message}</p>
+                <p className="err-msg">{errors.date?.message}</p>
               </Grid>
               <Grid item xs={2}>
-                <Button variant="contained" color="success" onClick={fetchBill} fullWidth>Fetch Bill</Button>
+                <Button variant="contained" color="success" onClick={fetchBill} fullWidth>
+                  Fetch Bill
+                </Button>
               </Grid>
             </Grid>
             <Grid container spacing={2} paddingBottom={2}>
@@ -340,9 +353,14 @@ function KisanBill() {
                 <PreviousBills billData={{ id: getValues()?.kisan?.partyId, date: getValues()?.date }} partyType={"kisan"} />
               </Grid>
             </Grid>
-            <TableContainer component={Paper} className='bill-table'>
+            <TableContainer component={Paper} className="bill-table">
               {noEntries && `NO ENTRIES FOUND`}
-              <SharedTable columns={kisanBillColumnsColumns} tableData={structuredClone(tableData)} keyArray={keyArray} refreshBill={refreshBill} />
+              <SharedTable
+                columns={kisanBillColumnsColumns}
+                tableData={structuredClone(tableData)}
+                keyArray={keyArray}
+                refreshBill={refreshBill}
+              />
             </TableContainer>
             <Grid container spacing={2} justifyContent="flex-end" p={2}>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
@@ -412,12 +430,16 @@ function KisanBill() {
               </Grid>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
                 <Grid item xs={2}>
-                  <Button variant="contained" color="primary" fullWidth onClick={saveBill}>Save Bill</Button>
+                  <Button variant="contained" color="primary" fullWidth onClick={saveBill}>
+                    Save Bill
+                  </Button>
                 </Grid>
                 <Grid item xs={2}>
-                  <Button variant="contained" color="success" type='submit' fullWidth>Print</Button>
+                  <Button variant="contained" color="success" type="submit" fullWidth>
+                    Print
+                  </Button>
                   <ReactToPrint
-                    trigger={() => <button style={{ display: 'none' }} ref={triggerRef}></button>}
+                    trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>}
                     content={() => componentRef.current}
                   />
                 </Grid>
@@ -426,21 +448,12 @@ function KisanBill() {
           </Grid>
         </Grid>
       </form>
-      <div style={{ display: 'none' }}>
+      <div style={{ display: "none" }}>
         <KisanBillPrint ref={componentRef} tableDataPrint={structuredClone(tableData)} restructureTable={true} formData={formData} />
       </div>
       <div>
-        <Snackbar
-          open={open}
-          autoHideDuration={2500}
-          onClose={handleClose}
-        >
-          <Alert
-            onClose={handleClose}
-            severity="success"
-            variant="filled"
-            sx={{ width: '100%' }}
-          >
+        <Snackbar open={open} autoHideDuration={2500} onClose={handleClose}>
+          <Alert onClose={handleClose} severity="success" variant="filled" sx={{ width: "100%" }}>
             BILL SAVED
           </Alert>
         </Snackbar>

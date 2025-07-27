@@ -91,6 +91,7 @@ function NavBar(props) {
   const syncPartyItem = async () => {
     const [partyList, itemList] = await Promise.all([
       getAllPartyList("VYAPARI", false),
+      getAllPartyList("KISAN", false),
       getItem(false)
     ]);
     if (partyList && itemList) {
@@ -99,6 +100,7 @@ function NavBar(props) {
         alertType: "success",
         alertMsg: "Party & Item Synced Successfully",
       });
+      props.setSyncComplete(new Date().getTime().toString());
     } else {
       setAlertData({
         open: true,

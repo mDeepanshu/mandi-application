@@ -34,7 +34,7 @@ const PartyMaster = () => {
       partyType: "KISAN", // Ensure this matches one of the MenuItem values
     },
   });
-  const { snackbarChange } = useOutletContext();
+  const { snackbarChange, syncComplete } = useOutletContext();
   const [tableData, setTableData] = useState([]);
   const [printTableData, setPrintTableData] = useState([]);
   const [filterVyapariText, setFilterVyapariText] = useState(true);
@@ -242,7 +242,6 @@ const PartyMaster = () => {
                 <Controller
                   name="ledgerOrder"
                   control={control}
-                  rules={vasuliDayLimitValidation}
                   defaultValue=""
                   render={({ field }) => <TextField {...field} fullWidth label="LEDGER INDEX" variant="outlined" disabled={currentPartyType == "KISAN"} />}
                 />

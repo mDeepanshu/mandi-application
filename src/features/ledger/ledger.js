@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Grid } from "@mui/material";
+import { useEffect, useState, useRef, lazy } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
 import { getLedger, makeVasuli } from "../../gateway/ledger-apis";
@@ -10,9 +9,7 @@ import styles from "./ledger.module.css";
 import { useMediaQuery } from "@mui/material";
 import PrintAllLedger from "../../dialogs/todays-all-ledger/todays-ledger";
 import DuplicateVasuli from "../../dialogs/duplicate-vasuli/duplicate-vasuli";
-
 import VyapariField from "../../shared/elements/VyapariField";
-import { useOutletContext } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
@@ -24,7 +21,7 @@ function Ledger() {
   const [ledgerColumns, setledgerColumns] = useState(["DATE", "ITEM NAME", "DEBIT", "CREDIT", "REMARK"]);
   const [keyArray, setKeyArray] = useState(["date", "itemNameWithCheckbox", "dr", "cr", "remark"]);
   const [showAllLedgerPrint, setShowAllLedgerPrint] = useState(false);
-  const [showDuplicateVasuli, setShowDuplicateVasuli] = useState({display:false,message:""});
+  const [showDuplicateVasuli, setShowDuplicateVasuli] = useState({ display: false, message: "" });
   const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
   const twoDaysPrior = new Date();
   twoDaysPrior.setDate(twoDaysPrior.getDate() - 2);
@@ -135,10 +132,10 @@ function Ledger() {
         name: getValues()?.vyapari_id?.name,
       },
     ];
-    const vasuliRes = await makeVasuli(vasuliData,allowDuplicate);
-    
+    const vasuliRes = await makeVasuli(vasuliData, allowDuplicate);
+
     if (vasuliRes?.responseCode == "400") {
-      setShowDuplicateVasuli({display:true,message:vasuliRes.responseBody});
+      setShowDuplicateVasuli({ display: true, message: vasuliRes.responseBody });
       return;
     }
     if (vasuliRes) {
@@ -161,11 +158,11 @@ function Ledger() {
     });
   };
 
-  const closeDuplicateVasuli = () => setShowDuplicateVasuli({display:false,message:""});
+  const closeDuplicateVasuli = () => setShowDuplicateVasuli({ display: false, message: "" });
 
   const continueDuplicateVasuli = () => {
     make_vasuli(true);
-    setShowDuplicateVasuli({display:false,message:""});
+    setShowDuplicateVasuli({ display: false, message: "" });
   };
 
   return (
