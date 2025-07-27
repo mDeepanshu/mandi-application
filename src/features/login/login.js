@@ -27,7 +27,7 @@ function Login({ changeLoginState }) {
         <>
             <div className={styles.container}>
                 <h3 className={styles.loginText}>LOGIN</h3>
-                <input ref={inputRef}  onChange={OnPasswordInput} value={password} className={styles.passwordInput} type='password' maxLength={4}></input>
+                <input ref={inputRef}  onChange={OnPasswordInput} value={password} className={styles.passwordInput} type='password' maxLength={4} aria-label='Password'></input>
             </div>
         </>
     );

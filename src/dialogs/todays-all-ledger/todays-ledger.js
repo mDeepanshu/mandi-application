@@ -5,7 +5,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import Autocomplete from "@mui/material/Autocomplete";
 import { getTodaysVyapari, getEveryLedger } from "../../gateway/comman-apis";
 import MasterTable from "../../shared/ui/master-table/master-table";
-import { useOutletContext } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 
 import styles from "./todays-ledger.module.css";

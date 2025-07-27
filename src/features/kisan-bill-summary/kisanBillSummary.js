@@ -6,7 +6,7 @@ import ReactToPrint from 'react-to-print';
 
 import styles from "./kisan-bill-summary.module.css";
 
-function KisanBillSummary() {
+function KisanBillSummaryComponent() {
 
   const componentRef = useRef();
   const triggerRef = useRef();
@@ -153,5 +153,5 @@ function KisanBillSummary() {
   );
 }
 
-export default KisanBillSummary;
+export default KisanBillSummaryComponent;
 

@@ -2,7 +2,19 @@ import React, { useEffect, useState, useRef } from "react";
 import { Dialog, DialogActions, DialogContent } from "@mui/material";
 
 import { useForm, Controller } from "react-hook-form";
-import { Grid, Table, TableBody, TableCell, TableContainer, TableHead, InputAdornment, TableRow, Paper, Button, useMediaQuery } from "@mui/material";
+import {
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  InputAdornment,
+  TableRow,
+  Paper,
+  Button,
+  useMediaQuery,
+} from "@mui/material";
 import TextField from "@mui/material/TextField";
 import SearchIcon from "@mui/icons-material/Search";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -23,15 +35,37 @@ const AuctionEdit = (props) => {
     setValue,
   } = useForm();
 
-  const { snackbarChange } = useOutletContext();
+  const { snackbarChange, syncComplete } = useOutletContext();
 
   const [itemsList, setItemsList] = useState([]);
   const [kisanList, setKisanList] = useState([]);
   const [buyItemsArr, setTableData] = useState([]);
   const kisanRef = useRef(null);
   const itemRef = useRef(null);
-  const [columns, setColumns] = useState(["INDEX", "VYAPARINAME", "RATE", "QUANTITY", "BAGS W.", "AMOUNT", "BAG", "CHUNGI", "EDIT", "DELETE"]);
-  const [keyArray, setKeyArray] = useState(["index", "vyapariName", "rate", "quantity", "bagWiseQuantity", "amount", "bag", "chungi", "edit", "delete"]);
+  const [columns, setColumns] = useState([
+    "INDEX",
+    "VYAPARINAME",
+    "RATE",
+    "QUANTITY",
+    "BAGS W.",
+    "AMOUNT",
+    "BAG",
+    "CHUNGI",
+    "EDIT",
+    "DELETE",
+  ]);
+  const [keyArray, setKeyArray] = useState([
+    "index",
+    "vyapariName",
+    "rate",
+    "quantity",
+    "bagWiseQuantity",
+    "amount",
+    "bag",
+    "chungi",
+    "edit",
+    "delete",
+  ]);
   const [entriesToDelete, setEntriesToDelete] = useState([]);
 
   useEffect(() => {
@@ -44,7 +78,8 @@ const AuctionEdit = (props) => {
     setValue("itemName", selectedItem || null);
     const selectedKisan = kisanList.find((option) => option.partyId == props.auctionToEdit?.[0]?.kisanId);
     setValue("kisaan", selectedKisan || null);
-    if (props.auctionToEdit?.[0]?.auctionSubmitDate) setValue("auctionSubmitDate", new Date(props.auctionToEdit?.[0]?.auctionSubmitDate).toISOString().split("T")[0] || null);
+    if (props.auctionToEdit?.[0]?.auctionSubmitDate)
+      setValue("auctionSubmitDate", props.auctionToEdit?.[0]?.auctionSubmitDate.split("T")[0] || null);
     setTableData([...props.auctionToEdit]);
     let entriesToDeleteTemp = [];
     props.auctionToEdit.forEach((element) => entriesToDeleteTemp.push(element.auctionTransactionId));
@@ -83,8 +118,11 @@ const AuctionEdit = (props) => {
           itemId: getValues()?.itemName?.itemId,
           bag: null,
           buyItems: [],
-          deviceId:buyItemsArr?.[0]?.deviceId,
-          auctionDate: new Date(getValues()?.auctionSubmitDate).toISOString().split("T")[0]+`T`+new Date(props.auctionToEdit?.[0]?.auctionSubmitDate).toISOString().split("T")[1],
+          deviceId: buyItemsArr?.[0]?.deviceId,
+          auctionDate:
+            new Date(getValues()?.auctionSubmitDate).toISOString().split("T")[0] +
+            `T` +
+            new Date(props.auctionToEdit?.[0]?.auctionSubmitDate).toISOString().split("T")[1],
         },
       ],
     };
@@ -101,7 +139,10 @@ const AuctionEdit = (props) => {
           chungi: element.chungi,
           quantity: element.quantity,
           bagWiseQuantity: element.bagWiseQuantityArray,
-          auctionDate: new Date(getValues().auctionSubmitDate).toISOString().split("T")[0]+"T"+new Date(element.auctionDate).toISOString().split("T")[1],
+          auctionDate:
+            new Date(getValues().auctionSubmitDate).toISOString().split("T")[0] +
+            "T" +
+            new Date(element.auctionDate).toISOString().split("T")[1],
         });
       });
     const device_id = buyItemsArr[0]?.deviceId == null ? 1 : buyItemsArr[0].deviceId;
@@ -152,6 +193,7 @@ const AuctionEdit = (props) => {
                   options={kisanList}
                   // disabled={getValues()?.kisaan?.name && buyItemsArr.length > 0}
                   getOptionLabel={(option) => `${option.idNo} | ${option.name}`}
+                  isOptionEqualToValue={(option, value) => option.partyId === value.partyId}
                   renderOption={(props, option) => (
                     <li {...props}>
                       <div style={{ display: "flex", alignItems: "center" }}>
@@ -205,6 +247,7 @@ const AuctionEdit = (props) => {
                   value={field.value || null}
                   options={itemsList}
                   getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) => option.itemId === value.itemId}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -213,7 +256,7 @@ const AuctionEdit = (props) => {
                         ...params.InputProps,
                         inputRef: itemRef,
                         style: {
-                          textTransform: "uppercase", // Ensure uppercase transformation here
+                          textTransform: "uppercase",
                         },
                         startAdornment: (
                           <InputAdornment position="start">
@@ -224,8 +267,7 @@ const AuctionEdit = (props) => {
                     />
                   )}
                   onChange={(event, value) => {
-                    field.onChange(value); // Updates the React Hook Form state
-                    // totalBagInputRef.current.focus();
+                    field.onChange(value); // update form state
                   }}
                   disablePortal
                   id="combo-box-demo"

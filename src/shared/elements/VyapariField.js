@@ -4,10 +4,11 @@ import { Autocomplete, TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { getAllPartyList } from "../../gateway/comman-apis";
 import styles from "./vyapari_field.module.css";
-
+import { useOutletContext } from "react-router-dom";
 const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelect = () => {} }) => {
   const [vyapariList, setVyapariList] = useState([]);
   const vyapariRef = useRef(null); // Create a ref
+  const { snackbarChange, syncComplete } = useOutletContext();
 
   useEffect(() => {
     if (vyapariRef.current) {
@@ -16,7 +17,8 @@ const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelec
       }, 0);
     }
     getVyapariNames();
-  }, []);
+  }, [syncComplete]);
+
   const getVyapariNames = async () => {
     const allVyapari = await getAllPartyList("VYAPARI");
     if (allVyapari?.responseBody) setVyapariList(allVyapari?.responseBody);
