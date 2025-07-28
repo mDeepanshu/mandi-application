@@ -328,9 +328,9 @@ function MasterTable(props) {
                               />
                             );
                           case "date":
-                            return rowData[key] === "TOTAL" ? <b>TOTAL</b> : new Date(rowData[key]).toLocaleString("en-IN", dateFormat);
+                            return rowData[key] === "TOTAL" ? <b>TOTAL</b> : new Date(rowData[key]+"Z").toLocaleString("en-IN", dateFormat);
                           case "auctionDate":
-                            return rowData[key] === "TOTAL" ? <b>TOTAL</b> : new Date(rowData[key]).toLocaleString("en-IN", dateTimeFormat);
+                            return rowData[key] === "TOTAL" ? <b>TOTAL</b> : new Date(rowData[key]+"Z").toLocaleString("en-IN", dateTimeFormat);
                           case "navigation":
                             return (
                               <>

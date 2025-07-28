@@ -20,7 +20,8 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { getAllPartyList,getItem } from "../../gateway/comman-apis";
+import { getAllPartyList, getItem } from "../../gateway/comman-apis";
+import { useNavigate } from "react-router-dom";
 
 const navItems = [
   // { name: '', label: 'Home' },
@@ -59,6 +60,13 @@ function NavBar(props) {
     setLabel(name);
   };
 
+  const navigate = useNavigate();
+
+  const handleMenuItemClick = (path) => {
+    handleClose(); // Close the menu first
+    setTimeout(() => navigate(path), 100); // Small delay
+  };
+
   const saveKisanBill = async () => {
     const response = await saveAllKisanBill();
     if (response?.responseCode === "200") {
@@ -89,11 +97,7 @@ function NavBar(props) {
   };
 
   const syncPartyItem = async () => {
-    const [partyList, itemList] = await Promise.all([
-      getAllPartyList("VYAPARI", false),
-      getAllPartyList("KISAN", false),
-      getItem(false)
-    ]);
+    const [partyList, itemList] = await Promise.all([getAllPartyList("VYAPARI", false), getAllPartyList("KISAN", false), getItem(false)]);
     if (partyList && itemList) {
       setAlertData({
         open: true,
@@ -119,22 +123,14 @@ function NavBar(props) {
       <List>
         {navItems.map((item, index) => (
           <Link to={item.name} key={index}>
-            <ListItem
-              key={item.name}
-              disablePadding
-              onClick={() => labelChange(item.name)}
-            >
+            <ListItem key={item.name} disablePadding onClick={() => labelChange(item.name)}>
               <ListItemButton sx={{ textAlign: "left" }}>
                 <ListItemText primary={item.label} />
               </ListItemButton>
             </ListItem>
           </Link>
         ))}
-        <ListItem
-          key="syncPartyList"
-          disablePadding
-          onClick={syncPartyItem}
-        >
+        <ListItem key="syncPartyList" disablePadding onClick={syncPartyItem}>
           <ListItemButton sx={{ textAlign: "left" }}>
             <ListItemText primary="SYNC PARTY & ITEM LIST" />
           </ListItemButton>
@@ -143,18 +139,13 @@ function NavBar(props) {
     </Box>
   );
 
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
+  const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar component="nav">
         <Toolbar sx={{ display: { xs: "none", sm: "flex" } }} variant="dense">
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-          >
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}>
             NAVBAR
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
@@ -185,24 +176,23 @@ function NavBar(props) {
               }}
             >
               {remNavItems.map((item, index) => (
-                <MenuItem key={index} onClick={handleClose}>
-                  <Link to={item.name} key={index}>
-                    <Button key={item.name}>{item.label}</Button>
-                  </Link>
+                <MenuItem key={index} onClick={() => handleMenuItemClick(item.name)}>
+                  {item.label}
                 </MenuItem>
               ))}
-              <MenuItem onClick={syncPartyItem}>
-                <Button>Sync Party & Item List</Button>
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  syncPartyItem();
+                }}
+              >
+                Sync Party & Item List
               </MenuItem>
             </Menu>
           </Box>
         </Toolbar>
-        <Toolbar
-          sx={{ display: { sm: "none" }, justifyContent: "space-between" }}
-        >
-          <div style={{ fontWeight: 600, fontSize: "25px" }}>
-            {label.toUpperCase()}
-          </div>
+        <Toolbar sx={{ display: { sm: "none" }, justifyContent: "space-between" }}>
+          <div style={{ fontWeight: 600, fontSize: "25px" }}>{label.toUpperCase()}</div>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -235,17 +225,8 @@ function NavBar(props) {
         </Drawer>
       </nav>
       <div>
-        <Snackbar
-          open={alertData.open}
-          autoHideDuration={2000}
-          onClose={handleClose}
-        >
-          <Alert
-            onClose={handleClose}
-            severity={alertData.alertType}
-            variant="filled"
-            sx={{ width: "100%" }}
-          >
+        <Snackbar open={alertData.open} autoHideDuration={2000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity={alertData.alertType} variant="filled" sx={{ width: "100%" }}>
             {alertData.alertMsg}
           </Alert>
         </Snackbar>
