@@ -6,18 +6,18 @@ import App from "./App";
 
 import Ledger from "./features/ledger/ledger";
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register(`${process.env.PUBLIC_URL}/service-worker.js`)
-      .then((registration) => {
-        console.log("ServiceWorker registered: ", registration);
-      })
-      .catch((error) => {
-        console.log("ServiceWorker registration failed: ", error);
-      });
-  });
-}
+// if ('serviceWorker' in navigator) {
+//   window.addEventListener('load', () => {
+//     navigator.serviceWorker
+//       .register(`${process.env.PUBLIC_URL}/service-worker.js`)
+//       .then((registration) => {
+//         console.log("ServiceWorker registered: ", registration);
+//       })
+//       .catch((error) => {
+//         console.log("ServiceWorker registration failed: ", error);
+//       });
+//   });
+// }
 
 
 const VasuliList = lazy(() => import("./features/vasuli-list/vasuli-list"));
