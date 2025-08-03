@@ -40,7 +40,17 @@ function SharedTable(props) {
   } = useForm();
   const [rowVariables, setRowVariables] = useState([]);
 
-  const excludeArr = ["edit", "delete", "index", "navigation", "auctionDate", "bagWiseQuantity", "bagWiseQuantityArray", "deviceName", "itemName"];
+  const excludeArr = [
+    "edit",
+    "delete",
+    "index",
+    "navigation",
+    "auctionDate",
+    "bagWiseQuantity",
+    "bagWiseQuantityArray",
+    "deviceName",
+    "itemName",
+  ];
 
   useEffect(() => {
     getVyapariNames();
@@ -80,16 +90,23 @@ function SharedTable(props) {
   };
 
   const editFromTable = (index, tranIdx) => {
+    for (let i = 0; i < tableData[index].length; i++) {
+      const element = tableData[index][i];
+      if (element?.isOld == "N") tranIdx = i;
+    }
+
     setEditingIndex(index);
     setOpen(true);
     for (let int = 0; int < props.keyArray.length; int++) {
       if (!excludeArr.includes(props.keyArray[int]))
         if (keyArray[int] == "partyName") {
-          const defaultOption = vyapariList.find((option) => option.name == tableData[index]?.[tranIdx]?.partyName);
+          let defaultOption;
+          if (props.bill_vyapari_id) defaultOption = vyapariList.find((option) => option.partyId == props.bill_vyapari_id);
+          else defaultOption = vyapariList.find((option) => option.name == tableData[index]?.[tranIdx]?.partyName);
           setValue("partyName", defaultOption || null);
         } else if (keyArray[int] == "quantity") {
-          setQtyTotal(tableData?.[index]?.[0]?.[keyArray[int]]);
-          setQty(tableData?.[index]?.[0]?.bagWiseQuantityArray);
+          setQtyTotal(tableData?.[index]?.[tranIdx]?.[keyArray[int]]);
+          setQty(tableData?.[index]?.[tranIdx]?.bagWiseQuantityArray);
         } else setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
     }
   };
@@ -114,9 +131,9 @@ function SharedTable(props) {
         if (!excludeArr.includes(props.keyArray[int])) {
           fields.push({
             name: props.keyArray[int],
-            label: columns[int],
+            label: props.columns[int],
             defaultValue: "",
-            validation: { required: `${columns[int]} is required` },
+            validation: { required: `${props.columns[int]} is required` },
           });
         }
       }
@@ -261,7 +278,10 @@ function SharedTable(props) {
                                 <Button disabled={rowVariables[index] === 0} onClick={() => handleNavigationClick(index, -1)}>
                                   <ArrowBackIos />
                                 </Button>
-                                <Button disabled={rowVariables[index] === rowData?.length - 1} onClick={() => handleNavigationClick(index, +1)}>
+                                <Button
+                                  disabled={rowVariables[index] === rowData?.length - 1}
+                                  onClick={() => handleNavigationClick(index, +1)}
+                                >
                                   <ArrowForwardIos />
                                 </Button>
                               </>
@@ -288,12 +308,14 @@ function SharedTable(props) {
           <DialogContent>
             <div className={styles.editForm}>
               {fieldDefinitions.map((fieldDef, index) => {
-                if (fieldDef.name === "partyName") return <VyapariField name="partyName" control={control} errors={errors} size="small"/>;
-                else {
+                if (fieldDef.name === "partyName") return <VyapariField name="partyName" control={control} errors={errors} size="small" />;
+              })}
+              {fieldDefinitions.map((fieldDef, index) => {
+                if (fieldDef.name !== "partyName") {
                   return (
                     <>
                       <Controller
-                        key={fieldDef.name}
+                        key={index}
                         name={fieldDef.name}
                         control={control}
                         defaultValue={fieldDef.defaultValue}
@@ -301,7 +323,7 @@ function SharedTable(props) {
                         render={({ field }) => (
                           <TextField
                             {...field}
-                            label={fieldDef.label}
+                            label={fieldDef.label.toUpperCase()}
                             variant="outlined"
                             sx={{ mb: 3 }}
                             InputLabelProps={{

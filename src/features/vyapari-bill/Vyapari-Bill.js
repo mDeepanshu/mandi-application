@@ -160,7 +160,7 @@ function VyapariBill() {
           {/* </Grid> */}
         </Grid>
         <div className={styles.billTable}>
-          <SharedTable columns={vyapariTableColumns} tableData={tableData} keyArray={keyArray} refreshBill={refreshBill} />
+          <SharedTable columns={vyapariTableColumns} tableData={tableData} keyArray={keyArray} refreshBill={refreshBill} bill_vyapari_id={getValues()?.vyapari_name?.partyId} />
         </div>
         <Grid container p={1} gap={1} justifyContent="flex-end">
           <Grid item xs={6} md={7}></Grid>
