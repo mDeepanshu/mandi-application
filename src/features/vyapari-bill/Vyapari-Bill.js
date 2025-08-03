@@ -43,7 +43,6 @@ function VyapariBill() {
     "Kisan Name",
     "DEVICE NAME",
     "Edit",
-    "Delete",
     "Updated Tran.",
   ]);
   const [formData, setFormData] = useState();
@@ -59,7 +58,6 @@ function VyapariBill() {
     "partyName",
     "deviceName",
     "edit",
-    "delete",
     "navigation",
   ]);
 
