@@ -47,7 +47,21 @@ function VyapariBill() {
     "Updated Tran.",
   ]);
   const [formData, setFormData] = useState();
-  const [keyArray, setKeyArray] = useState(["itemName", "bag", "chungi", "rate", "quantity", "bagWiseQuantity", "itemTotal", "auctionDate", "partyName", "deviceName", "edit", "delete", "navigation"]);
+  const [keyArray, setKeyArray] = useState([
+    "itemName",
+    "bag",
+    "chungi",
+    "rate",
+    "quantity",
+    "bagWiseQuantity",
+    "itemTotal",
+    "auctionDate",
+    "partyName",
+    "deviceName",
+    "edit",
+    "delete",
+    "navigation",
+  ]);
 
   useEffect(() => {
     // getVyapariNames();
@@ -87,7 +101,13 @@ function VyapariBill() {
     tableData?.forEach((element) => {
       tableSnapshot.push(element[0]);
     });
-    const bill = { ...getValues(), vyapariBillItems: tableSnapshot, vyapariId: getValues()?.vyapari_name?.partyId, vyapariName: getValues().vyapari_name?.name, billDate: getValues()?.date };
+    const bill = {
+      ...getValues(),
+      vyapariBillItems: tableSnapshot,
+      vyapariId: getValues()?.vyapari_name?.partyId,
+      vyapariName: getValues().vyapari_name?.name,
+      billDate: getValues()?.date,
+    };
     delete bill.vyapari_name;
     delete bill.date;
     saveVyapariBill(bill);
@@ -119,7 +139,9 @@ function VyapariBill() {
               name="date"
               control={control}
               rules={{ required: "Enter Date" }}
-              render={({ field }) => <TextField {...field} defaultValue={currentDate} size="small" fullWidth variant="outlined" type="date" />}
+              render={({ field }) => (
+                <TextField {...field} defaultValue={currentDate} size="small" fullWidth variant="outlined" type="date" />
+              )}
             />
             <p className="err-msg">{errors.date?.message}</p>
           </Grid>
@@ -164,7 +186,10 @@ function VyapariBill() {
             <Button variant="contained" color="success" type="button" onClick={() => printBill()} fullWidth>
               Print
             </Button>
-            <ReactToPrint trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>} content={() => componentRef.current} />
+            <ReactToPrint
+              trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>}
+              content={() => componentRef.current}
+            />
           </Grid>
         </Grid>
       </form>
