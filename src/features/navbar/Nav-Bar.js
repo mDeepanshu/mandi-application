@@ -22,13 +22,13 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { getAllPartyList, getItem } from "../../gateway/comman-apis";
 import { useNavigate } from "react-router-dom";
+import styles from "./nav-bar.module.css";
 
 const navItems = [
   // { name: '', label: 'Home' },
   { name: "kisan-bill", label: "Kisan Bill" },
   { name: "vyapari-bill", label: "vyapari bill" },
   { name: "ledger", label: "Ledger" },
-  { name: "kisan-bill-summry", label: "Kisan Bill Summry" },
   { name: "vyapari-vasuli-sheet", label: "Vyapari Vasuli Sheet" },
 ];
 const remNavItems = [
@@ -37,6 +37,7 @@ const remNavItems = [
   // { name: 'saveKisanBill', label: 'SAVE ALL KISAN BILL' },
   { name: "auction-entry", label: "AUCTION ENTRIES" },
   { name: "vasuli-list", label: "VASULI LIST" },
+  { name: "kisan-bill-summry", label: "Kisan Bill Summry" },
   { name: "device-control", label: "DEVICE CONTROL" },
 ];
 const drawerWidth = 240;
@@ -145,7 +146,7 @@ function NavBar(props) {
     <Box sx={{ display: "flex" }}>
       <AppBar component="nav">
         <Toolbar sx={{ display: { xs: "none", sm: "flex" } }} variant="dense">
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}>
+          <Typography className={styles.navbarTitle} variant="h6" component="div" sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}>
             NAVBAR
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>

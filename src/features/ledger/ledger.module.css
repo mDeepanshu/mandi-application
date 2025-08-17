@@ -88,10 +88,15 @@ h1 {
     display: none;
   }
 
-  .vasuliBtn {
+
+}
+
+@media (min-width: 800px) {
+    .vasuliBtn {
     display: none !important;
   }
 }
+
 
 @media (min-width: 1150px) {
   .date {

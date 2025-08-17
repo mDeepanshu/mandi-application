@@ -1,0 +1,5 @@
+@media (max-width: 830px) {
+    .navbarTitle {
+    display: none !important;
+  }
+}

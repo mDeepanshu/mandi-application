@@ -87,7 +87,10 @@ function MasterTable(props) {
       let fields = [];
       for (let int = 0; int < props.keyArray?.length; int++) {
         if (!excludeArr.includes(props.keyArray[int])) {
-          if ((props.keyArray[int] == "bag" && allTableData?.[index]?.bag == null) || (props.keyArray[int] == "chungi" && allTableData?.[index]?.bag != null))
+          if (
+            (props.keyArray[int] == "bag" && allTableData?.[index]?.bag == null) ||
+            (props.keyArray[int] == "chungi" && allTableData?.[index]?.bag != null)
+          )
             continue;
           else {
             if (props.keyArray[int] == "quantity") setQtyTotal();
@@ -328,9 +331,19 @@ function MasterTable(props) {
                               />
                             );
                           case "date":
-                            return rowData[key] === "TOTAL" ? <b>TOTAL</b> : new Date(rowData[key]+"Z").toLocaleString("en-IN", dateFormat);
+                            if (rowData[key] === "TOTAL") {
+                              return <b>TOTAL</b>;
+                            } else if (!rowData[key]) {
+                              return ""; // or return null; if you want nothing to render
+                            } else {
+                              return new Date(rowData[key] + "Z").toLocaleString("en-IN", dateFormat);
+                            }
                           case "auctionDate":
-                            return rowData[key] === "TOTAL" ? <b>TOTAL</b> : new Date(rowData[key]+"Z").toLocaleString("en-IN", dateTimeFormat);
+                            return rowData[key] === "TOTAL" ? (
+                              <b>TOTAL</b>
+                            ) : (
+                              new Date(rowData[key] + "Z").toLocaleString("en-IN", dateTimeFormat)
+                            );
                           case "navigation":
                             return (
                               <>
@@ -343,11 +356,16 @@ function MasterTable(props) {
                               </>
                             );
                           case "daysExceded":
-                            return <div className={`${styles.myClass} ${rowData[key] > 0 ? styles.daysExceded : styles.daysNotExceded}`}>{rowData[key]}</div>;
+                            return (
+                              <div className={`${styles.myClass} ${rowData[key] > 0 ? styles.daysExceded : styles.daysNotExceded}`}>
+                                {rowData[key]}
+                              </div>
+                            );
                           case "itemNameWithCheckbox":
                             return rowData.itemName ? (
                               <>
-                                <input type="checkbox" checked={!!checkedItems[index]} onChange={() => handleCheckboxChange(index)} /> {rowData.itemName}
+                                <input type="checkbox" checked={!!checkedItems[index]} onChange={() => handleCheckboxChange(index)} />{" "}
+                                {rowData.itemName}
                               </>
                             ) : (
                               ""
@@ -379,7 +397,8 @@ function MasterTable(props) {
           <DialogContent>
             <div className={styles.editForm}>
               {fieldDefinitions.map((fieldDef) => {
-                if (fieldDef.name === "vyapariName") return <VyapariField name="vyapariName" control={control} errors={errors} size="small" />;
+                if (fieldDef.name === "vyapariName")
+                  return <VyapariField name="vyapariName" control={control} errors={errors} size="small" />;
                 else {
                   return (
                     <>
