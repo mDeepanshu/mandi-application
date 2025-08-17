@@ -46,7 +46,8 @@ function Ledger() {
     defaultValues: {
       toDate: currentDate, // Set the default value to current date
       fromDate: priorDate, // Default to 2 days prior date
-      vyapariId: "",
+      // vyapariId: "",
+      // vyapari_id: null
     },
   });
 
@@ -55,7 +56,7 @@ function Ledger() {
     if (isValid) {
       const { fromDate, toDate } = data;
       getLedgerData(data.vyapari_id.partyId, fromDate, toDate);
-      setValue("vyapariId", data.vyapari_id.idNo);
+      // setValue("vyapariId", data.vyapari_id.idNo);
     } else {
       console.log("Validation failed");
     }
@@ -64,10 +65,12 @@ function Ledger() {
   const getLedgerData = async (vyapari_id, fromDate, toDate) => {
     const ledger = await getLedger(vyapari_id, fromDate, toDate);
     if (ledger) {
-      if (ledger.responseBody?.transactions) {
+      if (ledger.responseBody?.transactions.length) {
         const transactionWithTotals = insertDateWiseTotal([...ledger.responseBody?.transactions]);
         setTableData(transactionWithTotals);
-      } else setTableData([]);
+      } else {
+        setTableData([{ date: null, itemName: "", dr: "NO DATA", cr: "", remark: "" }]);
+      }
       setValue("closingAmount", ledger.responseBody?.closingAmount);
       setValue("openingAmount", ledger.responseBody?.openingAmount);
     }
@@ -165,6 +168,20 @@ function Ledger() {
     setShowDuplicateVasuli({ display: false, message: "" });
   };
 
+  const smsMessage = `
+Good Prize Industries
+Receipt of the Payment Done by You.
+आपके द्वारा किए गए भुगतान की रसीद।
+
+Name   -  Deepanshu
+ID     -  122
+Amount -  322
+Date   -  10-10-2023
+Remark -  remarks
+
+THANK YOU
+  `;
+
   return (
     <>
       <div className={styles.wrapper}>
@@ -231,6 +248,9 @@ function Ledger() {
                 <Button className={styles.vasuliBtn} variant="contained" color="success" type="button" onClick={() => make_vasuli()}>
                   VASULI
                 </Button>
+                {/* <Button variant="contained" color="success" type="button">
+                  <a href={`sms:+918349842228?body=${encodeURIComponent(smsMessage)}`}>Send SMS</a>
+                </Button> */}
               </div>
               <div className={styles.print_btns}>
                 <Button className={styles.print_btn} variant="contained" color="success" type="button" onClick={() => printLedger()}>
