@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { Delete, Edit, ArrowForwardIos, ArrowBackIos } from "@mui/icons-material";
 import { Button } from "@mui/material";
@@ -59,6 +59,7 @@ function MasterTable(props) {
   const handleClose = () => setOpen(false);
 
   const [checkedItems, setCheckedItems] = useState({});
+  const [chungiTxn, setChungiTxn] = useState();
 
   // Reset checked checkboxes when table data changes
   useEffect(() => {
@@ -90,19 +91,31 @@ function MasterTable(props) {
           if (
             (props.keyArray[int] == "bag" && allTableData?.[index]?.bag == null) ||
             (props.keyArray[int] == "chungi" && allTableData?.[index]?.bag != null)
-          )
+          ) {
+            if (props.keyArray[int] == "chungi" && allTableData?.[index]?.bag != null) setChungiTxn(false);
+            else setChungiTxn(true);
             continue;
+          }
           else {
-            if (props.keyArray[int] == "quantity") setQtyTotal();
-            fields.push({
-              name: props.keyArray[int],
-              label: columns[int],
-              defaultValue: "",
-              validation: { required: `${columns[int]} is required` },
-            });
+            if (props.keyArray[int] == "quantity" && allTableData?.[index]?.bag == null) {
+              fields.push({
+                name: props.keyArray[int],
+                label: "NAG",
+                defaultValue: "",
+                validation: { required: `${columns[int]} is required` },
+              });
+            } else {
+              fields.push({
+                name: props.keyArray[int],
+                label: columns[int],
+                defaultValue: "",
+                validation: { required: `${columns[int]} is required` },
+              });
+            }
           }
         }
       }
+      if (!chungiTxn) setQtyTotal();
       setFieldDefinitions(fields);
     }
   };
@@ -140,7 +153,7 @@ function MasterTable(props) {
         if (keyArray[int] == "vyapariName") {
           const defaultOption = vyapariList.find((option) => option.name == allTableData[editingIndex]?.vyapariName);
           setValue("vyapariName", defaultOption || null);
-        } else if (keyArray[int] == "quantity") {
+        } else if (keyArray[int] == "quantity" && !chungiTxn) {
           if (allTableData?.[editingIndex]?.bag == null) {
             setQty([allTableData?.[editingIndex]?.[keyArray[int]]]);
           } else setQty(allTableData?.[editingIndex]?.bagWiseQuantityArray);
@@ -189,8 +202,10 @@ function MasterTable(props) {
     if (editedData.vyapariName) {
       editedData.vyapariId = editedData.vyapariName.partyId;
       editedData.vyapariName = editedData.vyapariName.name;
-      editedData.bagWiseQuantityArray = qty;
-      editedData.quantity = qtyTotal;
+      if (editedData.bag) {
+        editedData.bagWiseQuantityArray = qty;
+        editedData.quantity = qtyTotal;
+      }
     }
     // delete editedData.vyapariName;
     if (editedData.itemTotal) {
@@ -429,7 +444,7 @@ function MasterTable(props) {
                           />
                         )}
                       />
-                      {fieldDef.name === "quantity" && (
+                      {fieldDef.name === "quantity" && !chungiTxn && (
                         <div
                           style={{
                             display: "flex",
