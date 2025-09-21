@@ -20,7 +20,7 @@ export const makeVasuli = async (data, confirmDuplicate) => {
 
 export const markVyapariAllowedTransactions = async (vyapariId, startDate, endDate) => {
   try {
-    const response = await axiosHttp.patch(`auction/mark-transaction-validated?fromDate=${startDate}&toDate=${endDate}'&vyapariId=${vyapariId}`, {});
+    const response = await axiosHttp.patch(`auction/mark-transaction-validated?fromDate=${startDate}&toDate=${endDate}&vyapariId=${vyapariId}`, {});
     return response.data;
   } catch (error) {
     return "error";
