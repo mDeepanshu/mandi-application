@@ -42,8 +42,8 @@ const PartyMaster = () => {
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
   const [alertData, setAlertData] = useState({});
 
-  const [partyColumns, setPartyColumns] = useState(["INDEX", "CONTACT", "ID NO", "PARTY NAME", "OWED AMOUNT", "MAX LOAN DAYS", "Last Vasuli Date", "Ledger Order", "Days Exceded", "PARTY TYPE", "EDIT"]);
-  const [keyArray, setKeyArray] = useState(["index", "contact", "idNo", "name", "owedAmount", "maxLoanDays", "lastVasuliDate", "ledgerOrder", "daysExceded", "partyType", "edit"]);
+  const [partyColumns, setPartyColumns] = useState(["INDEX", "CONTACT", "ID NO", "PARTY NAME", "OWED AMOUNT", "MAX LOAN DAYS", "Last Vasuli Date", "Ledger Order", "Days Exceded", "PARTY TYPE","PARTY CODE", "EDIT"]);
+  const [keyArray, setKeyArray] = useState(["index", "contact", "idNo", "name", "owedAmount", "maxLoanDays", "lastVasuliDate", "ledgerOrder", "daysExceded", "partyType","partyCode", "edit"]);
   const currentPartyType = watch("partyType", "KISAN");
 
   const partyTypeSelected = watch("partyType", "KISAN");

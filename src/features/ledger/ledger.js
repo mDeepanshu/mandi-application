@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, lazy } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
-import { getLedger, makeVasuli } from "../../gateway/ledger-apis";
+import { getLedger, makeVasuli, sendLedgerNotiApi, markVyapariAllowedTransactions } from "../../gateway/ledger-apis";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import LedgerPrint from "../../dialogs/ledger-print/ledger-print-dialog";
 import ReactToPrint from "react-to-print";
@@ -12,6 +12,7 @@ import DuplicateVasuli from "../../dialogs/duplicate-vasuli/duplicate-vasuli";
 import VyapariField from "../../shared/elements/VyapariField";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 
 function Ledger() {
   const componentRef = useRef();
@@ -168,6 +169,20 @@ function Ledger() {
     setShowDuplicateVasuli({ display: false, message: "" });
   };
 
+  const sendLedgerNoti = async (data) => {
+    const isValid = await trigger();
+    if (isValid) {
+      const { fromDate, toDate } = data;
+      markVyapariAllowedTransactions(data.vyapari_id.partyId, fromDate, toDate).then((res) => {
+        if (res !== "error") {
+          sendLedgerNotiApi(data.vyapari_id.partyId);
+        }
+      });
+    } else {
+      console.log("Validation failed");
+    }
+  };
+
   const smsMessage = `
 Good Prize Industries
 Receipt of the Payment Done by You.
@@ -247,6 +262,9 @@ THANK YOU
                 </Button>
                 <Button className={styles.vasuliBtn} variant="contained" color="success" type="button" onClick={() => make_vasuli()}>
                   VASULI
+                </Button>
+                <Button variant="contained" color="success" type="button" onClick={() => sendLedgerNoti(getValues())}>
+                  SEND LEDGER<PhoneAndroidIcon />
                 </Button>
                 {/* <Button variant="contained" color="success" type="button">
                   <a href={`sms:+918349842228?body=${encodeURIComponent(smsMessage)}`}>Send SMS</a>
