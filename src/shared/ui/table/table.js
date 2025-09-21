@@ -31,6 +31,8 @@ function SharedTable(props) {
   const [itemList, setItemList] = useState([]);
   const [qty, setQty] = useState([]);
   const [qtyTotal, setQtyTotal] = useState(0);
+  const [chungiTxn, setChungiTxn] = useState();
+
   const {
     control,
     formState: { errors },
@@ -90,6 +92,26 @@ function SharedTable(props) {
   };
 
   const editFromTable = (index, tranIdx) => {
+    let fieldIndex;
+    if (tableData[index][0].bag == null) {
+      fieldIndex = fieldDefinitions.findIndex(obj => obj.name === "bag");
+      setChungiTxn(true);
+      const findQtyIdx = fieldDefinitions.findIndex(obj => obj.name === "quantity");
+      const copiedFieldDefinitions = [...fieldDefinitions];
+      copiedFieldDefinitions[findQtyIdx].label = "NAG";
+      const updatedFieldDefinitions = copiedFieldDefinitions;
+      setFieldDefinitions(updatedFieldDefinitions);
+    }
+    else {
+      fieldIndex = fieldDefinitions.findIndex(obj => obj.name === "chungi");
+      setChungiTxn(false);
+    }
+    if (fieldIndex !== -1) {
+      setFieldDefinitions(prev =>
+        prev.filter((_, i) => i !== fieldIndex)
+      );
+    }
+
     for (let i = 0; i < tableData[index].length; i++) {
       const element = tableData[index][i];
       if (element?.isOld == "N") tranIdx = i;
@@ -104,7 +126,7 @@ function SharedTable(props) {
           if (props.bill_vyapari_id) defaultOption = vyapariList.find((option) => option.partyId == props.bill_vyapari_id);
           else defaultOption = vyapariList.find((option) => option.name == tableData[index]?.[tranIdx]?.partyName);
           setValue("partyName", defaultOption || null);
-        } else if (keyArray[int] == "quantity") {
+        } else if (keyArray[int] == "quantity" && !chungiTxn) {
           setQtyTotal(tableData?.[index]?.[tranIdx]?.[keyArray[int]]);
           setQty(tableData?.[index]?.[tranIdx]?.bagWiseQuantityArray);
         } else setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
@@ -150,7 +172,7 @@ function SharedTable(props) {
   };
 
   const updateRecord = async (saveAndReflect) => {
-    const isValid = await trigger(["partyName", "rate"]);
+    const isValid = await trigger(["partyName", "rate", "quantity"]);
     if (!isValid) return;
     if (saveAndReflect) {
       let changedValues = {
@@ -158,8 +180,12 @@ function SharedTable(props) {
         ...getValues(),
         vyapariId: getValues().partyName.partyId,
       };
-      changedValues.bagWiseQuantity = qty;
-      changedValues.quantity = qtyTotal;
+      changedValues.bagWiseQuantity = [];
+      if (changedValues.chungi && changedValues.chungi !=0 ) changedValues.chungi = Number(changedValues.chungi);
+      if (!chungiTxn) {
+        changedValues.bagWiseQuantity = qty;
+        changedValues.quantity = qtyTotal;
+      }
       delete changedValues.auctionDate;
       const updateRes = await updateAuctionTransaction(changedValues);
       props.refreshBill();
@@ -329,6 +355,7 @@ function SharedTable(props) {
                             InputLabelProps={{
                               shrink: true,
                             }}
+                            type="number"
                             fullWidth
                             // error={!!errors[fieldDef.name]}
                             // helperText={
@@ -346,7 +373,7 @@ function SharedTable(props) {
                           />
                         )}
                       />
-                      {fieldDef.name === "quantity" && (
+                      {fieldDef.name === "quantity" && !chungiTxn && (
                         <div
                           style={{
                             display: "flex",

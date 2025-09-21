@@ -85,8 +85,7 @@ function AuctionEntries() {
     trigger,
   } = useForm({
     defaultValues: {
-      toDate: currentDate, // Set the default value to current date
-      fromDate: currentDate, // Default to 2 days prior date
+      fromDate: currentDate,
     },
   });
 
@@ -100,10 +99,10 @@ function AuctionEntries() {
   };
 
   const getAuctionEntries = async () => {
-    const { fromDate, toDate } = getValues();
+    const { fromDate } = getValues();
     let deviceId = selectedTablet ? selectedTablet.id : ``;
 
-    const vasuliList = await getAuctionEntriesList(fromDate, toDate, deviceId);
+    const vasuliList = await getAuctionEntriesList(fromDate, fromDate, deviceId);
     if (vasuliList) {
       vasuliList.responseBody.forEach((obj, index) => {
         obj.entryIdx = index + 1;
@@ -197,16 +196,6 @@ function AuctionEntries() {
                 render={({ field }) => <TextField {...field} label="FROM DATE" variant="outlined" type="date" />}
               />
               <p className="error">{errors.fromDate?.message}</p>
-            </div>
-            <div className={styles.date}>
-              <Controller
-                name="toDate"
-                control={control}
-                rules={{ required: "Enter To Date" }}
-                defaultValue=""
-                render={({ field }) => <TextField {...field} label="TO DATE" variant="outlined" type="date" />}
-              />
-              <p className="error">{errors.toDate?.message}</p>
             </div>
             <Autocomplete
               disablePortal
