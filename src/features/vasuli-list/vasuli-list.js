@@ -33,7 +33,6 @@ function VasuliList() {
     setValue,
   } = useForm({
     defaultValues: {
-      toDate: currentDate, // Set the default value to current date
       fromDate: currentDate, // Default to 2 days prior date
     },
   });
@@ -48,8 +47,8 @@ function VasuliList() {
   };
 
   const getVasulies = async () => {
-    const { fromDate, toDate } = getValues();
-    const vasuliList = await getVasuliList(fromDate, toDate);
+    const { fromDate } = getValues();
+    const vasuliList = await getVasuliList(fromDate, fromDate);
     if (vasuliList) {
       setTableData(vasuliList.responseBody?.vasuliList);
       setVasuliTotal(vasuliList.responseBody?.totalVasuli);
@@ -116,16 +115,6 @@ function VasuliList() {
                 render={({ field }) => <TextField {...field} label="FROM DATE" variant="outlined" type="date" />}
               />
               <p className="error">{errors.fromDate?.message}</p>
-            </div>
-            <div className={styles.date}>
-              <Controller
-                name="toDate"
-                control={control}
-                rules={{ required: "Enter To Date" }}
-                defaultValue=""
-                render={({ field }) => <TextField {...field} label="TO DATE" variant="outlined" type="date" />}
-              />
-              <p className="error">{errors.toDate?.message}</p>
             </div>
           </div>
           <div className={styles.btns}>
