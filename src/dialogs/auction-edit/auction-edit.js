@@ -94,7 +94,13 @@ const AuctionEdit = (props) => {
     });
   };
 
+  let throttleUpdateRecord = true;
   const save = async () => {
+    throttleUpdateRecord = false;
+    setTimeout(() => {
+      throttleUpdateRecord = true;
+    }, 3000);
+    if (props.toggleLoading) props.toggleLoading(true, "UPDATING RECORD...");
     let editObj = {
       deleteAuctionTransactionDto: {
         auctionTransactionIds: entriesToDelete,
@@ -142,6 +148,7 @@ const AuctionEdit = (props) => {
       });
       props.onClose(true);
     }
+    if (props.toggleLoading) props.toggleLoading(false, "");
   };
 
   const deleteEntry = (index) => {

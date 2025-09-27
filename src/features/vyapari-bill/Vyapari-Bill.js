@@ -10,11 +10,13 @@ import ReactToPrint from "react-to-print";
 import SharedTable from "../../shared/ui/table/table";
 import PreviousBills from "../../shared/ui/previous-bill/previousBill";
 import VyapariField from "../../shared/elements/VyapariField";
+import { useOutletContext } from "react-router-dom";
 
 function VyapariBill() {
   const componentRef = useRef();
   const triggerRef = useRef();
   const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
+  const { changeLoading } = useOutletContext();
 
   const {
     register,
@@ -158,7 +160,7 @@ function VyapariBill() {
           {/* </Grid> */}
         </Grid>
         <div className={styles.billTable}>
-          <SharedTable columns={vyapariTableColumns} tableData={tableData} keyArray={keyArray} refreshBill={refreshBill} bill_vyapari_id={getValues()?.vyapari_name?.partyId} />
+          <SharedTable toggleLoading={changeLoading} columns={vyapariTableColumns} tableData={tableData} keyArray={keyArray} refreshBill={refreshBill} bill_vyapari_id={getValues()?.vyapari_name?.partyId} />
         </div>
         <Grid container p={1} gap={1} justifyContent="flex-end">
           <Grid item xs={6} md={7}></Grid>
