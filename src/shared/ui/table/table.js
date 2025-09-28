@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { Delete, Edit, ArrowForwardIos, ArrowBackIos } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import styles from "./table.module.css";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { updateAuctionTransaction } from "../../../gateway/comman-apis";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { getAllPartyList, getItem } from "../../../gateway/comman-apis";
-import Autocomplete from "@mui/material/Autocomplete";
-import SearchIcon from "@mui/icons-material/Search";
-import { InputAdornment } from "@mui/material";
 import VyapariField from "../../elements/VyapariField";
 
 function SharedTable(props) {
@@ -171,7 +168,14 @@ function SharedTable(props) {
     setTableData(allTableData.slice(value * 10, value * 10 + 10));
   };
 
+  let throttleUpdateRecord = true;
   const updateRecord = async (saveAndReflect) => {
+    if (!throttleUpdateRecord) return;
+    throttleUpdateRecord = false;
+    setTimeout(() => {
+      throttleUpdateRecord = true;
+    }, 3000);
+    if(props.toggleLoading) props.toggleLoading(true, "UPDATING RECORD...");
     const isValid = await trigger(["partyName", "rate", "quantity"]);
     if (!isValid) return;
     if (saveAndReflect) {
@@ -187,9 +191,10 @@ function SharedTable(props) {
         changedValues.quantity = qtyTotal;
       }
       delete changedValues.auctionDate;
-      const updateRes = await updateAuctionTransaction(changedValues);
+      await updateAuctionTransaction(changedValues);
       props.refreshBill();
       handleClose();
+      props.toggleLoading({ isLoading: false, message: "" });
       setSync({
         syncSeverity: true ? "success" : "error",
         syncStatus: true ? "EDIT SUCCESSFUL" : "EDIT UNSUCCESSFUL",
@@ -219,6 +224,7 @@ function SharedTable(props) {
       // setTableData(previousTableData);
       handleClose();
     }
+    if(props.toggleLoading) props.toggleLoading(false, "");
   };
 
   const closeSnackbar = (event, reason) => {

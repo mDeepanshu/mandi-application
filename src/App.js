@@ -7,29 +7,36 @@ import NavBar from "./features/navbar/Nav-Bar";
 import SnackbarGlobal from "./shared/ui/snackbar/snackbar";
 
 function App() {
-	
-const [loginStatus, setLoginStatus] = useState(true);
-const [snackbarData, setSnackbarData] = useState({});
-const [syncComplete, setSyncComplete] = useState("");
 
-const changeLoginState = (value) => {
-	setLoginStatus(value)
-}
+	const [loginStatus, setLoginStatus] = useState(true);
+	const [snackbarData, setSnackbarData] = useState({});
+	const [syncComplete, setSyncComplete] = useState("");
+	const [loading, setLoading] = useState({ isLoading: false, message: "Loading..." });
 
-const snackbarChange = (data) => {
-	setSnackbarData(data);
-}
+	const changeLoginState = (value) => {
+		setLoginStatus(value)
+	}
+
+	const snackbarChange = (data) => {
+		setSnackbarData(data);
+	}
+
+
+	const changeLoading = (newState, apiRes) => {
+		setLoading({ isLoading: newState, message: apiRes });
+	};
 
 	return (
 		<>
 			{
 				loginStatus ? (<Login changeLoginState={changeLoginState} />) : (
 					<>
+						{loading.isLoading && <div className="loader-bg"><div className="loader"></div></div>}
 						<NavBar setSyncComplete={setSyncComplete} />
 						<Box component="main" sx={{ mt: 8 }}>
-							<Outlet context={{snackbarChange, syncComplete}}/>
+							<Outlet context={{ snackbarChange, syncComplete, loading, changeLoading }} />
 						</Box>
-						<SnackbarGlobal snackbarData={snackbarData}/>
+						<SnackbarGlobal snackbarData={snackbarData} />
 					</>
 				)
 			}

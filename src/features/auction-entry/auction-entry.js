@@ -9,11 +9,13 @@ import Autocomplete from "@mui/material/Autocomplete";
 import AuctionEdit from "../../dialogs/auction-edit/auction-edit";
 import AuctionPrint from "../../dialogs/auction-print/auction-print";
 import SearchIcon from "@mui/icons-material/Search";
+import { useOutletContext } from "react-router-dom";
 
 function AuctionEntries() {
   const triggerRef = useRef();
   const componentRef = useRef();
   const [tableData, setTableData] = useState([]);
+  const { changeLoading } = useOutletContext();
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
   const [auctionEntriesColumns, setAuctionEntriesColumns] = useState([
     "",
@@ -285,7 +287,7 @@ function AuctionEntries() {
       </div>
       <div>
         {/* {showAuctionEdit && <AuctionEdit/>} */}
-        <AuctionEdit open={showAuctionEdit} onClose={(refreshTable) => handleToClose(refreshTable)} auctionToEdit={auctionToEdit} />
+        <AuctionEdit open={showAuctionEdit} onClose={(refreshTable) => handleToClose(refreshTable)} auctionToEdit={auctionToEdit} toggleLoading={changeLoading}/>
       </div>
     </>
   );
