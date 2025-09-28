@@ -6,6 +6,16 @@ import App from "./App";
 
 import Ledger from "./features/ledger/ledger";
 
+import VasuliList from "./features/vasuli-list/vasuli-list";
+import DeviceControl from "./features/device-control/device-control";
+import VyapariVasuliSheet from "./features/vyapari-vasuli-sheet/Vyapari-Vasuli-Sheet";
+import AuctionEntries from "./features/auction-entry/auction-entry";
+import Vyapari from "./features/vyapari-bill/Vyapari-Bill";
+import ItemMaster from "./features/item-master/Item-Master";
+import PartyMaster from "./features/party-master/Party-Master";
+import Kisan from "./features/kisan-bill/Kisan-Bill";
+import KisanBillSummaryComponent from "./features/kisan-bill-summary/kisanBillSummary";
+
 // if ('serviceWorker' in navigator) {
 //   window.addEventListener('load', () => {
 //     navigator.serviceWorker
@@ -18,18 +28,6 @@ import Ledger from "./features/ledger/ledger";
 //       });
 //   });
 // }
-
-
-const VasuliList = lazy(() => import("./features/vasuli-list/vasuli-list"));
-const DeviceControl = lazy(() => import("./features/device-control/device-control"));
-const VyapariVasuliSheet = lazy(() => import("./features/vyapari-vasuli-sheet/Vyapari-Vasuli-Sheet"));
-const AuctionEntries = lazy(() => import("./features/auction-entry/auction-entry"));
-const Vyapari = lazy(() => import("./features/vyapari-bill/Vyapari-Bill"));
-const ItemMaster = lazy(() => import("./features/item-master/Item-Master"));
-const PartyMaster = lazy(() => import("./features/party-master/Party-Master"));
-const Kisan = lazy(() => import("./features/kisan-bill/Kisan-Bill"));
-const KisanBillSummaryComponent = lazy(() => import("./features/kisan-bill-summary/kisanBillSummary"));
-
 
 const router = createBrowserRouter([
   {
