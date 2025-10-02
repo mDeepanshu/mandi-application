@@ -28,8 +28,8 @@ export const markVyapariAllowedTransactions = async (vyapariId, startDate, endDa
 };
 
 export const sendLedgerNotiApi = async (vyapariId) => {
-    try {
-    const response = await fetch(`https://5txvte0v46.execute-api.ap-southeast-1.amazonaws.com/dev/sendnotification/${vyapariId}`, {
+  try {
+    const response = await fetch(`https://imll8stdk8.execute-api.ap-southeast-1.amazonaws.com/prod/sendnotification/${vyapariId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +37,7 @@ export const sendLedgerNotiApi = async (vyapariId) => {
       body: JSON.stringify({
         name: "LEDGER RECEIVED/लेजर प्राप्त हुआ",
         amount: "",
-        ledger:true
+        ledger: true
       }),
     });
 
