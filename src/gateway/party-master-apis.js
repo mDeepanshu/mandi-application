@@ -28,7 +28,5 @@ export const getPartyGlobal = async () => {
         return response.data;
     } catch (error) {
         console.error('Error posting data:', error);
-        console.error('Not Throwing Error');
-
     }
 };
