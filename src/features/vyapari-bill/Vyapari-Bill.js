@@ -45,7 +45,7 @@ function VyapariBill() {
     "Kisan Name",
     "DEVICE NAME",
     "Edit",
-    "Updated Tran.",
+    // "Updated Tran.",
   ]);
   const [formData, setFormData] = useState();
   const [keyArray, setKeyArray] = useState([
@@ -60,7 +60,7 @@ function VyapariBill() {
     "partyName",
     "deviceName",
     "edit",
-    "navigation",
+    // "navigation",
   ]);
 
   useEffect(() => {
