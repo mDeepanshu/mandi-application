@@ -89,10 +89,12 @@ function SharedTable(props) {
   };
 
   const editFromTable = (index, tranIdx) => {
+    let isChungiTxn = false;
     let fieldIndex;
     if (tableData[index][0].bag == null) {
       fieldIndex = fieldDefinitions.findIndex(obj => obj.name === "bag");
       setChungiTxn(true);
+      isChungiTxn = true;
       const findQtyIdx = fieldDefinitions.findIndex(obj => obj.name === "quantity");
       const copiedFieldDefinitions = [...fieldDefinitions];
       copiedFieldDefinitions[findQtyIdx].label = "NAG";
@@ -102,6 +104,7 @@ function SharedTable(props) {
     else {
       fieldIndex = fieldDefinitions.findIndex(obj => obj.name === "chungi");
       setChungiTxn(false);
+      isChungiTxn = false;
     }
     if (fieldIndex !== -1) {
       setFieldDefinitions(prev =>
@@ -109,13 +112,12 @@ function SharedTable(props) {
       );
     }
 
-    for (let i = 0; i < tableData[index].length; i++) {
-      const element = tableData[index][i];
-      if (element?.isOld == "N") tranIdx = i;
-    }
-
+    // for (let i = 0; i < tableData[index].length; i++) {
+    //   const element = tableData[index][i];
+    //   if (element?.isOld == "N") tranIdx = i;
+    // }
+    tranIdx = 0;
     setEditingIndex(index);
-    setOpen(true);
     for (let int = 0; int < props.keyArray.length; int++) {
       if (!excludeArr.includes(props.keyArray[int]))
         if (keyArray[int] == "partyName") {
@@ -123,11 +125,12 @@ function SharedTable(props) {
           if (props.bill_vyapari_id) defaultOption = vyapariList.find((option) => option.partyId == props.bill_vyapari_id);
           else defaultOption = vyapariList.find((option) => option.name == tableData[index]?.[tranIdx]?.partyName);
           setValue("partyName", defaultOption || null);
-        } else if (keyArray[int] == "quantity" && !chungiTxn) {
+        } else if (keyArray[int] == "quantity" && !isChungiTxn) {
           setQtyTotal(tableData?.[index]?.[tranIdx]?.[keyArray[int]]);
           setQty(tableData?.[index]?.[tranIdx]?.bagWiseQuantityArray);
         } else setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
     }
+    setOpen(true);
   };
 
   const deleteFromTable = (index) => {
