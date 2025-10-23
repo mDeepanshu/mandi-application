@@ -2,21 +2,23 @@ import React, { useEffect, useState, useRef } from "react";
 import { Grid } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
-import { TableContainer, Paper, InputAdornment } from "@mui/material";
+import { TableContainer, Paper, InputAdornment, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { getKisanBill, saveKisanBill } from "../../gateway/kisan-bill-apis";
-import { getAllPartyList } from "../../gateway/comman-apis";
+import { getAllPartyList, getItem } from "../../gateway/comman-apis";
 import Autocomplete from "@mui/material/Autocomplete";
 import SearchIcon from "@mui/icons-material/Search";
 import ReactToPrint from "react-to-print";
 import KisanBillPrint from "../../dialogs/kisan-bill/kisan-bill-print";
 import "./kisan-bill.module.css";
 import SharedTable from "../../shared/ui/table/table";
+import MasterTable from "../../shared/ui/master-table/master-table";
 import PreviousBills from "../../shared/ui/previous-bill/previousBill";
 import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Alert from "@mui/material/Alert";
 import { useOutletContext } from "react-router-dom";
+import styles from "./kisan-bill.module.css";
 
 function KisanBill() {
   const { snackbarChange, syncComplete } = useOutletContext();
@@ -32,11 +34,17 @@ function KisanBill() {
     getValues,
     trigger,
     reset,
+    setFocus,
+    register,
+    setValue,
+    watch,
   } = useForm();
   const [kisanList, setKisanList] = useState([]);
+  const [kisanFilteredList, setFilteredKisanList] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
   const [noEntries, setNoEntries] = useState(false);
+  const selectedItem = watch("itemName");
 
   const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState([
     "Item Name",
@@ -44,10 +52,10 @@ function KisanBill() {
     "Rate",
     "Quantity",
     "Item Total",
-    "Date",
-    "Vyapari Name",
-    "Edit",
-    "Previuos Edits",
+    // "Date",
+    // "Vyapari Name",
+    // "Edit",
+    // "Previuos Edits",
   ]);
   const [keyArray, setKeyArray] = useState([
     "itemName",
@@ -55,10 +63,10 @@ function KisanBill() {
     "rate",
     "quantity",
     "itemTotal",
-    "auctionDate",
-    "partyName",
-    "edit",
-    "navigation",
+    // "auctionDate",
+    // "partyName",
+    // "edit",
+    // "navigation",
   ]);
   const [open, setOpen] = useState(false);
   // const today = new Date().toISOString().split('T')[0];
@@ -145,7 +153,12 @@ function KisanBill() {
       },
     },
   ]);
-
+  const [itemsList, setItemsList] = useState([]);
+  const fetchList = async () => {
+    const list = await getItem("items");
+    // const uniqueArray = list.filter((item, index, self) => index === self.findIndex((obj) => obj.name === item.name));
+    setItemsList(list.responseBody);
+  };
   const onSubmit = async (data) => {
     setFormData(getValues());
     if (triggerRef.current) {
@@ -179,11 +192,16 @@ function KisanBill() {
 
   const getKisanNames = async () => {
     const allKisan = await getAllPartyList("KISAN");
-    if (allKisan?.responseBody) setKisanList(allKisan?.responseBody);
+    if (allKisan?.responseBody) {
+      setKisanList(allKisan?.responseBody);
+      const filteredList = kisanList.filter((kisan) => kisan.kisanType === "A");
+      setFilteredKisanList(filteredList);
+    }
   };
 
   useEffect(() => {
     getKisanNames();
+    fetchList();
   }, [syncComplete]);
 
   useEffect(() => {
@@ -194,9 +212,9 @@ function KisanBill() {
     }
   }, [formData]);
 
-  const editFromTable = (index) => {};
+  const editFromTable = (index) => { };
 
-  const deleteFromTable = (index) => {};
+  const deleteFromTable = (index) => { };
 
   const saveBill = async () => {
     // const saveRes = saveKisanBill();
@@ -259,6 +277,56 @@ function KisanBill() {
     setOpen(false);
   };
 
+  const addToTable = async () => {
+    const isValid = await trigger(["itemName", "qty", "rate"]);
+    
+    if (isValid) {
+      const values = getValues();
+      const itemTotal = values.qty * values.rate;
+      const newRow = {
+        itemName: values.itemName.name,
+        bag: values.qty,
+        rate: values.rate,
+        quantity: values.qty,
+        itemTotal: itemTotal,
+      };
+      console.log(newRow);
+      
+      setTableData([...tableData, newRow]);
+      // Clear itemName, qty, rate fields
+      reset({ ...values, itemName: null, qty: "", rate: "" });
+    }
+  };
+
+  const nextAction = async (e, field) => {
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      switch (field) {
+        case 'itemName':
+          setFocus('qty');
+          break;
+        case 'Quantity':
+          setFocus('rate');
+          break;
+        case 'Rate':
+          // Add to table
+          await addToTable();
+          setFocus('itemName');
+          break;
+        default:
+          break;
+      }
+    }
+  };
+
+  const kisanTypeChange = (event) => {
+    setValue("kisanType", event.target.value, { shouldValidate: true });
+    const filteredList = kisanList.filter((kisan) => kisan.kisanType === event.target.value);
+    setFilteredKisanList(filteredList);
+  }
+
+
   const action = (
     <React.Fragment>
       <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
@@ -270,7 +338,7 @@ function KisanBill() {
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={2} p={3} pb={0}>
+        <Grid container spacing={2} p={1} pb={0}>
           <Grid item xs={2}>
             <Grid container direction="column" justifyContent="center" alignItems="center">
               {fieldDefinitions.map((fieldDef) => (
@@ -297,8 +365,8 @@ function KisanBill() {
             </Grid>
           </Grid>
           <Grid item xs={10}>
-            <Grid container spacing={2} paddingBottom={2}>
-              <Grid item xs={5}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
                 <Controller
                   name="kisan"
                   control={control}
@@ -307,13 +375,14 @@ function KisanBill() {
                     <Autocomplete
                       {...field}
                       value={field.value || null}
-                      options={kisanList}
+                      options={kisanFilteredList}
                       getOptionLabel={(option) => option.name}
                       getOptionKey={(option) => option.partyId}
                       renderInput={(params) => (
                         <TextField
                           {...params}
                           label="Kisan Name"
+                          size="small"
                           InputProps={{
                             ...params.InputProps,
                             startAdornment: (
@@ -332,34 +401,103 @@ function KisanBill() {
                 />
                 <p className="err-msg">{errors.kisan?.message}</p>
               </Grid>
+              <Grid item xs={2}>
+                <Controller
+                  name="kisanType"
+                  control={control}
+                  rules={{ required: "TYPE" }}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <FormControl fullWidth size="small" variant="outlined">
+                      <InputLabel id="party-type-label">TYPE</InputLabel>
+                      <Select
+                        {...field}
+                        label="TYPE"
+                        onChange={kisanTypeChange}
+                      >
+                        <MenuItem value="A">A</MenuItem>
+                        <MenuItem value="B">B</MenuItem>
+                        <MenuItem value="C">C</MenuItem>
+                      </Select>
+                    </FormControl>
+                  )}
+                />
+                <p className="err-msg">{errors.partyType?.message}</p>
+              </Grid>
               <Grid item xs={4}>
                 <Controller
                   name="date"
                   control={control}
                   rules={{ required: "Enter Date" }}
                   defaultValue={today}
-                  render={({ field }) => <TextField {...field} variant="outlined" type="date" />}
+                  render={({ field }) => <TextField style={{ width: '100%' }} {...field} variant="outlined" type="date" size="small" />}
                 />
                 <p className="err-msg">{errors.date?.message}</p>
               </Grid>
-              <Grid item xs={2}>
+              {/* <Grid item xs={3}>
                 <Button variant="contained" color="success" onClick={fetchBill} fullWidth>
                   Fetch Bill
                 </Button>
+              </Grid> */}
+            </Grid>
+            <Grid container spacing={2}>
+              {/* <PreviousBills billData={{ id: getValues()?.kisan?.partyId, date: getValues()?.date }} partyType={"kisan"} /> */}
+              <Grid item xs={4}>
+                <Autocomplete
+                  value={selectedItem || null}
+                  options={itemsList}
+                  getOptionLabel={(option) => option.name || ""}
+                  isOptionEqualToValue={(option, value) => option.itemId === value?.itemId}
+                  onChange={(event, value) => {
+                    setValue("itemName", value, { shouldValidate: true });
+                    // totalBagInputRef.current?.focus(); // if needed
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      {...register("itemName")}
+                      label="ITEM"
+                      size="small"
+                      // error={!!errors.itemName}
+                      // helperText={errors.itemName?.message}
+                      onKeyDown={(e) => nextAction(e, "itemName")}
+                      inputProps={{
+                        ...params.inputProps,
+                        style: { textTransform: "uppercase" },
+                      }}
+                    />
+                  )}
+                  disablePortal
+                  id="itemName"
+                />
+                <p className="err-msg">{errors.itemName?.message}</p>
+              </Grid>
+              <Grid item xs={3}>
+                <TextField size="small" label="Quantity" {...register("qty")} onKeyDown={(e) => nextAction(e, 'Quantity')} fullWidth/>
+              </Grid>
+              <Grid item xs={3}>
+                <TextField size="small" label="Rate" {...register("rate")} onKeyDown={(e) => nextAction(e, 'Rate')} fullWidth/>
+              </Grid>
+              <Grid item xs={2}>
+                <Button variant="contained" color="primary" fullWidth onClick={addToTable}>
+                  ADD
+                </Button>
               </Grid>
             </Grid>
-            <Grid container spacing={2} paddingBottom={2}>
-              <Grid item xs={11}>
-                <PreviousBills billData={{ id: getValues()?.kisan?.partyId, date: getValues()?.date }} partyType={"kisan"} />
-              </Grid>
-            </Grid>
-            <TableContainer component={Paper} className="bill-table">
+            <TableContainer component={Paper} >
               {noEntries && `NO ENTRIES FOUND`}
-              <SharedTable
+              {/* <SharedTable
                 columns={kisanBillColumnsColumns}
                 tableData={structuredClone(tableData)}
                 keyArray={keyArray}
                 refreshBill={refreshBill}
+              /> */}
+              <MasterTable
+                columns={kisanBillColumnsColumns}
+                tableData={structuredClone(tableData)}
+                keyArray={keyArray}
+                refreshBill={refreshBill}
+                customHeight="45vh"
               />
             </TableContainer>
             <Grid container spacing={2} justifyContent="flex-end" p={2}>
@@ -418,7 +556,6 @@ function KisanBill() {
                         {...field}
                         label="Total Bikri"
                         variant="outlined"
-                        sx={{ mb: 3 }}
                         fullWidth
                         error={!!errors.total}
                         helperText={errors.total ? errors.total.message : ""}
@@ -429,7 +566,7 @@ function KisanBill() {
                 </Grid>
               </Grid>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-                <Grid item xs={2}>
+                <Grid item xs={4}>
                   <Button variant="contained" color="primary" fullWidth onClick={saveBill}>
                     Save Bill
                   </Button>
@@ -449,7 +586,7 @@ function KisanBill() {
         </Grid>
       </form>
       <div style={{ display: "none" }}>
-        <KisanBillPrint ref={componentRef} tableDataPrint={structuredClone(tableData)} restructureTable={true} formData={formData} />
+        <KisanBillPrint ref={componentRef} tableDataPrint={structuredClone(tableData)} restructureTable={false} formData={formData} />
       </div>
       <div>
         <Snackbar open={open} autoHideDuration={2500} onClose={handleClose}>

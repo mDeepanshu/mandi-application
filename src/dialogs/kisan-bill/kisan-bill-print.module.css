@@ -1,24 +1,36 @@
-.container{
-    padding: 0 30px;
-    font-size: 14px;
-}
-.heading{
+.container {
+    font-family: Arial, sans-serif;
     display: flex;
-    justify-content: center; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-.constants{
-    display: grid;
-    grid-template-columns: repeat(3, auto); /* 4 columns, each taking equal space */
-    grid-template-rows: repeat(2, auto);   /* 2 rows, height will adjust based on content */
-    gap: 1px; /* Optional: Adds space between grid items */
-    justify-items: start;
-    padding: 0 10px;
+
+.heading {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    margin-bottom: 0.3rem;
 }
 
+.levelTwo {
+    display: flex;
+    width: 95%;
+}
+
+.constants {
+    width: 20%;
+
+}
+
+.tableContainer {
+    width: 80%;
+}
 
 .table {
     width: 100%;
+
 }
 
 td {
@@ -37,9 +49,38 @@ tr {
     max-width: 150px;
 }
 
+.totals {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    /* font-weight: bold; */
+    width: 100%;
+}
 
 @media print {
     .container {
-        font-size: 11px;
+        margin-top: 6rem;
+        font-size: 9px;
+    }
+
+    .heading {
+        font-size: 8px;
+    }
+
+    .levelTwo {
+        font-size: 10px;
+    }
+
+    .constants {
+        font-size: 7px;
+    }
+
+    .table {
+        font-size: 7px;
+    }
+
+    .totals{
+        font-size: 7px;
+        font-weight: 525;
     }
 }
