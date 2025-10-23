@@ -6,8 +6,6 @@ const KisanBillPrint = forwardRef((props, ref) => {
   const [localTable, setLocalTable] = useState([]);
 
   useEffect(() => {
-    console.log(props);
-    
     setLocalTable(props.tableDataPrint);
   }, [props]);
 

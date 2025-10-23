@@ -290,7 +290,6 @@ function KisanBill() {
         quantity: values.qty,
         itemTotal: itemTotal,
       };
-      console.log(newRow);
       
       setTableData([...tableData, newRow]);
       // Clear itemName, qty, rate fields
@@ -375,7 +374,7 @@ function KisanBill() {
                     <Autocomplete
                       {...field}
                       value={field.value || null}
-                      options={kisanFilteredList}
+                      options={kisanList}
                       getOptionLabel={(option) => option.name}
                       getOptionKey={(option) => option.partyId}
                       renderInput={(params) => (
