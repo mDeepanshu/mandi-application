@@ -1,5 +1,4 @@
-import React, { forwardRef, useEffect,useState } from 'react';
-import { Grid } from "@mui/material";
+import { forwardRef, useEffect,useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import styles from "./vyapari-bill-print.module.css";
 
@@ -8,9 +7,7 @@ const VyapariBillPrint = forwardRef((props, ref) => {
   const [printTable,setPrintTable] = useState([]);
   
   useEffect(() => {
-
     if(props.restructureTable){
-      
       let arr=[];
       props.tableData?.forEach(element => {
         arr.push(element[0]);

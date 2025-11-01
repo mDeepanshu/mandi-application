@@ -26,7 +26,7 @@ function KisanBill() {
   const componentRef = useRef();
   const triggerRef = useRef();
   const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
-
+  const itemInputRef = useRef(null);
   const {
     handleSubmit,
     control,
@@ -38,6 +38,7 @@ function KisanBill() {
     register,
     setValue,
     watch,
+    resetField
   } = useForm();
   const [kisanList, setKisanList] = useState([]);
   const [kisanFilteredList, setFilteredKisanList] = useState([]);
@@ -76,12 +77,14 @@ function KisanBill() {
   const [fieldDefinitions] = useState([
     {
       name: "mandiKharcha",
+      disabled: false,
       label: "Mandi Kharch",
       defaultValue: "",
       validation: { required: "Mandi Kharch is required" },
     },
     {
       name: "hammali",
+      disabled: false,
       label: "Hammali",
       defaultValue: "",
       validation: {
@@ -90,6 +93,7 @@ function KisanBill() {
     },
     {
       name: "nagarPalikaTaxRate",
+      disabled: false,
       label: "Nagar Palika Tax Rate",
       defaultValue: "",
       validation: {
@@ -98,6 +102,7 @@ function KisanBill() {
     },
     {
       name: "nagarPalikaTax",
+      disabled: false,
       label: "Nagar Palika Tax",
       defaultValue: "",
       validation: {
@@ -106,6 +111,7 @@ function KisanBill() {
     },
     {
       name: "bhada",
+      disabled: false,
       label: "Bhada",
       defaultValue: "",
       validation: {
@@ -114,6 +120,7 @@ function KisanBill() {
     },
     {
       name: "driver",
+      disabled: false,
       label: "Driver Inaam",
       defaultValue: "",
       validation: {
@@ -122,6 +129,7 @@ function KisanBill() {
     },
     {
       name: "nagdi",
+      disabled: false,
       label: "Nagdi",
       defaultValue: "",
       validation: {
@@ -130,6 +138,7 @@ function KisanBill() {
     },
     {
       name: "commissionRate",
+      disabled: true,
       label: "Commission Rate",
       defaultValue: "",
       validation: {
@@ -138,6 +147,7 @@ function KisanBill() {
     },
     {
       name: "commission",
+      disabled: true,
       label: "Commission",
       defaultValue: "",
       validation: {
@@ -146,6 +156,7 @@ function KisanBill() {
     },
     {
       name: "bags",
+      disabled: false,
       label: "Bags",
       defaultValue: "",
       validation: {
@@ -278,22 +289,23 @@ function KisanBill() {
   };
 
   const addToTable = async () => {
-    const isValid = await trigger(["itemName", "qty", "rate"]);
-    
+    const isValid = await trigger(["itemName", "qty", "bag", "rate"]);
+
     if (isValid) {
       const values = getValues();
       const itemTotal = values.qty * values.rate;
       const newRow = {
-        itemName: values.itemName.name,
+        itemName: values.itemName,
         bag: values.qty,
         rate: values.rate,
         quantity: values.qty,
         itemTotal: itemTotal,
       };
-      
+
+
       setTableData([...tableData, newRow]);
-      // Clear itemName, qty, rate fields
-      reset({ ...values, itemName: null, qty: "", rate: "" });
+      // itemInputRef.current.value = null;
+      reset({ ...values, itemName: "", qty: "", bag: "", rate: "" });
     }
   };
 
@@ -306,12 +318,15 @@ function KisanBill() {
           setFocus('qty');
           break;
         case 'Quantity':
+          setFocus('bag');
+          break;
+        case 'Bag':
           setFocus('rate');
           break;
         case 'Rate':
           // Add to table
           await addToTable();
-          setFocus('itemName');
+          itemInputRef.current?.focus();
           break;
         default:
           break;
@@ -377,6 +392,7 @@ function KisanBill() {
                       options={kisanList}
                       getOptionLabel={(option) => option.name}
                       getOptionKey={(option) => option.partyId}
+                      freeSolo
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -392,7 +408,22 @@ function KisanBill() {
                           }}
                         />
                       )}
-                      onChange={(event, value) => field.onChange(value)}
+                      // onChange={(event, value) => field.onChange(value)}
+                      onChange={(event, value) => {
+                        // Handle both selected and typed values
+                        if (typeof value === "string") {
+                          field.onChange({ name: value }); // typed manually
+                        } else if (value && value.inputValue) {
+                          field.onChange({ name: value.inputValue });
+                        } else {
+                          field.onChange(value); // selected from list
+                        }
+                      }}
+                      onInputChange={(event, newInputValue, reason) => {
+                        if (reason === "input") {
+                          field.onChange({ name: newInputValue });
+                        }
+                      }}
                       disablePortal
                       id="combo-box-demo"
                     />
@@ -423,7 +454,7 @@ function KisanBill() {
                 />
                 <p className="err-msg">{errors.partyType?.message}</p>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={2}>
                 <Controller
                   name="date"
                   control={control}
@@ -433,49 +464,48 @@ function KisanBill() {
                 />
                 <p className="err-msg">{errors.date?.message}</p>
               </Grid>
-              {/* <Grid item xs={3}>
+              <Grid item xs={2}>
                 <Button variant="contained" color="success" onClick={fetchBill} fullWidth>
                   Fetch Bill
                 </Button>
-              </Grid> */}
+              </Grid>
             </Grid>
             <Grid container spacing={2}>
               {/* <PreviousBills billData={{ id: getValues()?.kisan?.partyId, date: getValues()?.date }} partyType={"kisan"} /> */}
               <Grid item xs={4}>
-                <Autocomplete
-                  value={selectedItem || null}
-                  options={itemsList}
-                  getOptionLabel={(option) => option.name || ""}
-                  isOptionEqualToValue={(option, value) => option.itemId === value?.itemId}
-                  onChange={(event, value) => {
-                    setValue("itemName", value, { shouldValidate: true });
-                    // totalBagInputRef.current?.focus(); // if needed
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      {...register("itemName")}
-                      label="ITEM"
-                      size="small"
-                      // error={!!errors.itemName}
-                      // helperText={errors.itemName?.message}
-                      onKeyDown={(e) => nextAction(e, "itemName")}
-                      inputProps={{
-                        ...params.inputProps,
-                        style: { textTransform: "uppercase" },
-                      }}
+                <Controller
+                  name="itemName"
+                  control={control}
+                  render={({ field }) => (
+                    <Autocomplete
+                      {...field}
+                      freeSolo
+                      options={itemsList.map((o) => o.name)} // list of strings
+                      onChange={(_, value) => field.onChange(value || "")}
+                      value={field.value || ""} // value must be a string
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Item Name"
+                          type="search"
+                          onKeyDown={(e) => nextAction(e, "itemName")}
+                          inputRef={itemInputRef}
+                          size="small"
+                        />
+                      )}
                     />
                   )}
-                  disablePortal
-                  id="itemName"
                 />
                 <p className="err-msg">{errors.itemName?.message}</p>
               </Grid>
-              <Grid item xs={3}>
-                <TextField size="small" label="Quantity" {...register("qty")} onKeyDown={(e) => nextAction(e, 'Quantity')} fullWidth/>
+              <Grid item xs={2}>
+                <TextField size="small" type="number" label="Quantity" {...register("qty")} onKeyDown={(e) => nextAction(e, 'Quantity')} fullWidth />
               </Grid>
-              <Grid item xs={3}>
-                <TextField size="small" label="Rate" {...register("rate")} onKeyDown={(e) => nextAction(e, 'Rate')} fullWidth/>
+              <Grid item xs={2}>
+                <TextField size="small" type="number" label="Bag" {...register("bag")} onKeyDown={(e) => nextAction(e, 'Bag')} fullWidth />
+              </Grid>
+              <Grid item xs={2}>
+                <TextField size="small" type="number" label="Rate" {...register("rate")} onKeyDown={(e) => nextAction(e, 'Rate')} fullWidth />
               </Grid>
               <Grid item xs={2}>
                 <Button variant="contained" color="primary" fullWidth onClick={addToTable}>
@@ -485,12 +515,6 @@ function KisanBill() {
             </Grid>
             <TableContainer component={Paper} >
               {noEntries && `NO ENTRIES FOUND`}
-              {/* <SharedTable
-                columns={kisanBillColumnsColumns}
-                tableData={structuredClone(tableData)}
-                keyArray={keyArray}
-                refreshBill={refreshBill}
-              /> */}
               <MasterTable
                 columns={kisanBillColumnsColumns}
                 tableData={structuredClone(tableData)}
@@ -577,6 +601,7 @@ function KisanBill() {
                   <ReactToPrint
                     trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>}
                     content={() => componentRef.current}
+                    pageStyle="@page { size: 10cm 17cm;}"
                   />
                 </Grid>
               </Grid>

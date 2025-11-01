@@ -1,5 +1,4 @@
 import { forwardRef, useEffect, useState } from "react";
-import { TableContainer } from "@mui/material";
 import styles from "./kisan-bill-print.module.css";
 const KisanBillPrint = forwardRef((props, ref) => {
   const [printTable, setPrintTable] = useState([]);
@@ -58,8 +57,8 @@ const KisanBillPrint = forwardRef((props, ref) => {
     <>
       <div ref={ref} className={styles.container}>
         <div className={styles.heading}>
-          <div>किसान नाम: {props.formData?.kisan.name}</div>
-          <div>बिल तिथि: {props.formData?.date}</div>
+          <div>किसान नाम: {props.formData?.kisan?.name}</div>
+          <div>तिथि: {props.formData?.date}</div>
           <div>बिल आईडी: {props.formData?.billId}</div>
         </div>
         <div className={styles.levelTwo}>
@@ -89,8 +88,8 @@ const KisanBillPrint = forwardRef((props, ref) => {
                     <th>ITEM NAME</th>
                     <th align="right">BAG</th>
                     <th align="right">RATE</th>
-                    <th align="right">QUANTITY</th>
-                    <th align="right">ITEM TOTAL</th>
+                    <th align="right">QTY</th>
+                    <th align="right">TOTAL</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -119,10 +118,10 @@ const KisanBillPrint = forwardRef((props, ref) => {
                 खर्चा कुल: {props.formData?.kharchaTotal}
               </div>
               <div>
-                कुल: {props.formData?.totalBikri}
+                कुल बिक्र: {props.formData?.total}
               </div>
               <div>
-                कुल बिक्र: {props.formData?.total}
+                कुल: {props.formData?.totalBikri}
               </div>
             </div>
           </div>
