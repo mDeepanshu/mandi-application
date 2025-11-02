@@ -83,6 +83,10 @@ function MasterTable(props) {
   }, [qty]);
 
   const editFromTable = (index) => {
+    if (props.editKisanTable) {
+      props.editKisanTable(index);
+      return;
+    }
     setEditingIndex(index);
     if (index != -1) {
       let fields = [];
@@ -454,7 +458,7 @@ function MasterTable(props) {
                         >
                           <div className={styles.quantitylist}>
                             <ul className={styles.horizontallist}>
-                              {qty.map((item, index) => (
+                              {qty?.map((item, index) => (
                                 <li key={index}>
                                   {item}
                                   <button className={styles.qtybtn} onClick={(event) => removeQty(event, index)}>

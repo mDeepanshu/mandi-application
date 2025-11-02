@@ -24,9 +24,9 @@
     padding-right: 10px;
 }
 
-.constants > :nth-child(odd) {
-  margin-top: 0.5rem;
-  border-top: 1px solid black;
+.constants> :nth-child(odd) {
+    margin-top: 0.5rem;
+    border-top: 1px solid black;
 }
 
 
@@ -64,6 +64,12 @@ tr {
 }
 
 @media print {
+
+    @page {
+        size: 14cm 40cm;
+        margin: 0;
+    }
+
     .container {
         margin-top: 8rem;
         font-size: 13px;
@@ -73,7 +79,7 @@ tr {
         font-size: 11px;
     }
 
-    .heading > div {
+    .heading>div {
         /* border: 1px solid black; */
     }
 

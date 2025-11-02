@@ -115,10 +115,10 @@ const KisanBillPrint = forwardRef((props, ref) => {
               <div>
               </div>
               <div>
-                खर्चा कुल: {props.formData?.kharchaTotal}
+                कुल बिक्र: {props.formData?.total}
               </div>
               <div>
-                कुल बिक्र: {props.formData?.total}
+                खर्चा कुल: {props.formData?.kharchaTotal}
               </div>
               <div>
                 कुल: {props.formData?.totalBikri}
