@@ -55,7 +55,8 @@ function KisanBill() {
     "Item Total",
     // "Date",
     // "Vyapari Name",
-    // "Edit",
+    "Edit",
+    "Delete",
     // "Previuos Edits",
   ]);
   const [keyArray, setKeyArray] = useState([
@@ -66,7 +67,8 @@ function KisanBill() {
     "itemTotal",
     // "auctionDate",
     // "partyName",
-    // "edit",
+    "edit",
+    "delete",
     // "navigation",
   ]);
   const [open, setOpen] = useState(false);
@@ -77,14 +79,14 @@ function KisanBill() {
   const [fieldDefinitions] = useState([
     {
       name: "mandiKharcha",
-      disabled: false,
-      label: "Mandi Kharch",
+      hidden: false,
+      label: "Mandi Kharcha",
       defaultValue: "",
       validation: { required: "Mandi Kharch is required" },
     },
     {
       name: "hammali",
-      disabled: false,
+      hidden: false,
       label: "Hammali",
       defaultValue: "",
       validation: {
@@ -93,16 +95,13 @@ function KisanBill() {
     },
     {
       name: "nagarPalikaTaxRate",
-      disabled: false,
+      hidden: true,
       label: "Nagar Palika Tax Rate",
       defaultValue: "",
-      validation: {
-        required: "Nagar Palika Tax is required",
-      },
     },
     {
       name: "nagarPalikaTax",
-      disabled: false,
+      hidden: false,
       label: "Nagar Palika Tax",
       defaultValue: "",
       validation: {
@@ -111,7 +110,7 @@ function KisanBill() {
     },
     {
       name: "bhada",
-      disabled: false,
+      hidden: false,
       label: "Bhada",
       defaultValue: "",
       validation: {
@@ -120,7 +119,7 @@ function KisanBill() {
     },
     {
       name: "driver",
-      disabled: false,
+      hidden: false,
       label: "Driver Inaam",
       defaultValue: "",
       validation: {
@@ -129,7 +128,7 @@ function KisanBill() {
     },
     {
       name: "nagdi",
-      disabled: false,
+      hidden: false,
       label: "Nagdi",
       defaultValue: "",
       validation: {
@@ -138,30 +137,9 @@ function KisanBill() {
     },
     {
       name: "commissionRate",
-      disabled: true,
+      hidden: true,
       label: "Commission Rate",
       defaultValue: "",
-      validation: {
-        required: "Commission is required",
-      },
-    },
-    {
-      name: "commission",
-      disabled: true,
-      label: "Commission",
-      defaultValue: "",
-      validation: {
-        required: "Commission is required",
-      },
-    },
-    {
-      name: "bags",
-      disabled: false,
-      label: "Bags",
-      defaultValue: "",
-      validation: {
-        required: "Bags is required",
-      },
     },
   ]);
   const [itemsList, setItemsList] = useState([]);
@@ -223,9 +201,22 @@ function KisanBill() {
     }
   }, [formData]);
 
-  const editFromTable = (index) => { };
+  const editKisanTable = (index) => {
+    const rowToEdit = tableData[index];
+    setValue("itemName", rowToEdit.itemName, { shouldValidate: true });
+    setValue("qty", rowToEdit.quantity, { shouldValidate: true });
+    setValue("bag", rowToEdit.bag, { shouldValidate: true });
+    setValue("rate", rowToEdit.rate, { shouldValidate: true });
+    const updatedTableData = [...tableData];
+    updatedTableData.splice(index, 1);
+    setTableData(updatedTableData);
+  };
 
-  const deleteFromTable = (index) => { };
+  const deleteFromTable = (index) => {
+    const updatedTableData = [...tableData];
+    updatedTableData.splice(index, 1);
+    setTableData(updatedTableData);
+  };
 
   const saveBill = async () => {
     // const saveRes = saveKisanBill();
@@ -288,6 +279,17 @@ function KisanBill() {
     setOpen(false);
   };
 
+  const [addedToTable, setAddedToTable] = useState(true);
+
+  useEffect(() => {
+    let values = getValues();
+    let kharchaTotal = Number(values.mandiKharcha) + Number(values.bhada) + Number(values.driver) + Number(values.nagdi) + Number(values.hammali) + Number(values.nagarPalikaTax);
+    setValue("kharchaTotal", kharchaTotal, { shouldValidate: true });
+    setValue("total", Number(values.totalBikri) - kharchaTotal, { shouldValidate: true });
+
+  }, [addedToTable]);
+
+
   const addToTable = async () => {
     const isValid = await trigger(["itemName", "qty", "bag", "rate"]);
 
@@ -296,16 +298,25 @@ function KisanBill() {
       const itemTotal = values.qty * values.rate;
       const newRow = {
         itemName: values.itemName,
-        bag: values.qty,
+        bag: Number(values.bag),
         rate: values.rate,
         quantity: values.qty,
         itemTotal: itemTotal,
       };
 
-
       setTableData([...tableData, newRow]);
-      // itemInputRef.current.value = null;
-      reset({ ...values, itemName: "", qty: "", bag: "", rate: "" });
+
+      reset({
+        ...values,
+        itemName: "",
+        qty: "",
+        bag: "",
+        rate: "",
+        totalBikri: Number(values.totalBikri) + itemTotal,
+        hammali: Number(values.hammali) + 5 * Number(values.bag),
+        nagarPalikaTax: Number(values.nagarPalikaTax) + Number(values.bag),
+      });
+      setAddedToTable(!addedToTable);
     }
   };
 
@@ -366,8 +377,10 @@ function KisanBill() {
                     <TextField
                       {...field}
                       label={fieldDef.label}
+                      type="number"
                       variant="outlined"
-                      sx={{ mb: 3 }}
+                      sx={{ mb: 3, display: fieldDef.hidden ? 'none' : 'block' }}
+                      hidden={true}
                       fullWidth
                       error={!!errors[field.name]}
                       helperText={errors[field.name] ? errors[field.name].message : ""}
@@ -480,6 +493,7 @@ function KisanBill() {
                     <Autocomplete
                       {...field}
                       freeSolo
+                      disableClearable
                       options={itemsList.map((o) => o.name)} // list of strings
                       onChange={(_, value) => field.onChange(value || "")}
                       value={field.value || ""} // value must be a string
@@ -518,6 +532,8 @@ function KisanBill() {
               <MasterTable
                 columns={kisanBillColumnsColumns}
                 tableData={structuredClone(tableData)}
+                editKisanTable={(idx) => editKisanTable(idx)}
+                deleteEntry={(idx) => deleteFromTable(idx)}
                 keyArray={keyArray}
                 refreshBill={refreshBill}
                 customHeight="45vh"
@@ -536,11 +552,12 @@ function KisanBill() {
                       <TextField
                         {...field}
                         label="Kharcha Total"
+                        type="number"
                         variant="outlined"
                         sx={{ mb: 3 }}
                         fullWidth
-                        error={!!errors.kharcha_total}
-                        helperText={errors.kharcha_total ? errors.kharcha_total.message : ""}
+                        error={!!errors.kharchaTotal}
+                        helperText={errors.kharchaTotal ? errors.kharchaTotal.message : ""}
                         size="small"
                       />
                     )}
@@ -552,11 +569,12 @@ function KisanBill() {
                     name="totalBikri"
                     control={control}
                     defaultValue=""
-                    rules={{ required: "Total is Required" }}
+                    rules={{ required: "Total Bikri is Required" }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Total"
+                        label="Total Bikri"
+                        type="number"
                         variant="outlined"
                         sx={{ mb: 3 }}
                         fullWidth
@@ -573,11 +591,12 @@ function KisanBill() {
                     name="total"
                     control={control}
                     defaultValue=""
-                    rules={{ required: "Total Bikri is Required" }}
+                    rules={{ required: "Total is Required" }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Total Bikri"
+                        label="Total"
+                        type="number"
                         variant="outlined"
                         fullWidth
                         error={!!errors.total}
@@ -601,7 +620,7 @@ function KisanBill() {
                   <ReactToPrint
                     trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>}
                     content={() => componentRef.current}
-                    pageStyle="@page { size: 10cm 17cm;}"
+                    pageStyle="@page { size: 14cm 200cm}"
                   />
                 </Grid>
               </Grid>
