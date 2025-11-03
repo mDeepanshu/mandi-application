@@ -6,6 +6,12 @@
     justify-content: center;
 }
 
+.headingOne {
+    display: flex;
+    justify-content: space-between;
+    width: 95%;
+    margin-bottom: 0.3rem;
+}
 
 .heading {
     display: flex;
@@ -24,8 +30,8 @@
     padding-right: 10px;
 }
 
-.constants> :nth-child(odd) {
-    margin-top: 0.5rem;
+.constants>* {
+    padding: 0.5rem 0;
     border-top: 1px solid black;
 }
 
@@ -55,12 +61,22 @@ tr {
     /* max-width: 150px; */
 }
 
-.totals {
-    margin-top: 1rem;
+.lastRow {
     display: flex;
     justify-content: space-between;
-    /* font-weight: bold; */
     width: 100%;
+}
+
+.totals {
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    font-weight: 600;
+    width: 50%;
+}
+
+.totals>div {
+    text-align: right;
 }
 
 @media print {
@@ -68,10 +84,11 @@ tr {
     @page {
         size: 14cm 40cm;
         margin: 0;
+
     }
 
     .container {
-        margin-top: 8rem;
+        margin-top: 6rem;
         font-size: 13px;
     }
 
@@ -79,8 +96,8 @@ tr {
         font-size: 11px;
     }
 
-    .heading>div {
-        /* border: 1px solid black; */
+    .headingOne {
+        font-size: 11px;
     }
 
     .levelTwo {
@@ -91,12 +108,33 @@ tr {
         font-size: 10px;
     }
 
+    .constantsTotal {
+        font-size: 12px;
+        font-weight: 525;
+        margin-top: 3.4cm;
+    }
+
+    .tableContainer {
+        height: 12cm;
+    }
+
     .table {
         font-size: 10px;
+        width: 100%;
+    }
+
+    .lastRow {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
     }
 
     .totals {
+        display: flex;
+        flex-direction: column;
+        width: 50%;
         font-size: 12px;
-        font-weight: 525;
+        font-weight: 550;
+        margin-top: 7cm;
     }
 }
