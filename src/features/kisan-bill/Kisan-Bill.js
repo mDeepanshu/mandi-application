@@ -50,8 +50,8 @@ function KisanBill() {
   const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState([
     "Item Name",
     "Bag",
-    "Rate",
     "Quantity",
+    "Rate",
     "Item Total",
     // "Date",
     // "Vyapari Name",
@@ -62,8 +62,8 @@ function KisanBill() {
   const [keyArray, setKeyArray] = useState([
     "itemName",
     "bag",
-    "rate",
     "quantity",
+    "rate",
     "itemTotal",
     // "auctionDate",
     // "partyName",
@@ -115,6 +115,15 @@ function KisanBill() {
       defaultValue: "",
       validation: {
         required: "Bhada is required",
+      },
+    },
+    {
+      name: "bhadaRate",
+      hidden: false,
+      label: "Bhada Rate",
+      defaultValue: "",
+      validation: {
+        required: "Bhada Rate is required",
       },
     },
     {
@@ -204,8 +213,8 @@ function KisanBill() {
   const editKisanTable = (index) => {
     const rowToEdit = tableData[index];
     setValue("itemName", rowToEdit.itemName, { shouldValidate: true });
-    setValue("qty", rowToEdit.quantity, { shouldValidate: true });
     setValue("bag", rowToEdit.bag, { shouldValidate: true });
+    setValue("qty", rowToEdit.quantity, { shouldValidate: true });
     setValue("rate", rowToEdit.rate, { shouldValidate: true });
     const updatedTableData = [...tableData];
     updatedTableData.splice(index, 1);
@@ -513,10 +522,10 @@ function KisanBill() {
                 <p className="err-msg">{errors.itemName?.message}</p>
               </Grid>
               <Grid item xs={2}>
-                <TextField size="small" type="number" label="Quantity" {...register("qty")} onKeyDown={(e) => nextAction(e, 'Quantity')} fullWidth />
+                <TextField size="small" type="number" label="Bag" {...register("bag")} onKeyDown={(e) => nextAction(e, 'Bag')} fullWidth />
               </Grid>
               <Grid item xs={2}>
-                <TextField size="small" type="number" label="Bag" {...register("bag")} onKeyDown={(e) => nextAction(e, 'Bag')} fullWidth />
+                <TextField size="small" type="number" label="Quantity" {...register("qty")} onKeyDown={(e) => nextAction(e, 'Quantity')} fullWidth />
               </Grid>
               <Grid item xs={2}>
                 <TextField size="small" type="number" label="Rate" {...register("rate")} onKeyDown={(e) => nextAction(e, 'Rate')} fullWidth />
@@ -536,7 +545,7 @@ function KisanBill() {
                 deleteEntry={(idx) => deleteFromTable(idx)}
                 keyArray={keyArray}
                 refreshBill={refreshBill}
-                customHeight="45vh"
+                customHeight="47vh"
               />
             </TableContainer>
             <Grid container spacing={2} justifyContent="flex-end" p={2}>

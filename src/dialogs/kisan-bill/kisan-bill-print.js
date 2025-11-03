@@ -56,72 +56,66 @@ const KisanBillPrint = forwardRef((props, ref) => {
   return (
     <>
       <div ref={ref} className={styles.container}>
+        <div className={styles.headingOne}>
+          <div>बिल आईडी: {props.formData?.billId}</div>
+        </div>
         <div className={styles.heading}>
           <div>किसान नाम: {props.formData?.kisan?.name}</div>
           <div>तिथि: {props.formData?.date}</div>
-          <div>बिल आईडी: {props.formData?.billId}</div>
         </div>
         <div className={styles.levelTwo}>
           <div className={styles.constants}>
-            <div>मंडी खर्चा:</div>
-            <div>{props.formData?.mandiKharcha}{""}</div>
-            <div>हम्माली:</div>
-            <div>{props.formData?.hammali}{""}</div>
-            <div>न. पा. टैक्स:</div>
-            <div>{props.formData?.nagarPalikaTax}{""}</div>
-            <div>भाड़ा:</div>
-            <div>{props.formData?.bhada}{""}</div>
-            <div>ड्राइवर इनाम:</div>
-            <div>{props.formData?.driver}{}</div>
-            <div>नगद:</div>
-            <div>{props.formData?.nagdi}{""}</div>
+            <div>मंडी खर्चा: {props.formData?.mandiKharcha}</div>
+            <div>हम्माली: {props.formData?.hammali}</div>
+            <div>न. पा. टैक्स: {props.formData?.nagarPalikaTax}</div>
+            <div>भाड़ा: {props.formData?.bhada}</div>
+            <div>ड्राइवर इनाम: {props.formData?.driver}</div>
+            <div>नगद: {props.formData?.nagdi}</div>
+            <div className={styles.constantsTotal}>
+              <b>खर्चा कुल: {props.formData?.kharchaTotal}</b>
+            </div>
           </div>
           <div className={styles.tableContainer}>
-            {/* <TableContainer> */}
-              <table
-                border="1"
-                style={{ borderCollapse: "collapse", width: "100%",border: "0.5px solid black", }}
-                className={styles.table}
-              >
-                <thead>
-                  <tr>
-                    <th>ITEM NAME</th>
-                    <th align="right">BAG</th>
-                    <th align="right">RATE</th>
-                    <th align="right">QTY</th>
-                    <th align="right">TOTAL</th>
+            <table
+              border="1"
+              style={{ borderCollapse: "collapse", width: "100%", border: "0.5px solid black", }}
+              className={styles.table}
+            >
+              <thead>
+                <tr>
+                  <th>ITEM NAME</th>
+                  <th align="right">BAG</th>
+                  <th align="right">QTY</th>
+                  <th align="right">RATE</th>
+                  <th align="right">TOTAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                {printTable?.map((row, index) => (
+                  <tr key={index} sx={{ padding: "4px 8px", lineHeight: "1.2rem" }}>
+                    <td component="th" scope="row">
+                      {row?.itemName}
+                    </td>
+                    <td align="right">{row?.bag}</td>
+                    <td align="right">{row?.quantity}</td>
+                    <td align="right">{row?.rate}</td>
+                    <td align="right">{row?.itemTotal}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {printTable?.map((row, index) => (
-                    <tr key={index} sx={{ padding: "4px 8px", lineHeight: "1.2rem" }}>
-                      <td component="th" scope="row">
-                        {row?.itemName}
-                      </td>
-                      <td align="right">{row?.bag}</td>
-                      <td align="right">{row?.rate}</td>
-                      <td align="right">{row?.quantity}</td>
-                      <td align="right">{row?.itemTotal}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            {/* </TableContainer> */}
-            <div className={styles.totals}>
-              <div>
-              </div>
-              <div>
-              </div>
-              <div>
-              </div>
-              <div>
-                कुल बिक्र: {props.formData?.total}
-              </div>
-              <div>
-                खर्चा कुल: {props.formData?.kharchaTotal}
-              </div>
-              <div>
-                कुल: {props.formData?.totalBikri}
+                ))}
+              </tbody>
+            </table>
+            <div className={styles.lastRow}>
+              <div></div>
+              <div className={styles.totals}>
+                <div>
+                  कुल बिक्र: {props.formData?.total}
+                </div>
+                <div>
+                  खर्चा कुल: {props.formData?.kharchaTotal}
+                </div>
+                <div>
+                  कुल: {props.formData?.totalBikri}
+                </div>
               </div>
             </div>
           </div>
