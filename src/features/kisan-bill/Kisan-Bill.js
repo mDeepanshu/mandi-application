@@ -335,13 +335,13 @@ function KisanBill() {
       e.preventDefault();
       switch (field) {
         case 'itemName':
-          setFocus('qty');
-          break;
-        case 'Quantity':
           setFocus('bag');
           break;
-        case 'Bag':
+        case 'Quantity':
           setFocus('rate');
+          break;
+        case 'Bag':
+          setFocus('qty');
           break;
         case 'Rate':
           // Add to table
