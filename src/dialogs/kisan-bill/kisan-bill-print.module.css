@@ -80,6 +80,12 @@ tr {
 }
 
 @media print {
+    .container {
+        font-size: 11px;
+    }
+}
+
+/* @media print {
 
     @page {
         size: 14cm 40cm;
@@ -137,4 +143,4 @@ tr {
         font-weight: 550;
         margin-top: 7cm;
     }
-}
+} */

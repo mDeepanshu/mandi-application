@@ -15,3 +15,9 @@
     justify-items: start;
     padding: 0 10px;
 }
+
+@print {
+    .container{
+        font-size: 12px;        
+    }
+}
