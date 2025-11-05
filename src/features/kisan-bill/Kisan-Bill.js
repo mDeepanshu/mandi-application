@@ -10,7 +10,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import ReactToPrint from "react-to-print";
 import KisanBillPrint from "../../dialogs/kisan-bill/kisan-bill-print";
 import "./kisan-bill.module.css";
-import SharedTable from "../../shared/ui/table/table";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import PreviousBills from "../../shared/ui/previous-bill/previousBill";
 import Snackbar from "@mui/material/Snackbar";
@@ -19,9 +18,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import Alert from "@mui/material/Alert";
 import { useOutletContext } from "react-router-dom";
 import styles from "./kisan-bill.module.css";
+import formFields from "./kisan-bill-fields.json";
 
 function KisanBill() {
   const { snackbarChange, syncComplete } = useOutletContext();
+  const { itemAddFields, totalFields, fieldDefinitions,KisanBillTableColumns,KisanBIllKeyArray } = formFields;
 
   const componentRef = useRef();
   const triggerRef = useRef();
@@ -40,128 +41,35 @@ function KisanBill() {
     watch,
     resetField
   } = useForm();
+  
   const [kisanList, setKisanList] = useState([]);
   const [kisanFilteredList, setFilteredKisanList] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
   const [noEntries, setNoEntries] = useState(false);
-  const selectedItem = watch("itemName");
 
-  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState([
-    "Item Name",
-    "Bag",
-    "Quantity",
-    "Rate",
-    "Item Total",
-    // "Date",
-    // "Vyapari Name",
-    "Edit",
-    "Delete",
-    // "Previuos Edits",
-  ]);
-  const [keyArray, setKeyArray] = useState([
-    "itemName",
-    "bag",
-    "quantity",
-    "rate",
-    "itemTotal",
-    // "auctionDate",
-    // "partyName",
-    "edit",
-    "delete",
-    // "navigation",
-  ]);
+  const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(KisanBillTableColumns);
+
+  const [keyArray, setKeyArray] = useState(KisanBIllKeyArray);
+
   const [open, setOpen] = useState(false);
+
+
   // const today = new Date().toISOString().split('T')[0];
   const todayd = new Date();
   const today = new Date(todayd.getTime() - todayd.getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
-  const [fieldDefinitions] = useState([
-    {
-      name: "mandiKharcha",
-      hidden: false,
-      label: "Mandi Kharcha",
-      defaultValue: "",
-      validation: { required: "Mandi Kharch is required" },
-    },
-    {
-      name: "hammali",
-      hidden: false,
-      label: "Hammali",
-      defaultValue: "",
-      validation: {
-        required: "Hammali is required",
-      },
-    },
-    {
-      name: "nagarPalikaTaxRate",
-      hidden: true,
-      label: "Nagar Palika Tax Rate",
-      defaultValue: "",
-    },
-    {
-      name: "nagarPalikaTax",
-      hidden: false,
-      label: "Nagar Palika Tax",
-      defaultValue: "",
-      validation: {
-        required: "Nagar Palika Tax is required",
-      },
-    },
-    {
-      name: "bhada",
-      hidden: false,
-      label: "Bhada",
-      defaultValue: "",
-      validation: {
-        required: "Bhada is required",
-      },
-    },
-    {
-      name: "bhadaRate",
-      hidden: false,
-      label: "Bhada Rate",
-      defaultValue: "",
-      validation: {
-        required: "Bhada Rate is required",
-      },
-    },
-    {
-      name: "driver",
-      hidden: false,
-      label: "Driver Inaam",
-      defaultValue: "",
-      validation: {
-        required: "Driver Inaam is required",
-      },
-    },
-    {
-      name: "nagdi",
-      hidden: false,
-      label: "Nagdi",
-      defaultValue: "",
-      validation: {
-        required: "Nagdi is required",
-      },
-    },
-    {
-      name: "commissionRate",
-      hidden: true,
-      label: "Commission Rate",
-      defaultValue: "",
-    },
-  ]);
   const [itemsList, setItemsList] = useState([]);
+
   const fetchList = async () => {
     const list = await getItem("items");
     // const uniqueArray = list.filter((item, index, self) => index === self.findIndex((obj) => obj.name === item.name));
     setItemsList(list.responseBody);
   };
-  const onSubmit = async (data) => {
-    setFormData(getValues());
-    if (triggerRef.current) {
-      triggerRef.current.click();
-    }
+
+  const onPrintBtn = async (e) => {
+    const isValid = await trigger(["kisan", "date", "totalBikri", "kharchaTotal", "total", "mandiKharcha", "bhada", "driver", "nagdi", "hammali", "nagarPalikaTax"]);
+    if (isValid) setFormData(getValues());
   };
 
   const fetchBill = async () => {
@@ -288,22 +196,11 @@ function KisanBill() {
     setOpen(false);
   };
 
-  const [addedToTable, setAddedToTable] = useState(true);
-
-  useEffect(() => {
-    let values = getValues();
-    let kharchaTotal = Number(values.mandiKharcha) + Number(values.bhada) + Number(values.driver) + Number(values.nagdi) + Number(values.hammali) + Number(values.nagarPalikaTax);
-    setValue("kharchaTotal", kharchaTotal, { shouldValidate: true });
-    setValue("total", Number(values.totalBikri) - kharchaTotal, { shouldValidate: true });
-
-  }, [addedToTable]);
-
-
   const addToTable = async () => {
-    const isValid = await trigger(["itemName", "qty", "bag", "rate"]);
+    const isValid = await trigger(["itemName", "qty", "bag", "rate", "bhadaRate"]);
+    const values = getValues();
 
     if (isValid) {
-      const values = getValues();
       const itemTotal = values.qty * values.rate;
       const newRow = {
         itemName: values.itemName,
@@ -315,6 +212,13 @@ function KisanBill() {
 
       setTableData([...tableData, newRow]);
 
+      const newHammali = Number(values.hammali) + 5 * Number(values.bag);
+      const newBhada = Number(values.bhada) + Number(values.bhadaRate) * Number(values.bag);
+      const newNagarPalikaTax = Number(values.nagarPalikaTax) + Number(values.bag);
+      const newTotalBikri = Number(values.totalBikri) + itemTotal;
+
+      let kharchaTotal = Number(values.mandiKharcha) + newBhada + Number(values.driver) + Number(values.nagdi) + newHammali + newNagarPalikaTax;
+
       reset({
         ...values,
         itemName: "",
@@ -323,9 +227,11 @@ function KisanBill() {
         rate: "",
         totalBikri: Number(values.totalBikri) + itemTotal,
         hammali: Number(values.hammali) + 5 * Number(values.bag),
+        bhada: Number(values.bhada) + Number(values.bhadaRate) * Number(values.bag),
         nagarPalikaTax: Number(values.nagarPalikaTax) + Number(values.bag),
+        kharchaTotal: kharchaTotal,
+        total: newTotalBikri - kharchaTotal,
       });
-      setAddedToTable(!addedToTable);
     }
   };
 
@@ -360,7 +266,6 @@ function KisanBill() {
     setFilteredKisanList(filteredList);
   }
 
-
   const action = (
     <React.Fragment>
       <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
@@ -371,7 +276,7 @@ function KisanBill() {
 
   return (
     <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form>
         <Grid container spacing={2} p={1} pb={0}>
           <Grid item xs={2}>
             <Grid container direction="column" justifyContent="center" alignItems="center">
@@ -420,6 +325,8 @@ function KisanBill() {
                           {...params}
                           label="Kisan Name"
                           size="small"
+                          error={!!errors[field.name]}
+                          helperText={errors[field.name] ? errors[field.name].message : ""}
                           InputProps={{
                             ...params.InputProps,
                             startAdornment: (
@@ -451,14 +358,12 @@ function KisanBill() {
                     />
                   )}
                 />
-                <p className="err-msg">{errors.kisan?.message}</p>
               </Grid>
               <Grid item xs={2}>
                 <Controller
                   name="kisanType"
                   control={control}
                   rules={{ required: "TYPE" }}
-                  defaultValue=""
                   render={({ field }) => (
                     <FormControl fullWidth size="small" variant="outlined">
                       <InputLabel id="party-type-label">TYPE</InputLabel>
@@ -466,6 +371,8 @@ function KisanBill() {
                         {...field}
                         label="TYPE"
                         onChange={kisanTypeChange}
+                        error={!!errors[field.name]}
+                        helperText={errors[field.name] ? errors[field.name].message : ""}
                       >
                         <MenuItem value="A">A</MenuItem>
                         <MenuItem value="B">B</MenuItem>
@@ -474,7 +381,7 @@ function KisanBill() {
                     </FormControl>
                   )}
                 />
-                <p className="err-msg">{errors.partyType?.message}</p>
+                <p className={styles.errMsg}>{errors.kisanType?.message}</p>
               </Grid>
               <Grid item xs={2}>
                 <Controller
@@ -482,9 +389,8 @@ function KisanBill() {
                   control={control}
                   rules={{ required: "Enter Date" }}
                   defaultValue={today}
-                  render={({ field }) => <TextField style={{ width: '100%' }} {...field} variant="outlined" type="date" size="small" />}
+                  render={({ field }) => <TextField style={{ width: '100%' }} {...field} variant="outlined" type="date" size="small" error={!!errors[field.name]} helperText={errors[field.name] ? errors[field.name].message : ""} />}
                 />
-                <p className="err-msg">{errors.date?.message}</p>
               </Grid>
               <Grid item xs={2}>
                 <Button variant="contained" color="success" onClick={fetchBill} fullWidth>
@@ -510,6 +416,8 @@ function KisanBill() {
                         <TextField
                           {...params}
                           label="Item Name"
+                          error={!!errors[field.name]}
+                          helperText={errors[field.name] ? errors[field.name].message : ""}
                           type="search"
                           onKeyDown={(e) => nextAction(e, "itemName")}
                           inputRef={itemInputRef}
@@ -519,17 +427,23 @@ function KisanBill() {
                     />
                   )}
                 />
-                <p className="err-msg">{errors.itemName?.message}</p>
               </Grid>
-              <Grid item xs={2}>
-                <TextField size="small" type="number" label="Bag" {...register("bag")} onKeyDown={(e) => nextAction(e, 'Bag')} fullWidth />
-              </Grid>
-              <Grid item xs={2}>
-                <TextField size="small" type="number" label="Quantity" {...register("qty")} onKeyDown={(e) => nextAction(e, 'Quantity')} fullWidth />
-              </Grid>
-              <Grid item xs={2}>
-                <TextField size="small" type="number" label="Rate" {...register("rate")} onKeyDown={(e) => nextAction(e, 'Rate')} fullWidth />
-              </Grid>
+              {itemAddFields.slice(1).map((field) => (
+                <Grid item xs={2} key={field.name}>
+                  <TextField
+                    size="small"
+                    type="number"
+                    label={field.label}
+                    {...register(field.name, {
+                      required: field.label + " Required"
+                    })}
+                    error={errors[field.name]}
+                    helperText={errors[field.name] ? field.label + " Required" : ""}
+                    onKeyDown={(e) => nextAction(e, field.label)}
+                    fullWidth
+                  />
+                </Grid>
+              ))}
               <Grid item xs={2}>
                 <Button variant="contained" color="primary" fullWidth onClick={addToTable}>
                   ADD
@@ -550,71 +464,20 @@ function KisanBill() {
             </TableContainer>
             <Grid container spacing={2} justifyContent="flex-end" p={2}>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-                <Grid item xs={2}>
-                  <Controller
-                    key="kharchaTotal"
-                    name="kharchaTotal"
-                    control={control}
-                    defaultValue=""
-                    rules={{ validation: "Kharcha Total is Required" }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Kharcha Total"
-                        type="number"
-                        variant="outlined"
-                        sx={{ mb: 3 }}
-                        fullWidth
-                        error={!!errors.kharchaTotal}
-                        helperText={errors.kharchaTotal ? errors.kharchaTotal.message : ""}
-                        size="small"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={2}>
-                  <Controller
-                    key="totalBikri"
-                    name="totalBikri"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: "Total Bikri is Required" }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Total Bikri"
-                        type="number"
-                        variant="outlined"
-                        sx={{ mb: 3 }}
-                        fullWidth
-                        error={!!errors.totalBikri}
-                        helperText={errors.totalBikri ? errors.totalBikri.message : ""}
-                        size="small"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={2}>
-                  <Controller
-                    key="total"
-                    name="total"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: "Total is Required" }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Total"
-                        type="number"
-                        variant="outlined"
-                        fullWidth
-                        error={!!errors.total}
-                        helperText={errors.total ? errors.total.message : ""}
-                        size="small"
-                      />
-                    )}
-                  />
-                </Grid>
+                {totalFields.map((field) => (
+                  <Grid item xs={2} key={field.name}>
+                    <TextField
+                      size="small"
+                      type="number"
+                      label={field.label}
+                      error={!!errors[field.name]}
+                      helperText={errors[field.name] ? errors[field.name].message : ""}
+                      {...register(field.name, {
+                        required: field.label + " is Required"
+                      })}
+                    />
+                  </Grid>
+                ))}
               </Grid>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
                 <Grid item xs={4}>
@@ -623,13 +486,13 @@ function KisanBill() {
                   </Button>
                 </Grid>
                 <Grid item xs={2}>
-                  <Button variant="contained" color="success" type="submit" fullWidth>
+                  <Button variant="contained" color="success" type="button" onClick={onPrintBtn} fullWidth>
                     Print
                   </Button>
                   <ReactToPrint
-                    trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>}
+                    trigger={() => <button type="button" style={{ display: "none" }} ref={triggerRef}></button>}
                     content={() => componentRef.current}
-                    pageStyle="@page { size: 14cm 200cm}"
+                    pageStyle="@page { size: 14cm 20cm}"
                   />
                 </Grid>
               </Grid>

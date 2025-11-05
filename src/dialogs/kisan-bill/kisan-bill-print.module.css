@@ -1,9 +1,11 @@
-.container {
+.kisanBillPrintContainer {
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    margin-top: 6rem;
+    font-size: 13px;
 }
 
 .headingOne {
@@ -11,6 +13,7 @@
     justify-content: space-between;
     width: 95%;
     margin-bottom: 0.3rem;
+    font-size: 11px;
 }
 
 .heading {
@@ -18,16 +21,25 @@
     justify-content: space-between;
     width: 95%;
     margin-bottom: 0.3rem;
+    font-size: 11px;
 }
 
 .levelTwo {
     display: flex;
     width: 95%;
+    font-size: 14px;
 }
 
 .constants {
     width: 20%;
     padding-right: 10px;
+    font-size: 10px;
+}
+
+.constantsTotal {
+    font-size: 12px;
+    font-weight: 525;
+    margin-top: 3.4cm;
 }
 
 .constants>* {
@@ -38,11 +50,12 @@
 
 .tableContainer {
     width: 80%;
+    height: 12cm;
 }
 
 .table {
     width: 100%;
-
+    font-size: 10px;
 }
 
 td {
@@ -70,9 +83,10 @@ tr {
 .totals {
     display: flex;
     flex-direction: column;
-    font-size: 12px;
-    font-weight: 600;
     width: 50%;
+    font-size: 12px;
+    font-weight: 550;
+    margin-top: 7cm;
 }
 
 .totals>div {
@@ -80,20 +94,14 @@ tr {
 }
 
 @media print {
-    .container {
-        font-size: 11px;
-    }
-}
-
-/* @media print {
 
     @page {
-        size: 14cm 40cm;
+        size: 14cm 20cm;
         margin: 0;
 
     }
 
-    .container {
+    /* .container {
         margin-top: 6rem;
         font-size: 13px;
     }
@@ -142,5 +150,5 @@ tr {
         font-size: 12px;
         font-weight: 550;
         margin-top: 7cm;
-    }
-} */
+    } */
+}
