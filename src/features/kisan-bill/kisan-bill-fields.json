@@ -1,0 +1,129 @@
+{
+    "totalFields": [
+        {
+            "name": "kharchaTotal",
+            "label": "Kharcha Total"
+        },
+        {
+            "name": "totalBikri",
+            "label": "Total Bikri"
+        },
+        {
+            "name": "total",
+            "label": "Total"
+        }
+    ],
+    "itemAddFields": [
+        {
+            "name": "itemName",
+            "label": "Item Name"
+        },
+        {
+            "name": "bag",
+            "label": "Bag"
+        },
+        {
+            "name": "qty",
+            "label": "Quantity"
+        },
+        {
+            "name": "rate",
+            "label": "Rate"
+        }
+    ],
+    "fieldDefinitions": [
+        {
+            "name": "mandiKharcha",
+            "hidden": false,
+            "label": "Mandi Kharcha",
+            "defaultValue": "",
+            "validation": {
+                "required": "Mandi Kharch is required"
+            }
+        },
+        {
+            "name": "hammali",
+            "hidden": false,
+            "label": "Hammali",
+            "defaultValue": "",
+            "validation": {
+                "required": "Hammali is required"
+            }
+        },
+        {
+            "name": "nagarPalikaTaxRate",
+            "hidden": true,
+            "label": "Nagar Palika Tax Rate",
+            "defaultValue": ""
+        },
+        {
+            "name": "nagarPalikaTax",
+            "hidden": false,
+            "label": "Nagar Palika Tax",
+            "defaultValue": "",
+            "validation": {
+                "required": "Nagar Palika Tax is required"
+            }
+        },
+        {
+            "name": "bhada",
+            "hidden": false,
+            "label": "Bhada",
+            "defaultValue": "",
+            "validation": {
+                "required": "Bhada is required"
+            }
+        },
+        {
+            "name": "bhadaRate",
+            "hidden": false,
+            "label": "Bhada Rate",
+            "defaultValue": "",
+            "validation": {
+                "required": "Bhada Rate is required"
+            }
+        },
+        {
+            "name": "driver",
+            "hidden": false,
+            "label": "Driver Inaam",
+            "defaultValue": "",
+            "validation": {
+                "required": "Driver Inaam is required"
+            }
+        },
+        {
+            "name": "nagdi",
+            "hidden": false,
+            "label": "Nagdi",
+            "defaultValue": "",
+            "validation": {
+                "required": "Nagdi is required"
+            }
+        },
+        {
+            "name": "commissionRate",
+            "hidden": true,
+            "label": "Commission Rate",
+            "defaultValue": ""
+        }
+    ],
+    "KisanBillTableColumns": [
+        "Item Name",
+        "Bag",
+        "Quantity",
+        "Rate",
+        "Item Total",
+        "Edit",
+        "Delete"
+    ],
+    "KisanBIllKeyArray": [
+        "itemName",
+        "bag",
+        "quantity",
+        "rate",
+        "itemTotal",
+        "edit",
+        "delete"
+    ]
+}

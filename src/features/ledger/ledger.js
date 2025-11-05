@@ -200,7 +200,7 @@ THANK YOU
   return (
     <>
       <div className={styles.wrapper}>
-        <div className={styles.container}>
+        <div className={styles.LedgerContainer}>
           <h1>LEDGER</h1>
           <form onSubmit={(e) => e.preventDefault()}>
             <div className={styles.dateFields}>

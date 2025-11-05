@@ -55,7 +55,7 @@ const KisanBillPrint = forwardRef((props, ref) => {
 
   return (
     <>
-      <div ref={ref} className={styles.container}>
+      <div ref={ref} className={styles.kisanBillPrintContainer}>
         <div className={styles.headingOne}>
           <div>बिल आईडी: {props.formData?.billId}</div>
         </div>
