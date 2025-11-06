@@ -27,36 +27,36 @@ const LedgerPrint = forwardRef((props, ref) => {
         let date = transactions?.[0]?.date;
         let dateTotal = transactions?.[0]?.dr;
         for (let i = 1; i < transactions.length; i++) {
-          if (transactions[i].date == date) {
-            dateTotal += transactions[i].dr;
-          } else {
-            date = transactions?.[i]?.date;
-            const amt = transactions?.[i]?.dr;
-            transactions.splice(i, 0, {
-              date: "TOTAL",
-              itemName: "",
-              cr: "",
-              dr: dateTotal,
-            });
-            dateTotal = amt;
-            i++;
-          }
+            if (transactions[i].date == date) {
+                dateTotal += transactions[i].dr;
+            } else {
+                date = transactions?.[i]?.date;
+                const amt = transactions?.[i]?.dr;
+                transactions.splice(i, 0, {
+                    date: "TOTAL",
+                    itemName: "",
+                    cr: "",
+                    dr: dateTotal,
+                });
+                dateTotal = amt;
+                i++;
+            }
         }
         transactions.push({
-          date: "TOTAL",
-          itemName: "",
-          cr: "",
-          dr: dateTotal,
+            date: "TOTAL",
+            itemName: "",
+            cr: "",
+            dr: dateTotal,
         });
         return transactions;
-      };
+    };
 
     return (
         <div ref={ref} className={styles.container}>
-            <div className={styles.constants} style={{ fontSize: '11px' }}>
+            <div className={styles.constants}>
                 <div><b>{props.formData?.vyapari_id?.name}{props.formData?.vyapariName} | </b>ID: <b>{props.formData?.vyapari_id?.idNo}{props.formData?.vyapariIdNo}</b></div>
             </div>
-            <table border="1" style={{fontSize: '10px'}}>
+            <table border="1">
                 <thead>
                     <tr>
                         <th>DATE</th>
