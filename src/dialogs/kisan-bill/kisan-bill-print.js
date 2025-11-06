@@ -56,6 +56,7 @@ const KisanBillPrint = forwardRef((props, ref) => {
   return (
     <>
       <div ref={ref} className={styles.kisanBillPrintContainer}>
+        <div className={styles.graphic}></div>
         <div className={styles.headingOne}>
           <div>बिल आईडी: {props.formData?.billId}</div>
         </div>
@@ -71,9 +72,6 @@ const KisanBillPrint = forwardRef((props, ref) => {
             <div>भाड़ा: {props.formData?.bhada}</div>
             <div>ड्राइवर इनाम: {props.formData?.driver}</div>
             <div>नगद: {props.formData?.nagdi}</div>
-            <div className={styles.constantsTotal}>
-              <b>खर्चा कुल: {props.formData?.kharchaTotal}</b>
-            </div>
           </div>
           <div className={styles.tableContainer}>
             <table
@@ -104,19 +102,21 @@ const KisanBillPrint = forwardRef((props, ref) => {
                 ))}
               </tbody>
             </table>
-            <div className={styles.lastRow}>
-              <div></div>
-              <div className={styles.totals}>
-                <div>
-                  कुल बिक्र: {props.formData?.total}
-                </div>
-                <div>
-                  खर्चा कुल: {props.formData?.kharchaTotal}
-                </div>
-                <div>
-                  कुल: {props.formData?.totalBikri}
-                </div>
-              </div>
+          </div>
+        </div>
+        <div className={styles.lastRow}>
+          <div className={styles.constantsTotal}>
+            <b>खर्चा कुल: {props.formData?.kharchaTotal}</b>
+          </div>
+          <div className={styles.totals}>
+            <div>
+              कुल बिक्र: {props.formData?.total}
+            </div>
+            <div>
+              खर्चा कुल: {props.formData?.kharchaTotal}
+            </div>
+            <div>
+              कुल: {props.formData?.totalBikri}
             </div>
           </div>
         </div>

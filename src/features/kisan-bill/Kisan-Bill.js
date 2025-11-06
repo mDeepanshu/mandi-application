@@ -459,7 +459,7 @@ function KisanBill() {
                 deleteEntry={(idx) => deleteFromTable(idx)}
                 keyArray={keyArray}
                 refreshBill={refreshBill}
-                customHeight="47vh"
+                customHeight="43vh"
               />
             </TableContainer>
             <Grid container spacing={2} justifyContent="flex-end" p={2}>
@@ -467,6 +467,7 @@ function KisanBill() {
                 {totalFields.map((field) => (
                   <Grid item xs={2} key={field.name}>
                     <TextField
+                      key={watch(field.name)}
                       size="small"
                       type="number"
                       label={field.label}
