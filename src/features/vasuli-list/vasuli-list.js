@@ -1,10 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Grid } from "@mui/material";
+import { useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
 import { getVasuliList, editVasuli, whatsAppVasuli } from "../../gateway/vasuli-list-api";
 import MasterTable from "../../shared/ui/master-table/master-table";
-import ReactToPrint from "react-to-print";
 import styles from "./vasuli-list.module.css";
 import { useOutletContext } from "react-router-dom";
 import AlertDialog from "../../dialogs/corformation/conformation";
@@ -16,7 +14,6 @@ function VasuliList() {
   const [tableData, setTableData] = useState([]);
   const [vasuliListColumns, setVasuliListColumns] = useState(["INDEX", "AMOUNT", "DATE", "NAME", "REMARK", "EDIT"]);
   const [keyArray, setKeyArray] = useState(["index", "amount", "date", "vyapariName", "remark", "edit"]);
-  const [vasuliList, setVasuliList] = useState([]);
   const currentDate = new Date().toISOString().split("T")[0];
   const [vasuliTotal, setVasuliTotal] = useState([]);
   const { snackbarChange, syncComplete } = useOutletContext();
@@ -79,7 +76,7 @@ function VasuliList() {
 
   const handleConformationClose = (action) => {
     console.log("Final Edit Global Data:", finalEditGlobal);
-    
+
     const day = String(new Date(finalEditGlobal.date).getDate()).padStart(2, "0");
     const month = String(new Date(finalEditGlobal.date).getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
     const year = new Date(finalEditGlobal.date).getFullYear();
