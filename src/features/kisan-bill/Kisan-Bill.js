@@ -22,12 +22,17 @@ import formFields from "./kisan-bill-fields.json";
 
 function KisanBill() {
   const { snackbarChange, syncComplete } = useOutletContext();
-  const { itemAddFields, totalFields, fieldDefinitions,KisanBillTableColumns,KisanBIllKeyArray } = formFields;
+  const { itemAddFields, totalFields, fieldDefinitions, KisanBillTableColumns, KisanBIllKeyArray } = formFields;
 
   const componentRef = useRef();
+  const selectRef = useRef();
   const triggerRef = useRef();
-  const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
+  const kisanInputRef = useRef();
   const itemInputRef = useRef(null);
+  const constantRefs = useRef({});
+  const printButtonRef = useRef(null);
+
+  const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
   const {
     handleSubmit,
     control,
@@ -41,7 +46,7 @@ function KisanBill() {
     watch,
     resetField
   } = useForm();
-  
+
   const [kisanList, setKisanList] = useState([]);
   const [kisanFilteredList, setFilteredKisanList] = useState([]);
   const [tableData, setTableData] = useState([]);
@@ -49,15 +54,13 @@ function KisanBill() {
   const [noEntries, setNoEntries] = useState(false);
 
   const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(KisanBillTableColumns);
-
   const [keyArray, setKeyArray] = useState(KisanBIllKeyArray);
 
   const [open, setOpen] = useState(false);
-
-
   // const today = new Date().toISOString().split('T')[0];
   const todayd = new Date();
   const today = new Date(todayd.getTime() - todayd.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+  const itemNameLatest = watch('itemName');
 
   const [itemsList, setItemsList] = useState([]);
 
@@ -108,6 +111,7 @@ function KisanBill() {
   useEffect(() => {
     getKisanNames();
     fetchList();
+    selectRef.current.focus();
   }, [syncComplete]);
 
   useEffect(() => {
@@ -197,7 +201,7 @@ function KisanBill() {
   };
 
   const addToTable = async () => {
-    const isValid = await trigger(["itemName", "qty", "bag", "rate", "bhadaRate"]);
+    const isValid = await trigger(["itemName", "qty", "bag", "rate"]);
     const values = getValues();
 
     if (isValid) {
@@ -227,7 +231,6 @@ function KisanBill() {
         rate: "",
         totalBikri: Number(values.totalBikri) + itemTotal,
         hammali: Number(values.hammali) + 5 * Number(values.bag),
-        bhada: Number(values.bhada) + Number(values.bhadaRate) * Number(values.bag),
         nagarPalikaTax: Number(values.nagarPalikaTax) + Number(values.bag),
         kharchaTotal: kharchaTotal,
         total: newTotalBikri - kharchaTotal,
@@ -241,6 +244,10 @@ function KisanBill() {
       e.preventDefault();
       switch (field) {
         case 'itemName':
+          if (!itemInputRef.current.value) {
+            constantRefs.current["bhadaRate"]?.focus();
+            break;
+          }
           setFocus('bag');
           break;
         case 'Quantity':
@@ -250,9 +257,18 @@ function KisanBill() {
           setFocus('qty');
           break;
         case 'Rate':
-          // Add to table
           await addToTable();
           itemInputRef.current?.focus();
+          break;
+        case 'bhadaRate':
+          calculateBhada();
+          constantRefs.current["bhada"]?.focus();
+          break;
+        case 'bhada':
+          constantRefs.current["nagdi"]?.focus();
+          break;
+        case 'nagdi':
+          printButtonRef.current.focus();
           break;
         default:
           break;
@@ -260,10 +276,21 @@ function KisanBill() {
     }
   };
 
+  const calculateBhada = () => {
+    if (!getValues().bhadaRate) return;
+    const values = getValues();
+    const newBhada = Number(values.bhadaRate) * (Number(values.nagarPalikaTax) || 0);
+    setValue("bhada", newBhada, { shouldValidate: true });
+  }
+
   const kisanTypeChange = (event) => {
     setValue("kisanType", event.target.value, { shouldValidate: true });
     const filteredList = kisanList.filter((kisan) => kisan.kisanType === event.target.value);
     setFilteredKisanList(filteredList);
+
+    if (kisanInputRef.current) {
+      setTimeout(() => kisanInputRef.current?.focus(), 0);
+    }
   }
 
   const action = (
@@ -280,29 +307,32 @@ function KisanBill() {
         <Grid container spacing={2} p={1} pb={0}>
           <Grid item xs={2}>
             <Grid container direction="column" justifyContent="center" alignItems="center">
-              {fieldDefinitions.map((fieldDef) => (
-                <Controller
-                  key={fieldDef.name}
-                  name={fieldDef.name}
-                  control={control}
-                  defaultValue={fieldDef.defaultValue}
-                  rules={fieldDef.validation}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label={fieldDef.label}
-                      type="number"
-                      variant="outlined"
-                      sx={{ mb: 3, display: fieldDef.hidden ? 'none' : 'block' }}
-                      hidden={true}
-                      fullWidth
-                      error={!!errors[field.name]}
-                      helperText={errors[field.name] ? errors[field.name].message : ""}
-                      size="small"
+              {fieldDefinitions.map(
+                (fieldDef) =>
+                  !fieldDef.hidden && (
+                    <Controller
+                      key={fieldDef.name}
+                      name={fieldDef.name}
+                      control={control}
+                      defaultValue=""
+                      rules={fieldDef.validation}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label={fieldDef.label}
+                          variant="outlined"
+                          size="small"
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          inputRef={(el) => (constantRefs.current[fieldDef.name] = el)}
+                          onKeyDown={(e) => nextAction(e, fieldDef.name)}
+                          error={!!errors[field.name]}
+                          helperText={errors[field.name] ? errors[field.name].message : ""}
+                        />
+                      )}
                     />
-                  )}
-                />
-              ))}
+                  )
+              )}
             </Grid>
           </Grid>
           <Grid item xs={10}>
@@ -324,6 +354,10 @@ function KisanBill() {
                         <TextField
                           {...params}
                           label="Kisan Name"
+                          inputRef={(input) => {
+                            params.InputProps.ref(input);
+                            kisanInputRef.current = input;
+                          }}
                           size="small"
                           error={!!errors[field.name]}
                           helperText={errors[field.name] ? errors[field.name].message : ""}
@@ -347,6 +381,7 @@ function KisanBill() {
                         } else {
                           field.onChange(value); // selected from list
                         }
+                        itemInputRef.current?.focus();
                       }}
                       onInputChange={(event, newInputValue, reason) => {
                         if (reason === "input") {
@@ -370,6 +405,7 @@ function KisanBill() {
                       <Select
                         {...field}
                         label="TYPE"
+                        inputRef={selectRef}
                         onChange={kisanTypeChange}
                         error={!!errors[field.name]}
                         helperText={errors[field.name] ? errors[field.name].message : ""}
@@ -487,7 +523,7 @@ function KisanBill() {
                   </Button>
                 </Grid>
                 <Grid item xs={2}>
-                  <Button variant="contained" color="success" type="button" onClick={onPrintBtn} fullWidth>
+                  <Button variant="contained" color="success" type="button" onClick={onPrintBtn} ref={printButtonRef} fullWidth>
                     Print
                   </Button>
                   <ReactToPrint
