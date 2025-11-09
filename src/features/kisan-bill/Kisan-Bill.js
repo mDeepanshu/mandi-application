@@ -238,18 +238,25 @@ function KisanBill() {
     }
   };
 
+  const nextActionItemName = async (e) => {
+    setTimeout(() => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!itemInputRef.current.value) {
+          constantRefs.current["bhadaRate"]?.focus();
+          return;
+        } else {
+          setFocus('bag');
+        }
+      }
+    }, 100);
+  };
+
   const nextAction = async (e, field) => {
 
     if (e.key === 'Enter') {
       e.preventDefault();
       switch (field) {
-        case 'itemName':
-          if (!itemInputRef.current.value) {
-            constantRefs.current["bhadaRate"]?.focus();
-            break;
-          }
-          setFocus('bag');
-          break;
         case 'Quantity':
           setFocus('rate');
           break;
@@ -445,9 +452,9 @@ function KisanBill() {
                       {...field}
                       freeSolo
                       disableClearable
-                      options={itemsList.map((o) => o.name)} // list of strings
+                      options={itemsList.map((o) => o.name)}
                       onChange={(_, value) => field.onChange(value || "")}
-                      value={field.value || ""} // value must be a string
+                      value={field.value || ""}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -455,7 +462,7 @@ function KisanBill() {
                           error={!!errors[field.name]}
                           helperText={errors[field.name] ? errors[field.name].message : ""}
                           type="search"
-                          onKeyDown={(e) => nextAction(e, "itemName")}
+                          onKeyDown={(e) => nextActionItemName(e)}
                           inputRef={itemInputRef}
                           size="small"
                         />
