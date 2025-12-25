@@ -46,3 +46,12 @@ export const sendLedgerNotiApi = async (vyapariId) => {
     console.error("Error:", error);
   }
 };
+
+export const sendAllLedgerNotiApi = async (startDate, endDate) => {
+  try {
+    const response = await axiosHttp.patch(`/auction/mark-transaction-validated?fromDate=${startDate}&toDate=${endDate}&bulk=true`, {});
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
