@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, lazy } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
-import { getLedger, makeVasuli, sendLedgerNotiApi, markVyapariAllowedTransactions } from "../../gateway/ledger-apis";
+import { getLedger, makeVasuli, sendLedgerNotiApi, markVyapariAllowedTransactions, sendAllLedgerNotiApi } from "../../gateway/ledger-apis";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import LedgerPrint from "../../dialogs/ledger-print/ledger-print-dialog";
 import ReactToPrint from "react-to-print";
@@ -183,6 +183,25 @@ function Ledger() {
     }
   };
 
+  const sendAllLedgerNoti = async () => {
+    sendAllLedgerNotiApi(currentDate,currentDate).then((res) => {
+      if (res !== "error") {
+        setAlertData({
+          open: true,
+          alertType: "success",
+          alertMsg: "All Ledger Notifications Sent Successfully",
+        });
+      }else{
+        setAlertData({
+          open: true,
+          alertType: "error",
+          alertMsg: "Error in Sending Notifications",
+        });
+      }
+    });
+  };
+
+
   const smsMessage = `
 Good Prize Industries
 Receipt of the Payment Done by You.
@@ -284,6 +303,9 @@ THANK YOU
                   PRINT ALL
                 </Button>
               </div>
+              <Button variant="contained" color="success" type="button" onClick={() => sendAllLedgerNoti()}>
+                SEND ALL LEDGER<PhoneAndroidIcon />
+              </Button>
               <ReactToPrint
                 trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>}
                 content={() => componentRef.current}
