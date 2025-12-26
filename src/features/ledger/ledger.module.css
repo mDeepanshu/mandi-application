@@ -68,9 +68,11 @@ h1 {
 .btns {
   flex-direction: column;
 }
+
 .print_btn {
   width: 49%;
 }
+
 .print_all_btn {
   width: 49%;
 }
@@ -92,7 +94,7 @@ h1 {
 }
 
 @media (min-width: 800px) {
-    .vasuliBtn {
+  .vasuliBtn {
     display: none !important;
   }
 }
@@ -158,11 +160,28 @@ h1 {
     flex-direction: row;
   }
 
-  .actionBtns > * {
+  .actionBtns>* {
     display: block;
     width: 100%;
   }
-  
+
+  .send_ledger_btn.send_ledger_btn {
+    display: flex;
+    align-items: center;
+  }
+
+  .send_all_ledger_btn.send_all_ledger_btn {
+    display: none;
+  }
+
+  .vasuliBtn.vasuliBtn {
+    width: 33%;
+  }
+
+  .fetch.fetch {
+    width: 33%;
+  }
+
   /* .vasuliBtn{
     display: block;
   } */
