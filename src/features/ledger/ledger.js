@@ -184,14 +184,14 @@ function Ledger() {
   };
 
   const sendAllLedgerNoti = async () => {
-    sendAllLedgerNotiApi(currentDate,currentDate).then((res) => {
+    sendAllLedgerNotiApi(currentDate, currentDate).then((res) => {
       if (res !== "error") {
         setAlertData({
           open: true,
           alertType: "success",
           alertMsg: "All Ledger Notifications Sent Successfully",
         });
-      }else{
+      } else {
         setAlertData({
           open: true,
           alertType: "error",
@@ -276,13 +276,13 @@ THANK YOU
             </div>
             <div className={styles.btns}>
               <div className={`${styles.btns} ${styles.actionBtns}`}>
-                <Button variant="contained" color="success" type="button" onClick={() => fetch_ledger(getValues())}>
+                <Button className={styles.fetch} variant="contained" color="success" type="button" onClick={() => fetch_ledger(getValues())}>
                   FETCH
                 </Button>
                 <Button className={styles.vasuliBtn} variant="contained" color="success" type="button" onClick={() => make_vasuli()}>
                   VASULI
                 </Button>
-                <Button variant="contained" color="success" type="button" onClick={() => sendLedgerNoti(getValues())}>
+                <Button className={styles.send_ledger_btn} variant="contained" color="success" type="button" onClick={() => sendLedgerNoti(getValues())}>
                   SEND LEDGER<PhoneAndroidIcon />
                 </Button>
                 {/* <Button variant="contained" color="success" type="button">
@@ -303,7 +303,7 @@ THANK YOU
                   PRINT ALL
                 </Button>
               </div>
-              <Button variant="contained" color="success" type="button" onClick={() => sendAllLedgerNoti()}>
+              <Button variant="contained" color="success" type="button" className={styles.send_all_ledger_btn} onClick={() => sendAllLedgerNoti()}>
                 SEND ALL LEDGER<PhoneAndroidIcon />
               </Button>
               <ReactToPrint
