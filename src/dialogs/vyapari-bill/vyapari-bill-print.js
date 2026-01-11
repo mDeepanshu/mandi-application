@@ -40,12 +40,12 @@ const VyapariBillPrint = forwardRef((props, ref) => {
             {printTable?.map((row, index) => (
               <TableRow key={index}  sx={{ '& > *': { padding: '4px 8px' } }}>
                 <TableCell component="th" scope="row">
-                  {row.itemName}
+                  {row?.item_name}
                 </TableCell>
-                <TableCell align="right">{row.bag}</TableCell>
-                <TableCell align="right">{row.rate}</TableCell>
-                <TableCell align="right">{row.quantity}</TableCell>
-                <TableCell align="right">{row.rate*row.quantity}</TableCell>
+                <TableCell align="right">{row?.bag}</TableCell>
+                <TableCell align="right">{row?.rate}</TableCell>
+                <TableCell align="right">{row?.quantity}</TableCell>
+                <TableCell align="right">{row?.rate*row?.quantity}</TableCell>
               </TableRow>
             ))}
           </TableBody>

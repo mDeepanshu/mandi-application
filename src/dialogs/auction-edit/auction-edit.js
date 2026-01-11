@@ -63,6 +63,8 @@ const AuctionEdit = (props) => {
   useEffect(() => {
     const selectedItem = itemsList.find((option) => option.name == props.auctionToEdit?.[0]?.itemName);
     setValue("itemName", selectedItem || null);
+    console.log(props.auctionToEdit?.[0]?.kisanId);
+    
     const selectedKisan = kisanList.find((option) => option.partyId == props.auctionToEdit?.[0]?.kisanId);
     setValue("kisaan", selectedKisan || null);
     if (props.auctionToEdit?.[0]?.auctionSubmitDate)
@@ -74,7 +76,10 @@ const AuctionEdit = (props) => {
   }, [props.auctionToEdit]);
 
   const initKisanList = async () => {
+
     let kisan_list = await getAllPartyList("KISAN");
+    console.log(kisan_list);
+    
     if (kisan_list?.responseBody) setKisanList(kisan_list?.responseBody);
   };
 
@@ -107,11 +112,11 @@ const AuctionEdit = (props) => {
       },
       addAuctionDtos: [
         {
-          kisanId: getValues()?.kisaan?.partyId,
-          itemId: getValues()?.itemName?.itemId,
-          bag: null,
+          kisan_id: getValues()?.kisaan?.partyId,
+          item_id: getValues()?.itemName?.item_id,
+          total_bags: 0,
           buyItems: [],
-          deviceId: buyItemsArr?.[0]?.deviceId,
+          device_id: buyItemsArr?.[0]?.deviceId,
           auctionDate:
             new Date(getValues()?.auctionSubmitDate).toISOString().split("T")[0] +
             `T` +
@@ -128,7 +133,7 @@ const AuctionEdit = (props) => {
         editObj.addAuctionDtos[0].buyItems.push({
           vyapariId: element.vyapariId,
           rate: element.rate,
-          bags: element.bag,
+          bag: element.bag,
           chungi: element.chungi,
           quantity: element.quantity,
           bagWiseQuantity: element.bagWiseQuantityArray,

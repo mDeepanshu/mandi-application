@@ -45,7 +45,7 @@ export const getItem = async (cachedRes = true) => {
     if (cachedRes && localStorage.getItem(`itemList`)) {
       return JSON.parse(localStorage.getItem(`itemList`));
     }
-    const response = await axiosHttp.get("/listItems");
+    const response = await axiosHttp.get("item/listItems");
     localStorage.setItem(`itemList`, JSON.stringify(response.data));
     return response.data;
   } catch (error) {
