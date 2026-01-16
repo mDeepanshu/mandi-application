@@ -2,7 +2,7 @@ import axiosHttp from "../interceptors/error-handling-interceptor";
 
 export const addItemGlobal = async (data) => {
     try {
-        const response = await axiosHttp.post('/', data);
+        const response = await axiosHttp.post('/item', data);
         return response.data;
     } catch (error) {
         console.error('Error posting data:', error);
