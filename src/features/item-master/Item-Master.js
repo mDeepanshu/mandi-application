@@ -58,7 +58,7 @@ const ItemMaster = () => {
 
     let newTableData = [
       {
-        itemId: Date.now().toString(16),
+        item_id: Date.now().toString(16),
         name: values.itemName,
       }
     ];
