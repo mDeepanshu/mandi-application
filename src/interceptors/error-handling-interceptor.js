@@ -21,7 +21,7 @@ axiosHttp.interceptors.response.use(
 axiosHttp.interceptors.request.use(
   (config) => {
     // Modify the request config before it is sent
-    const deviceId = `25`; // Retrieve the deviceId from local storage
+    const deviceId = `41`; // Retrieve the deviceId from local storage
     if (deviceId) {
       config.headers.deviceId = deviceId;
     }
