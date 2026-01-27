@@ -66,21 +66,21 @@
             }
         },
         {
-            "name": "bhada",
-            "hidden": false,
-            "label": "Bhada",
-            "defaultValue": "",
-            "validation": {
-                "required": "Bhada is required"
-            }
-        },
-        {
             "name": "bhadaRate",
             "hidden": false,
             "label": "Bhada Rate",
             "defaultValue": "",
             "validation": {
                 "required": "Bhada Rate is required"
+            }
+        },
+        {
+            "name": "bhada",
+            "hidden": false,
+            "label": "Bhada",
+            "defaultValue": "",
+            "validation": {
+                "required": "Bhada is required"
             }
         },
         {

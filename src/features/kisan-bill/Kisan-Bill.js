@@ -31,6 +31,8 @@ function KisanBill() {
   const itemInputRef = useRef(null);
   const constantRefs = useRef({});
   const printButtonRef = useRef(null);
+  const qtyRef = useRef(null);
+  const itemSelectRef = useRef(null);
 
   const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
   const {
@@ -52,6 +54,10 @@ function KisanBill() {
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
   const [noEntries, setNoEntries] = useState(false);
+  const [selectedItem, setSelectedItem] = useState("");
+  const [remaininglist, setremainingList] = useState([{ name: "AALO", qty: "10" }, { name: "AALO", qty: "10" }, { name: "AALO", qty: "10" }, { name: "AALO", qty: "10" }, { name: "AALO", qty: "10" }]);
+  const [addRemaininglist, setAddRemainingList] = useState([{ name: "AALO", qty: "10" }, { name: "AALO", qty: "10" }, { name: "AALO", qty: "10" }, { name: "AALO", qty: "10" }, { name: "AALO", qty: "10" }]);
+  const [qtyRemaining, setRemainingQty] = useState("");
 
   const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(KisanBillTableColumns);
   const [keyArray, setKeyArray] = useState(KisanBIllKeyArray);
@@ -67,7 +73,7 @@ function KisanBill() {
   const fetchList = async () => {
     const list = await getItem("items");
     // const uniqueArray = list.filter((item, index, self) => index === self.findIndex((obj) => obj.name === item.name));
-    setItemsList(list.responseBody);
+    setItemsList(list?.responseBody);
   };
 
   const onPrintBtn = async (e) => {
@@ -103,7 +109,7 @@ function KisanBill() {
     const allKisan = await getAllPartyList("KISAN");
     if (allKisan?.responseBody) {
       setKisanList(allKisan?.responseBody);
-      const filteredList = kisanList.filter((kisan) => kisan.kisanType === "A");
+      const filteredList = kisanList?.filter((kisan) => kisan.kisanType === "A");
       setFilteredKisanList(filteredList);
     }
   };
@@ -272,17 +278,20 @@ function KisanBill() {
           constantRefs.current["bhada"]?.focus();
           break;
         case 'bhada':
+          constantRefs.current["driver"]?.focus();
+          break;
+        case 'driver':
           constantRefs.current["nagdi"]?.focus();
           break;
         case 'nagdi':
           printButtonRef.current.focus();
+          // itemSelectRef.current?.focus();
           break;
         default:
           break;
       }
     }
   };
-
   const calculateBhada = () => {
     if (!getValues().bhadaRate) return;
     const values = getValues();
@@ -292,7 +301,7 @@ function KisanBill() {
 
   const kisanTypeChange = (event) => {
     setValue("kisanType", event.target.value, { shouldValidate: true });
-    const filteredList = kisanList.filter((kisan) => kisan.kisanType === event.target.value);
+    const filteredList = kisanList?.filter((kisan) => kisan.kisanType === event.target.value);
     setFilteredKisanList(filteredList);
 
     if (kisanInputRef.current) {
@@ -312,9 +321,9 @@ function KisanBill() {
     <div>
       <form>
         <Grid container spacing={2} p={1} pb={0}>
-          <Grid item xs={2}>
+          <Grid item xs={3}>
             <Grid container direction="column" justifyContent="center" alignItems="center">
-              {fieldDefinitions.map(
+              {fieldDefinitions?.map(
                 (fieldDef) =>
                   !fieldDef.hidden && (
                     <Controller
@@ -341,10 +350,106 @@ function KisanBill() {
                   )
               )}
             </Grid>
+            <Grid container justifyContent="center" alignItems="center" style={{ marginTop: '16px' }}>
+              {/* <PreviousBills billData={{ id: getValues()?.kisan?.partyId, date: getValues()?.date }} partyType={"kisan"} /> */}
+
+              <div className={styles.itemlist}>
+                <b>PURANA BAKAYA STOCK</b>
+                <div className={styles.listheader}>
+                  ITEM NAME / QTY
+                </div>
+
+                <ul className={styles.listbody}>
+                  {remaininglist.map((item, index) => (
+                    <li key={index}>
+                      <span className="item-name">{item.name}</span>
+                      <span className="item-qty">{item.qty}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className={styles.itemlist}>
+                <b>BAKAYA STOCK JODE</b>
+                <div className={styles.listheader}>
+                  <span>ITEM NAME</span>
+                  <span>QTY</span>
+                </div>
+
+                <div className={styles.additem}>
+                  <select
+                    ref={itemSelectRef}
+                    value={selectedItem}
+                    onChange={e => {
+                      setSelectedItem(e.target.value);
+                      setTimeout(() => qtyRef.current?.focus(), 0);
+                    }}
+                  >
+                    <option value="">Select item</option>
+                    {itemsList.map(item => (
+                      <option key={item.name} value={item.name}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                  {/* <select
+                    ref={itemSelectRef}
+                    value={selectedItem}
+                    onChange={e => setSelectedItem(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter") {
+                        e.preventDefault(); // prevent form submit
+                        qtyRef.current?.focus();
+                      }
+                    }}
+                  >
+                    <option value="">Select item</option>
+                    {itemsList.map(item => (
+                      <option key={item.name} value={item.name}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select> */}
+                  <input
+                    ref={qtyRef}
+                    type="number"
+                    min="0"
+                    placeholder="Qty"
+                    value={qtyRemaining}
+                    onChange={e => setRemainingQty(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter") {
+                        if (!qtyRemaining) {
+                          printButtonRef.current.focus();
+                          return;
+                        }
+
+                        itemSelectRef.current?.focus();
+                        setAddRemainingList([...addRemaininglist, { name: selectedItem, qty: qtyRemaining }]);
+                        setSelectedItem("");
+                        setRemainingQty("");
+                      }
+                    }}
+                  />
+                  <button>Add</button>
+                </div>
+
+                <ul className={styles.listbody}>
+                  {addRemaininglist.map((item, index) => (
+                    <li key={index}>
+                      <span className="itemname">{item.name}</span>
+                      <span className="itemqty">{item.qty}</span>
+                    </li>
+                  ))}
+                </ul>
+
+              </div>
+
+            </Grid>
           </Grid>
-          <Grid item xs={10}>
+          <Grid item xs={9}>
             <Grid container spacing={2}>
-              <Grid item xs={6}>
+              <Grid item xs={5}>
                 <Controller
                   name="kisan"
                   control={control}
@@ -426,7 +531,7 @@ function KisanBill() {
                 />
                 <p className={styles.errMsg}>{errors.kisanType?.message}</p>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={3}>
                 <Controller
                   name="date"
                   control={control}
@@ -452,7 +557,7 @@ function KisanBill() {
                       {...field}
                       freeSolo
                       disableClearable
-                      options={itemsList.map((o) => o.name)}
+                      options={itemsList?.map((o) => o.name)}
                       onChange={(_, value) => field.onChange(value || "")}
                       value={field.value || ""}
                       renderInput={(params) => (
@@ -471,7 +576,7 @@ function KisanBill() {
                   )}
                 />
               </Grid>
-              {itemAddFields.slice(1).map((field) => (
+              {itemAddFields.slice(1)?.map((field) => (
                 <Grid item xs={2} key={field.name}>
                   <TextField
                     size="small"
@@ -507,7 +612,7 @@ function KisanBill() {
             </TableContainer>
             <Grid container spacing={2} justifyContent="flex-end" p={2}>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-                {totalFields.map((field) => (
+                {totalFields?.map((field) => (
                   <Grid item xs={2} key={field.name}>
                     <TextField
                       key={watch(field.name)}
@@ -526,12 +631,12 @@ function KisanBill() {
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
                 <Grid item xs={4}>
                   <Button variant="contained" color="primary" fullWidth onClick={saveBill}>
-                    Save Bill
+                    Print
                   </Button>
                 </Grid>
                 <Grid item xs={2}>
                   <Button variant="contained" color="success" type="button" onClick={onPrintBtn} ref={printButtonRef} fullWidth>
-                    Print
+                    Save & Print
                   </Button>
                   <ReactToPrint
                     trigger={() => <button type="button" style={{ display: "none" }} ref={triggerRef}></button>}
