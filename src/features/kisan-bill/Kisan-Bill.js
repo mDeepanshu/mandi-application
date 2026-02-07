@@ -3,7 +3,7 @@ import { Grid } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
 import { TableContainer, Paper, InputAdornment, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import { getKisanBill, saveKisanBill } from "../../gateway/kisan-bill-apis";
+import { getKisanBill, saveKisanBill, getKisanPendingStockApi } from "../../gateway/kisan-bill-apis";
 import { getAllPartyList, getItem } from "../../gateway/comman-apis";
 import Autocomplete from "@mui/material/Autocomplete";
 import SearchIcon from "@mui/icons-material/Search";
@@ -11,7 +11,7 @@ import ReactToPrint from "react-to-print";
 import KisanBillPrint from "../../dialogs/kisan-bill/kisan-bill-print";
 import "./kisan-bill.module.css";
 import MasterTable from "../../shared/ui/master-table/master-table";
-import PreviousBills from "../../shared/ui/previous-bill/previousBill";
+// import PreviousBills from "../../shared/ui/previous-bill/previousBill";
 import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
@@ -31,6 +31,8 @@ function KisanBill() {
   const itemInputRef = useRef(null);
   const constantRefs = useRef({});
   const printButtonRef = useRef(null);
+  const qtyRef = useRef(null);
+  const itemSelectRef = useRef(null);
 
   const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
   const {
@@ -52,45 +54,48 @@ function KisanBill() {
   const [tableData, setTableData] = useState([]);
   const [formData, setFormData] = useState();
   const [noEntries, setNoEntries] = useState(false);
+  const [selectedItem, setSelectedItem] = useState("");
+  const [remaininglist, setremainingList] = useState([]);
+  const [addRemaininglist, setAddRemainingList] = useState([]);
+  const [qtyRemaining, setRemainingQty] = useState("");
 
   const [kisanBillColumnsColumns, setKisanBillColumnsColumns] = useState(KisanBillTableColumns);
   const [keyArray, setKeyArray] = useState(KisanBIllKeyArray);
 
   const [open, setOpen] = useState(false);
-  // const today = new Date().toISOString().split('T')[0];
   const todayd = new Date();
   const today = new Date(todayd.getTime() - todayd.getTimezoneOffset() * 60000).toISOString().split("T")[0];
-  const itemNameLatest = watch('itemName');
 
   const [itemsList, setItemsList] = useState([]);
 
   const fetchList = async () => {
     const list = await getItem("items");
-    // const uniqueArray = list.filter((item, index, self) => index === self.findIndex((obj) => obj.name === item.name));
-    setItemsList(list.responseBody);
+    setItemsList(list?.responseBody);
   };
 
   const onPrintBtn = async (e) => {
-    const isValid = await trigger(["kisan", "date", "totalBikri", "kharchaTotal", "total", "mandiKharcha", "bhada", "driver", "nagdi", "hammali", "nagarPalikaTax"]);
+    const isValid = await trigger(["kisan", "date", "kaccha_total", "kharcha_total", "pakki_bikri", "mandi_kharcha", "bhada", "driver_inaam", "nagdi", "hammali", "nagar_palika_tax"]);
     if (isValid) setFormData(getValues());
   };
 
   const fetchBill = async () => {
     setNoEntries(false);
-    const isValid = await trigger(["kisan", "date"]);
+    // const isValid = await trigger(["kisan", "date"]);
+    const isValid = await trigger(["billId"]);
     if (isValid) {
       let formValues = getValues();
-      const billData = await getKisanBill(formValues.kisan.partyId, formValues.date);
+      const billData = await getKisanBill(formValues.billId);
+      console.log("billData", billData);
       if (billData) {
-        const auctionList = billData?.responseBody?.bills;
-
-        if (billData?.responseBody?.bills?.length === 0) {
+        if (billData?.responseBody?.pendingStock?.length) {
+          setremainingList(billData?.responseBody?.pendingStock);
+        }
+        if (billData?.responseBody?.bill?.length === 0) {
           setNoEntries(true);
         }
-        setTableData(auctionList);
-        if (billData?.responseBody?.bills?.length) {
-          const billConstant = billData?.responseBody;
-          delete billConstant.bills;
+        setTableData(billData?.responseBody?.items);
+        if (billData?.responseBody?.bill) {
+          const billConstant = billData?.responseBody?.bill;
           reset({ ...getValues(), ...billConstant });
         } else {
           reset({ kisan: null });
@@ -103,7 +108,7 @@ function KisanBill() {
     const allKisan = await getAllPartyList("KISAN");
     if (allKisan?.responseBody) {
       setKisanList(allKisan?.responseBody);
-      const filteredList = kisanList.filter((kisan) => kisan.kisanType === "A");
+      const filteredList = kisanList?.filter((kisan) => kisan.kisanType === "A");
       setFilteredKisanList(filteredList);
     }
   };
@@ -124,7 +129,7 @@ function KisanBill() {
 
   const editKisanTable = (index) => {
     const rowToEdit = tableData[index];
-    setValue("itemName", rowToEdit.itemName, { shouldValidate: true });
+    setValue("item_name", rowToEdit.item_name, { shouldValidate: true });
     setValue("bag", rowToEdit.bag, { shouldValidate: true });
     setValue("qty", rowToEdit.quantity, { shouldValidate: true });
     setValue("rate", rowToEdit.rate, { shouldValidate: true });
@@ -141,43 +146,64 @@ function KisanBill() {
 
   const saveBill = async () => {
     // const saveRes = saveKisanBill();
-    let tableSnapshot = [];
-    tableData.forEach((element) => {
-      tableSnapshot.push({ ...element[element.length - 1] });
-    });
-    //
-    let mergedTable = [];
-    mergedTable.push({ ...tableSnapshot[0] });
-    if (tableSnapshot.length) {
-      let flag = true;
-      for (let index = 1; index < tableSnapshot.length; index++) {
-        for (const element of mergedTable) {
-          if (element.rate == tableSnapshot[index].rate && element.itemName == tableSnapshot[index].itemName) {
-            element.quantity += tableSnapshot[index].quantity;
-            element.itemTotal += tableSnapshot[index].itemTotal;
-            element.bag += tableSnapshot[index].bag;
-            flag = false;
-            break;
-          }
-        }
-        if (flag) {
-          mergedTable.push({ ...tableSnapshot[index] });
-        }
-        flag = true;
-      }
-    }
-    //
+    // let tableSnapshot = [];
+    // tableData.forEach((element) => {
+    //   tableSnapshot.push({ ...element[element.length - 1] });
+    // });
+    // //
+    // let mergedTable = [];
+    // mergedTable.push({ ...tableSnapshot[0] });
+    // if (tableSnapshot.length) {
+    //   let flag = true;
+    //   for (let index = 1; index < tableSnapshot.length; index++) {
+    //     for (const element of mergedTable) {
+    //       if (element.rate == tableSnapshot[index].rate && element.item_name == tableSnapshot[index].item_name) {
+    //         element.quantity += tableSnapshot[index].quantity;
+    //         element.item_total += tableSnapshot[index].item_total;
+    //         element.bag += tableSnapshot[index].bag;
+    //         flag = false;
+    //         break;
+    //       }
+    //     }
+    //     if (flag) {
+    //       mergedTable.push({ ...tableSnapshot[index] });
+    //     }
+    //     flag = true;
+    //   }
+    // }
+    // //
+    // const bill = {
+    //   ...getValues(),
+    //   kisanBillItems: mergedTable,
+    //   kisanId: getValues().kisan.partyId,
+    //   kisanName: getValues().kisan.name,
+    //   billDate: getValues().date,
+    // };
+    // delete bill.kisan;
+    // delete bill.date;
+    const formValues = getValues();
     const bill = {
-      ...getValues(),
-      kisanBillItems: mergedTable,
+      mandi_kharcha: formValues.mandi_kharcha,
+      hammali: formValues.hammali,
+      nagar_palika_tax: formValues.nagar_palika_tax,
+      bhada: formValues.bhada,
+      driver_inaam: formValues.driver_inaam,
+      nagdi: formValues.nagdi,
+      bhada_rate: formValues.bhada_rate,
+      kisanBillItems: tableData,
+      pendingStockItems: addRemaininglist,
+      kharcha_total: formValues.kharcha_total,
+      kaccha_total: formValues.kaccha_total,
+      pakki_bikri: formValues.pakki_bikri,
       kisanId: getValues().kisan.partyId,
-      kisanName: getValues().kisan.name,
-      billDate: getValues().date,
+      kisan_name: getValues().kisan.name,
+      bill_date: getValues().date,
     };
-    delete bill.kisan;
-    delete bill.date;
+    console.log("bill", bill);
+
+
     const saveRes = await saveKisanBill(bill);
-    if (saveRes.responseCode == "200") {
+    if (saveRes?.responseCode == "200") {
       setOpen(true);
     }
   };
@@ -201,39 +227,41 @@ function KisanBill() {
   };
 
   const addToTable = async () => {
-    const isValid = await trigger(["itemName", "qty", "bag", "rate"]);
+    const isValid = await trigger(["item_name", "qty", "bag", "rate"]);
     const values = getValues();
 
     if (isValid) {
-      const itemTotal = values.qty * values.rate;
+      const item_total = values.qty * values.rate;
       const newRow = {
-        itemName: values.itemName,
+        item_name: values.item_name,
         bag: Number(values.bag),
         rate: values.rate,
         quantity: values.qty,
-        itemTotal: itemTotal,
+        item_total: item_total,
       };
 
       setTableData([...tableData, newRow]);
+      console.log("tableData",tableData);
+      
 
       const newHammali = Number(values.hammali) + 5 * Number(values.bag);
-      const newBhada = Number(values.bhada) + Number(values.bhadaRate) * Number(values.bag);
-      const newNagarPalikaTax = Number(values.nagarPalikaTax) + Number(values.bag);
-      const newTotalBikri = Number(values.totalBikri) + itemTotal;
+      const newBhada = Number(values.bhada) + Number(values.bhada_rate) * Number(values.bag);
+      const newNagarPalikaTax = Number(values.nagar_palika_tax) + Number(values.bag);
+      const newTotalBikri = Number(values.kaccha_total) + item_total;
 
-      let kharchaTotal = Number(values.mandiKharcha) + newBhada + Number(values.driver) + Number(values.nagdi) + newHammali + newNagarPalikaTax;
+      let kharcha_total = Number(values.mandi_kharcha) + newBhada + Number(values.driver_inaam) + Number(values.nagdi) + newHammali + newNagarPalikaTax;
 
       reset({
         ...values,
-        itemName: "",
+        item_name: "",
         qty: "",
         bag: "",
         rate: "",
-        totalBikri: Number(values.totalBikri) + itemTotal,
+        kaccha_total: Number(values.kaccha_total) + item_total,
         hammali: Number(values.hammali) + 5 * Number(values.bag),
-        nagarPalikaTax: Number(values.nagarPalikaTax) + Number(values.bag),
-        kharchaTotal: kharchaTotal,
-        total: newTotalBikri - kharchaTotal,
+        nagar_palika_tax: Number(values.nagar_palika_tax) + Number(values.bag),
+        kharcha_total: kharcha_total,
+        pakki_bikri: newTotalBikri - kharcha_total,
       });
     }
   };
@@ -243,7 +271,7 @@ function KisanBill() {
       if (e.key === 'Enter') {
         e.preventDefault();
         if (!itemInputRef.current.value) {
-          constantRefs.current["bhadaRate"]?.focus();
+          constantRefs.current["bhada_rate"]?.focus();
           return;
         } else {
           setFocus('bag');
@@ -267,15 +295,19 @@ function KisanBill() {
           await addToTable();
           itemInputRef.current?.focus();
           break;
-        case 'bhadaRate':
+        case 'bhada_rate':
           calculateBhada();
           constantRefs.current["bhada"]?.focus();
           break;
         case 'bhada':
+          constantRefs.current["driver_inaam"]?.focus();
+          break;
+        case 'driver_inaam':
           constantRefs.current["nagdi"]?.focus();
           break;
         case 'nagdi':
           printButtonRef.current.focus();
+          // itemSelectRef.current?.focus();
           break;
         default:
           break;
@@ -284,21 +316,29 @@ function KisanBill() {
   };
 
   const calculateBhada = () => {
-    if (!getValues().bhadaRate) return;
+    if (!getValues().bhada_rate) return;
     const values = getValues();
-    const newBhada = Number(values.bhadaRate) * (Number(values.nagarPalikaTax) || 0);
+    const newBhada = Number(values.bhada_rate) * (Number(values.nagar_palika_tax) || 0);
     setValue("bhada", newBhada, { shouldValidate: true });
   }
 
   const kisanTypeChange = (event) => {
     setValue("kisanType", event.target.value, { shouldValidate: true });
-    const filteredList = kisanList.filter((kisan) => kisan.kisanType === event.target.value);
+    const filteredList = kisanList?.filter((kisan) => kisan.kisanType === event.target.value);
     setFilteredKisanList(filteredList);
 
     if (kisanInputRef.current) {
       setTimeout(() => kisanInputRef.current?.focus(), 0);
     }
   }
+
+  const getKisanPendingStock = async (partyId) => {
+    if (!partyId) return;
+    const billData = await getKisanPendingStockApi(partyId);
+    if (billData?.responseBody?.length) {
+      setremainingList(billData?.responseBody);
+    }
+  };
 
   const action = (
     <React.Fragment>
@@ -312,9 +352,9 @@ function KisanBill() {
     <div>
       <form>
         <Grid container spacing={2} p={1} pb={0}>
-          <Grid item xs={2}>
+          <Grid item xs={3}>
             <Grid container direction="column" justifyContent="center" alignItems="center">
-              {fieldDefinitions.map(
+              {fieldDefinitions?.map(
                 (fieldDef) =>
                   !fieldDef.hidden && (
                     <Controller
@@ -341,10 +381,113 @@ function KisanBill() {
                   )
               )}
             </Grid>
+            <Grid container justifyContent="center" alignItems="center" style={{ marginTop: '16px' }}>
+              {/* <PreviousBills billData={{ id: getValues()?.kisan?.partyId, date: getValues()?.date }} partyType={"kisan"} /> */}
+
+              <div className={styles.itemlist}>
+                <b>PURANA BAKAYA STOCK</b>
+                <div className={styles.listheader}>
+                  ITEM NAME / QTY
+                </div>
+
+                <ul className={styles.listbody}>
+                  {remaininglist.map((item, index) => (
+                    <li key={index}>
+                      <span className="item-name">{item.item_name}</span>
+                      <span className="item-qty">{item.quantity}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className={styles.itemlist}>
+                <b>BAKAYA STOCK JODE</b>
+                <div className={styles.listheader}>
+                  <span>ITEM NAME</span>
+                  <span>QTY</span>
+                </div>
+
+                <div className={styles.additem}>
+                  <select
+                    ref={itemSelectRef}
+                    value={selectedItem}
+                    onChange={e => {
+                      setSelectedItem(e.target.value);
+                      setTimeout(() => qtyRef.current?.focus(), 0);
+                    }}
+                  >
+                    <option value="">Select item</option>
+                    {itemsList.map(item => (
+                      <option key={item.name} value={item.name}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                  {/* <select
+                    ref={itemSelectRef}
+                    value={selectedItem}
+                    onChange={e => setSelectedItem(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter") {
+                        e.preventDefault(); // prevent form submit
+                        qtyRef.current?.focus();
+                      }
+                    }}
+                  >
+                    <option value="">Select item</option>
+                    {itemsList.map(item => (
+                      <option key={item.name} value={item.name}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select> */}
+                  <input
+                    ref={qtyRef}
+                    type="number"
+                    min="0"
+                    placeholder="Qty"
+                    value={qtyRemaining}
+                    onChange={e => setRemainingQty(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter") {
+                        if (!qtyRemaining) {
+                          printButtonRef.current.focus();
+                          return;
+                        }
+
+                        itemSelectRef.current?.focus();
+                        setAddRemainingList([...addRemaininglist, { name: selectedItem, quantity: qtyRemaining }]);
+                        setSelectedItem("");
+                        setRemainingQty("");
+                      }
+                    }}
+                  />
+                  <button>Add</button>
+                </div>
+
+                <ul className={styles.listbody}>
+                  {addRemaininglist.map((item, index) => (
+                    <li key={index}>
+                      <span className="itemname">{item.name}</span>
+                      <span className="itemqty">{item.quantity}</span>
+                    </li>
+                  ))}
+                </ul>
+
+              </div>
+
+            </Grid>
           </Grid>
-          <Grid item xs={10}>
+          <Grid item xs={9}>
             <Grid container spacing={2}>
-              <Grid item xs={6}>
+              <Grid item xs={2}>
+                <Controller
+                  name="billId"
+                  control={control}
+                  render={({ field }) => <TextField style={{ width: '100%' }} {...field} label="Kisan Bill" variant="outlined" size="small" />}
+                />
+              </Grid>
+              <Grid item xs={3}>
                 <Controller
                   name="kisan"
                   control={control}
@@ -388,6 +531,7 @@ function KisanBill() {
                         } else {
                           field.onChange(value); // selected from list
                         }
+                        getKisanPendingStock(value?.partyId);
                         itemInputRef.current?.focus();
                       }}
                       onInputChange={(event, newInputValue, reason) => {
@@ -426,7 +570,7 @@ function KisanBill() {
                 />
                 <p className={styles.errMsg}>{errors.kisanType?.message}</p>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={3}>
                 <Controller
                   name="date"
                   control={control}
@@ -445,14 +589,14 @@ function KisanBill() {
               {/* <PreviousBills billData={{ id: getValues()?.kisan?.partyId, date: getValues()?.date }} partyType={"kisan"} /> */}
               <Grid item xs={4}>
                 <Controller
-                  name="itemName"
+                  name="item_name"
                   control={control}
                   render={({ field }) => (
                     <Autocomplete
                       {...field}
                       freeSolo
                       disableClearable
-                      options={itemsList.map((o) => o.name)}
+                      options={itemsList?.map((o) => o.name)}
                       onChange={(_, value) => field.onChange(value || "")}
                       value={field.value || ""}
                       renderInput={(params) => (
@@ -471,7 +615,7 @@ function KisanBill() {
                   )}
                 />
               </Grid>
-              {itemAddFields.slice(1).map((field) => (
+              {itemAddFields.slice(1)?.map((field) => (
                 <Grid item xs={2} key={field.name}>
                   <TextField
                     size="small"
@@ -507,7 +651,7 @@ function KisanBill() {
             </TableContainer>
             <Grid container spacing={2} justifyContent="flex-end" p={2}>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
-                {totalFields.map((field) => (
+                {totalFields?.map((field) => (
                   <Grid item xs={2} key={field.name}>
                     <TextField
                       key={watch(field.name)}
@@ -525,13 +669,13 @@ function KisanBill() {
               </Grid>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
                 <Grid item xs={4}>
-                  <Button variant="contained" color="primary" fullWidth onClick={saveBill}>
-                    Save Bill
+                  <Button variant="contained" color="primary" fullWidth onClick={onPrintBtn}>
+                    Print
                   </Button>
                 </Grid>
                 <Grid item xs={2}>
-                  <Button variant="contained" color="success" type="button" onClick={onPrintBtn} ref={printButtonRef} fullWidth>
-                    Print
+                  <Button variant="contained" color="success" type="button" onClick={saveBill} ref={printButtonRef} fullWidth>
+                    Save & Print
                   </Button>
                   <ReactToPrint
                     trigger={() => <button type="button" style={{ display: "none" }} ref={triggerRef}></button>}
