@@ -1,21 +1,21 @@
 {
     "totalFields": [
         {
-            "name": "kharchaTotal",
+            "name": "kharcha_total",
             "label": "Kharcha Total"
         },
         {
-            "name": "totalBikri",
-            "label": "Total Bikri"
+            "name": "kaccha_total",
+            "label": "Kaccha Total"
         },
         {
-            "name": "total",
-            "label": "Total"
+            "name": "pakki_bikri",
+            "label": "Pakki Bikri"
         }
     ],
     "itemAddFields": [
         {
-            "name": "itemName",
+            "name": "item_name",
             "label": "Item Name"
         },
         {
@@ -33,7 +33,7 @@
     ],
     "fieldDefinitions": [
         {
-            "name": "mandiKharcha",
+            "name": "mandi_kharcha",
             "hidden": false,
             "label": "Mandi Kharcha",
             "defaultValue": "",
@@ -51,13 +51,13 @@
             }
         },
         {
-            "name": "nagarPalikaTaxRate",
+            "name": "nagar_palika_tax_rate",
             "hidden": true,
             "label": "Nagar Palika Tax Rate",
             "defaultValue": ""
         },
         {
-            "name": "nagarPalikaTax",
+            "name": "nagar_palika_tax",
             "hidden": false,
             "label": "Nagar Palika Tax",
             "defaultValue": "",
@@ -66,7 +66,7 @@
             }
         },
         {
-            "name": "bhadaRate",
+            "name": "bhada_rate",
             "hidden": false,
             "label": "Bhada Rate",
             "defaultValue": "",
@@ -84,7 +84,7 @@
             }
         },
         {
-            "name": "driver",
+            "name": "driver_inaam",
             "hidden": false,
             "label": "Driver Inaam",
             "defaultValue": "",
@@ -102,7 +102,7 @@
             }
         },
         {
-            "name": "commissionRate",
+            "name": "commission_rate",
             "hidden": true,
             "label": "Commission Rate",
             "defaultValue": ""
@@ -118,11 +118,11 @@
         "Delete"
     ],
     "KisanBIllKeyArray": [
-        "itemName",
+        "item_name",
         "bag",
         "quantity",
         "rate",
-        "itemTotal",
+        "item_total",
         "edit",
         "delete"
     ]
