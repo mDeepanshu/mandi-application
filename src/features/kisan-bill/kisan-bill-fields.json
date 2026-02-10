@@ -35,6 +35,7 @@
         {
             "name": "mandi_kharcha",
             "hidden": false,
+            "disable": true,
             "label": "Mandi Kharcha",
             "defaultValue": "",
             "validation": {
