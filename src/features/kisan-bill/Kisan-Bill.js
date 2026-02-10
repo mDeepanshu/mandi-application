@@ -228,43 +228,92 @@ function KisanBill() {
 
   const addToTable = async () => {
     const isValid = await trigger(["item_name", "qty", "bag", "rate"]);
+    if (!isValid) return;
+
     const values = getValues();
 
-    if (isValid) {
-      const item_total = values.qty * values.rate;
-      const newRow = {
-        item_name: values.item_name,
-        bag: Number(values.bag),
-        rate: values.rate,
-        quantity: values.qty,
-        item_total: item_total,
-      };
+    const {
+      item_name,
+      qty,
+      bag,
+      rate,
+      hammali,
+      bhada,
+      bhada_rate,
+      nagar_palika_tax,
+      kaccha_total,
+      mandi_kharcha,
+      commission_rate,
+      driver_inaam,
+      nagdi,
+    } = values;
 
-      setTableData([...tableData, newRow]);
-      console.log("tableData",tableData);
-      
+    // Normalize numbers once
+    const nQty = Number(qty);
+    const nBag = Number(bag);
+    const nRate = Number(rate);
 
-      const newHammali = Number(values.hammali) + 5 * Number(values.bag);
-      const newBhada = Number(values.bhada) + Number(values.bhada_rate) * Number(values.bag);
-      const newNagarPalikaTax = Number(values.nagar_palika_tax) + Number(values.bag);
-      const newTotalBikri = Number(values.kaccha_total) + item_total;
+    const nHammali = Number(hammali);
+    const nBhada = Number(bhada);
+    const nBhadaRate = Number(bhada_rate);
+    const nNagarTax = Number(nagar_palika_tax);
+    const nKacchaTotal = Number(kaccha_total);
+    const nMandiKharcha = Number(mandi_kharcha) || 0;
+    const nCommissionRate = Number(commission_rate);
+    const nDriverInaam = Number(driver_inaam);
+    const nNagdi = Number(nagdi);
 
-      let kharcha_total = Number(values.mandi_kharcha) + newBhada + Number(values.driver_inaam) + Number(values.nagdi) + newHammali + newNagarPalikaTax;
+    // Derived calculations
+    const itemTotal = nQty * nRate;
 
-      reset({
-        ...values,
-        item_name: "",
-        qty: "",
-        bag: "",
-        rate: "",
-        kaccha_total: Number(values.kaccha_total) + item_total,
-        hammali: Number(values.hammali) + 5 * Number(values.bag),
-        nagar_palika_tax: Number(values.nagar_palika_tax) + Number(values.bag),
-        kharcha_total: kharcha_total,
-        pakki_bikri: newTotalBikri - kharcha_total,
-      });
-    }
+    const updatedHammali = nHammali + 5 * nBag;
+    const updatedBhada = nBhada + nBhadaRate * nBag;
+    const updatedNagarTax = nNagarTax + nBag;
+    const updatedKacchaTotal = nKacchaTotal + itemTotal;
+
+    const updatedCommission =
+      nMandiKharcha + (nCommissionRate * itemTotal) / 100;
+
+    const kharchaTotal =
+      updatedCommission +
+      updatedHammali +
+      updatedNagarTax +
+      updatedBhada +
+      nDriverInaam +
+      nNagdi;
+
+    const pakkiBikri = updatedKacchaTotal - kharchaTotal;
+
+    // Add row to table
+    setTableData((prev) => [
+      ...prev,
+      {
+        item_name,
+        bag: nBag,
+        rate: nRate,
+        quantity: nQty,
+        item_total: itemTotal,
+      },
+    ]);
+
+    // Reset form with updated totals
+    reset({
+      ...values,
+      item_name: "",
+      qty: "",
+      bag: "",
+      rate: "",
+      kaccha_total: updatedKacchaTotal,
+      hammali: updatedHammali,
+      mandi_kharcha: updatedCommission,
+      nagar_palika_tax: updatedNagarTax,
+    });
+
+    // Set dependent calculated fields
+    setValue("kharcha_total", kharchaTotal, { shouldValidate: true });
+    setValue("pakki_bikri", pakkiBikri, { shouldValidate: true });
   };
+
 
   const nextActionItemName = async (e) => {
     setTimeout(() => {
@@ -333,11 +382,19 @@ function KisanBill() {
   }
 
   const getKisanPendingStock = async (partyId) => {
+    setremainingList([]);
     if (!partyId) return;
     const billData = await getKisanPendingStockApi(partyId);
     if (billData?.responseBody?.length) {
       setremainingList(billData?.responseBody);
     }
+  };
+
+  const getCommisionRate = (commission_rate) => {
+    if (!commission_rate) {
+      console.error("Commission rate not found for this kisan");
+    }
+    else setValue("commission_rate", Number(commission_rate), { shouldValidate: true });
   };
 
   const action = (
@@ -360,6 +417,7 @@ function KisanBill() {
                     <Controller
                       key={fieldDef.name}
                       name={fieldDef.name}
+                      disabled={fieldDef.disable}
                       control={control}
                       defaultValue=""
                       rules={fieldDef.validation}
@@ -532,6 +590,7 @@ function KisanBill() {
                           field.onChange(value); // selected from list
                         }
                         getKisanPendingStock(value?.partyId);
+                        getCommisionRate(value?.commission);
                         itemInputRef.current?.focus();
                       }}
                       onInputChange={(event, newInputValue, reason) => {
