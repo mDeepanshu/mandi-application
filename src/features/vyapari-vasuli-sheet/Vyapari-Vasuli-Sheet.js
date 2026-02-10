@@ -27,12 +27,12 @@ function VyapariVasuliSheet() {
     "CLOSING AMOUNT",
   ]);
   const [keyArray, setKeyArray] = useState([
-    "vyapariIdNo",
-    "partyName",
-    "openingAmount",
-    "dayBill",
+    "vyapariidno",
+    "partyname",
+    "openingbalance",
+    "daybill",
     "ttl",
-    "closingAmount",
+    "closingbalance",
   ]);
   const [totals, setTotals] = useState({
     openingAmountSum: 0,
@@ -62,9 +62,9 @@ function VyapariVasuliSheet() {
 
     const ledger = await getVyapariVasuliSheet(data);
     let dayBillTotal = 0;
-    ledger?.responseBody?.vasuliList?.forEach((element) => {
-      let total = element.dayBill
-        .split(",")
+    ledger?.responseBody?.forEach((element) => {
+      let total = element.daybill
+        ?.split(",")
         .map(Number)
         .reduce((sum, num) => sum + num, 0);
       element.ttl = total;
@@ -76,8 +76,8 @@ function VyapariVasuliSheet() {
       closingAmountSum: ledger?.responseBody?.closingAmountSum,
     });
     if (ledger) {
-      setTableData(ledger?.responseBody?.vasuliList);
-      setTableDataFiltered(ledger?.responseBody?.vasuliList);
+      setTableData(ledger?.responseBody);
+      setTableDataFiltered(ledger?.responseBody);
     }
   };
 
