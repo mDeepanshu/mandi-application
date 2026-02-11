@@ -85,7 +85,6 @@ function KisanBill() {
     if (isValid) {
       let formValues = getValues();
       const billData = await getKisanBill(formValues.billId);
-      console.log("billData", billData);
       if (billData) {
         if (billData?.responseBody?.pendingStock?.length) {
           setremainingList(billData?.responseBody?.pendingStock);
@@ -139,6 +138,39 @@ function KisanBill() {
   };
 
   const deleteFromTable = (index) => {
+    //update constants
+    const values = getValues();
+    const itemTotal = tableData[index].quantity * tableData[index].rate;
+    const updatedKacchaTotal = Number(values.kaccha_total) - itemTotal;
+    const updatedHammali = Number(values.hammali) - 5 * tableData[index].bag;
+    const updatedBhada = Number(values.bhada) - Number(values.bhada_rate) * tableData[index].bag;
+    const updatedNagarTax = Number(values.nagar_palika_tax) - tableData[index].bag;
+    const updatedCommission = Number(values.mandi_kharcha) - (Number(values.commission_rate) * itemTotal) / 100;
+
+    const kharchaTotal =
+      updatedCommission +
+      updatedHammali +
+      updatedNagarTax +
+      updatedBhada +
+      values.driver_inaam +
+      values.nagdi +
+      0;
+
+    const pakkiBikri = updatedKacchaTotal - kharchaTotal;
+
+    reset({
+      ...values,
+      kaccha_total: updatedKacchaTotal,
+      hammali: updatedHammali,
+      bhada: updatedBhada,
+      nagar_palika_tax: updatedNagarTax,
+      mandi_kharcha: updatedCommission,
+      kharcha_total: kharchaTotal,
+      pakki_bikri: pakkiBikri,
+    });
+    //
+
+
     const updatedTableData = [...tableData];
     updatedTableData.splice(index, 1);
     setTableData(updatedTableData);
@@ -199,8 +231,6 @@ function KisanBill() {
       kisan_name: getValues().kisan.name,
       bill_date: getValues().date,
     };
-    console.log("bill", bill);
-
 
     const saveRes = await saveKisanBill(bill);
     if (saveRes?.responseCode == "200") {
@@ -258,7 +288,8 @@ function KisanBill() {
     const nBhadaRate = Number(bhada_rate);
     const nNagarTax = Number(nagar_palika_tax);
     const nKacchaTotal = Number(kaccha_total);
-    const nMandiKharcha = Number(mandi_kharcha) || 0;
+    const nMandiKharcha = Number(mandi_kharcha || 0);
+
     const nCommissionRate = Number(commission_rate);
     const nDriverInaam = Number(driver_inaam);
     const nNagdi = Number(nagdi);
@@ -387,6 +418,8 @@ function KisanBill() {
     const billData = await getKisanPendingStockApi(partyId);
     if (billData?.responseBody?.length) {
       setremainingList(billData?.responseBody);
+    } else {
+      setremainingList([{ item_name: "NO PENDING STOCK", quantity: "" }]);
     }
   };
 
@@ -395,6 +428,24 @@ function KisanBill() {
       console.error("Commission rate not found for this kisan");
     }
     else setValue("commission_rate", Number(commission_rate), { shouldValidate: true });
+  };
+
+  const moveToAddItem = (index) => {
+    const itemToMove = remaininglist[index];
+    // setAddRemainingList([...addRemaininglist, { name: itemToMove.item_name, quantity: itemToMove.quantity }]);
+    setValue("item_name", itemToMove.item_name, { shouldValidate: true });
+    setValue("qty", itemToMove.quantity, { shouldValidate: true });
+    const updatedRemainingList = [...remaininglist];
+    updatedRemainingList.splice(index, 1);
+    setremainingList(updatedRemainingList);
+  };
+
+  const remainingItemAdd = () => {
+    if (!selectedItem || !qtyRemaining) return;
+    itemSelectRef.current?.focus();
+    setAddRemainingList([...addRemaininglist, { name: selectedItem, quantity: qtyRemaining }]);
+    setSelectedItem("");
+    setRemainingQty("");
   };
 
   const action = (
@@ -417,7 +468,6 @@ function KisanBill() {
                     <Controller
                       key={fieldDef.name}
                       name={fieldDef.name}
-                      disabled={fieldDef.disable}
                       control={control}
                       defaultValue=""
                       rules={fieldDef.validation}
@@ -426,6 +476,7 @@ function KisanBill() {
                           {...field}
                           label={fieldDef.label}
                           variant="outlined"
+                          disabled={fieldDef.disable}
                           size="small"
                           fullWidth
                           sx={{ mb: 2 }}
@@ -448,11 +499,12 @@ function KisanBill() {
                   ITEM NAME / QTY
                 </div>
 
-                <ul className={styles.listbody}>
+                <ul className={styles.listBodyPrevPending}>
                   {remaininglist.map((item, index) => (
                     <li key={index}>
                       <span className="item-name">{item.item_name}</span>
                       <span className="item-qty">{item.quantity}</span>
+                      <span className="move-button"><button type="button" onClick={() => moveToAddItem(index)}>➔</button></span>
                     </li>
                   ))}
                 </ul>
@@ -481,24 +533,6 @@ function KisanBill() {
                       </option>
                     ))}
                   </select>
-                  {/* <select
-                    ref={itemSelectRef}
-                    value={selectedItem}
-                    onChange={e => setSelectedItem(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === "Enter") {
-                        e.preventDefault(); // prevent form submit
-                        qtyRef.current?.focus();
-                      }
-                    }}
-                  >
-                    <option value="">Select item</option>
-                    {itemsList.map(item => (
-                      <option key={item.name} value={item.name}>
-                        {item.name}
-                      </option>
-                    ))}
-                  </select> */}
                   <input
                     ref={qtyRef}
                     type="number"
@@ -512,15 +546,11 @@ function KisanBill() {
                           printButtonRef.current.focus();
                           return;
                         }
-
-                        itemSelectRef.current?.focus();
-                        setAddRemainingList([...addRemaininglist, { name: selectedItem, quantity: qtyRemaining }]);
-                        setSelectedItem("");
-                        setRemainingQty("");
+                        remainingItemAdd();
                       }
                     }}
                   />
-                  <button>Add</button>
+                  <button type="button" onClick={remainingItemAdd}>Add</button>
                 </div>
 
                 <ul className={styles.listbody}>
@@ -680,6 +710,8 @@ function KisanBill() {
                     size="small"
                     type="number"
                     label={field.label}
+                    InputLabelProps={{ shrink: true }}
+                    placeholder={field.label}
                     {...register(field.name, {
                       required: field.label + " Required"
                     })}
