@@ -62,3 +62,12 @@ export const getKisanPendingStockApi = async (partyId) => {
     console.error('Error posting data:', error);
   }
 };
+
+export const markPendingStockAsCleared = async (pendingId) => {
+  try {
+    const response = await axiosHttp.get(`kisan/markPendingAsSold?pendingId=${pendingId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error posting data:', error);
+  }
+};

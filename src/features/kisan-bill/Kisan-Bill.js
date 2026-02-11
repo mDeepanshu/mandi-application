@@ -3,7 +3,7 @@ import { Grid } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
 import { TableContainer, Paper, InputAdornment, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import { getKisanBill, saveKisanBill, getKisanPendingStockApi } from "../../gateway/kisan-bill-apis";
+import { getKisanBill, saveKisanBill, getKisanPendingStockApi, markPendingStockAsCleared } from "../../gateway/kisan-bill-apis";
 import { getAllPartyList, getItem } from "../../gateway/comman-apis";
 import Autocomplete from "@mui/material/Autocomplete";
 import SearchIcon from "@mui/icons-material/Search";
@@ -47,7 +47,11 @@ function KisanBill() {
     setValue,
     watch,
     resetField
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      kisanType: ""
+    }
+  });
 
   const [kisanList, setKisanList] = useState([]);
   const [kisanFilteredList, setFilteredKisanList] = useState([]);
@@ -55,7 +59,7 @@ function KisanBill() {
   const [formData, setFormData] = useState();
   const [noEntries, setNoEntries] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
-  const [remaininglist, setremainingList] = useState([]);
+  const [remaininglist, setRemainingList] = useState([]);
   const [addRemaininglist, setAddRemainingList] = useState([]);
   const [qtyRemaining, setRemainingQty] = useState("");
 
@@ -87,7 +91,7 @@ function KisanBill() {
       const billData = await getKisanBill(formValues.billId);
       if (billData) {
         if (billData?.responseBody?.pendingStock?.length) {
-          setremainingList(billData?.responseBody?.pendingStock);
+          setRemainingList(billData?.responseBody?.pendingStock);
         }
         if (billData?.responseBody?.bill?.length === 0) {
           setNoEntries(true);
@@ -177,42 +181,6 @@ function KisanBill() {
   };
 
   const saveBill = async () => {
-    // const saveRes = saveKisanBill();
-    // let tableSnapshot = [];
-    // tableData.forEach((element) => {
-    //   tableSnapshot.push({ ...element[element.length - 1] });
-    // });
-    // //
-    // let mergedTable = [];
-    // mergedTable.push({ ...tableSnapshot[0] });
-    // if (tableSnapshot.length) {
-    //   let flag = true;
-    //   for (let index = 1; index < tableSnapshot.length; index++) {
-    //     for (const element of mergedTable) {
-    //       if (element.rate == tableSnapshot[index].rate && element.item_name == tableSnapshot[index].item_name) {
-    //         element.quantity += tableSnapshot[index].quantity;
-    //         element.item_total += tableSnapshot[index].item_total;
-    //         element.bag += tableSnapshot[index].bag;
-    //         flag = false;
-    //         break;
-    //       }
-    //     }
-    //     if (flag) {
-    //       mergedTable.push({ ...tableSnapshot[index] });
-    //     }
-    //     flag = true;
-    //   }
-    // }
-    // //
-    // const bill = {
-    //   ...getValues(),
-    //   kisanBillItems: mergedTable,
-    //   kisanId: getValues().kisan.partyId,
-    //   kisanName: getValues().kisan.name,
-    //   billDate: getValues().date,
-    // };
-    // delete bill.kisan;
-    // delete bill.date;
     const formValues = getValues();
     const bill = {
       mandi_kharcha: formValues.mandi_kharcha,
@@ -235,6 +203,9 @@ function KisanBill() {
     const saveRes = await saveKisanBill(bill);
     if (saveRes?.responseCode == "200") {
       setOpen(true);
+      setTableData([]);
+      setAddRemainingList([]);
+      reset();
     }
   };
 
@@ -413,13 +384,13 @@ function KisanBill() {
   }
 
   const getKisanPendingStock = async (partyId) => {
-    setremainingList([]);
+    setRemainingList([]);
     if (!partyId) return;
     const billData = await getKisanPendingStockApi(partyId);
     if (billData?.responseBody?.length) {
-      setremainingList(billData?.responseBody);
+      setRemainingList(billData?.responseBody);
     } else {
-      setremainingList([{ item_name: "NO PENDING STOCK", quantity: "" }]);
+      setRemainingList([{ item_name: "NO PENDING STOCK", quantity: "" }]);
     }
   };
 
@@ -430,14 +401,17 @@ function KisanBill() {
     else setValue("commission_rate", Number(commission_rate), { shouldValidate: true });
   };
 
-  const moveToAddItem = (index) => {
+  const moveToAddItem = async (index, pendingId) => {
+    const markItemSoldRes = await markPendingStockAsCleared(pendingId);
+    if (!markItemSoldRes?.responseBody?.sold) return;
+
     const itemToMove = remaininglist[index];
     // setAddRemainingList([...addRemaininglist, { name: itemToMove.item_name, quantity: itemToMove.quantity }]);
     setValue("item_name", itemToMove.item_name, { shouldValidate: true });
     setValue("qty", itemToMove.quantity, { shouldValidate: true });
     const updatedRemainingList = [...remaininglist];
     updatedRemainingList.splice(index, 1);
-    setremainingList(updatedRemainingList);
+    setRemainingList(updatedRemainingList);
   };
 
   const remainingItemAdd = () => {
@@ -446,6 +420,15 @@ function KisanBill() {
     setAddRemainingList([...addRemaininglist, { name: selectedItem, quantity: qtyRemaining }]);
     setSelectedItem("");
     setRemainingQty("");
+  };
+
+  const resetFullBill = () => {
+    setTableData([]);
+    setAddRemainingList([]);
+    setRemainingList([]);
+    reset();
+    setValue("kisan", null);
+    setValue("kisanType", null);
   };
 
   const action = (
@@ -469,7 +452,6 @@ function KisanBill() {
                       key={fieldDef.name}
                       name={fieldDef.name}
                       control={control}
-                      defaultValue=""
                       rules={fieldDef.validation}
                       render={({ field }) => (
                         <TextField
@@ -504,7 +486,7 @@ function KisanBill() {
                     <li key={index}>
                       <span className="item-name">{item.item_name}</span>
                       <span className="item-qty">{item.quantity}</span>
-                      <span className="move-button"><button type="button" onClick={() => moveToAddItem(index)}>➔</button></span>
+                      <span className="move-button"><button type="button" onClick={() => moveToAddItem(index, item.id)}>➔</button></span>
                     </li>
                   ))}
                 </ul>
@@ -572,7 +554,14 @@ function KisanBill() {
                 <Controller
                   name="billId"
                   control={control}
-                  render={({ field }) => <TextField style={{ width: '100%' }} {...field} label="Kisan Bill" variant="outlined" size="small" />}
+                  render={({ field }) =>
+                    <TextField
+                      style={{ width: '100%' }}
+                      {...field}
+                      label="Kisan Bill"
+                      variant="outlined"
+                      size="small" />
+                  }
                 />
               </Grid>
               <Grid item xs={3}>
@@ -640,16 +629,24 @@ function KisanBill() {
                   control={control}
                   rules={{ required: "TYPE" }}
                   render={({ field }) => (
-                    <FormControl fullWidth size="small" variant="outlined">
+                    <FormControl
+                      fullWidth
+                      size="small"
+                      variant="outlined"
+                      error={!!errors.kisanType}
+                    >
                       <InputLabel id="party-type-label">TYPE</InputLabel>
                       <Select
                         {...field}
                         label="TYPE"
                         inputRef={selectRef}
-                        onChange={kisanTypeChange}
-                        error={!!errors[field.name]}
-                        helperText={errors[field.name] ? errors[field.name].message : ""}
+                        value={field.value || ""}
+                        onChange={(e) => {
+                          field.onChange(e);       // 🔥 REQUIRED
+                          kisanTypeChange(e);      // your logic
+                        }}
                       >
+                        <MenuItem value="">None</MenuItem> {/* optional */}
                         <MenuItem value="A">A</MenuItem>
                         <MenuItem value="B">B</MenuItem>
                         <MenuItem value="C">C</MenuItem>
@@ -759,6 +756,11 @@ function KisanBill() {
                 ))}
               </Grid>
               <Grid container item xs={12} spacing={2} justifyContent="flex-end">
+                <Grid item xs={2}>
+                  <Button variant="outlined" color="primary" fullWidth onClick={resetFullBill}>
+                    Refresh
+                  </Button>
+                </Grid>
                 <Grid item xs={4}>
                   <Button variant="contained" color="primary" fullWidth onClick={onPrintBtn}>
                     Print
