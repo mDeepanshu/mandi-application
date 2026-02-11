@@ -23,6 +23,18 @@
   border-bottom: 1px solid #ddd;
 }
 
+.listBodyPrevPending{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.listBodyPrevPending li {
+  display: grid;
+  grid-template-columns: 1fr 60px 30px;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid #eee;
+}
 /* Scrollable list */
 .listbody {
   margin: 0;
