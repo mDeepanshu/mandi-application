@@ -37,6 +37,8 @@ function MasterTable(props) {
     "date",
     "auctionDate",
     "deviceName",
+    "bagwisequantity",
+    "bagwisequantityarray",
     "bagWiseQuantity",
     "bagWiseQuantityArray",
     "lastVasuliDate",

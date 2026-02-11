@@ -5,6 +5,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { getAllPartyList } from "../../gateway/comman-apis";
 import styles from "./vyapari_field.module.css";
 import { useOutletContext } from "react-router-dom";
+
 const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelect = () => {} }) => {
   const [vyapariList, setVyapariList] = useState([]);
   const vyapariRef = useRef(null); // Create a ref
@@ -39,7 +40,7 @@ const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelec
             filterOptions={(options, state) =>
               options
                 .filter((option) =>
-                  option.name.toUpperCase().includes(state.inputValue.toUpperCase()) || option.idNo.includes(state.inputValue)
+                  option.name.toUpperCase().includes(state.inputValue.toUpperCase()) || (option.idNo).toString().includes(state.inputValue)
                 )
                 .slice(0, 10)
             }
