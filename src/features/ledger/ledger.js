@@ -66,8 +66,8 @@ function Ledger() {
   const getLedgerData = async (vyapari_id, fromDate, toDate) => {
     const ledger = await getLedger(vyapari_id, fromDate, toDate);
     if (ledger) {
-      if (ledger.responseBody?.transactions.length) {
-        const transactionWithTotals = insertDateWiseTotal([...ledger.responseBody?.transactions]);
+      if (ledger.responseBody?.ledger.length) {
+        const transactionWithTotals = insertDateWiseTotal([...ledger.responseBody?.ledger]);
         setTableData(transactionWithTotals);
       } else {
         setTableData([{ date: null, itemName: "", dr: "NO DATA", cr: "", remark: "" }]);
