@@ -199,7 +199,6 @@ const PartyMaster = () => {
                   name="name"
                   control={control}
                   rules={{ required: "Enter Party Name" }}
-                  defaultValue=""
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -241,7 +240,6 @@ const PartyMaster = () => {
                   <Controller
                     name="ledgerOrder"
                     control={control}
-                    defaultValue=""
                     render={({ field }) => <TextField {...field} fullWidth label="LEDGER INDEX" variant="outlined" disabled={currentPartyType == "KISAN"} />}
                   />
                   <p className="err-msg">{errors.maxLoanDays?.message}</p>
@@ -251,7 +249,6 @@ const PartyMaster = () => {
                     name="maxLoanDays"
                     control={control}
                     rules={vasuliDayLimitValidation}
-                    defaultValue=""
                     render={({ field }) => <TextField {...field} fullWidth label="VASULI DAY LIMIT" variant="outlined" disabled={currentPartyType == "KISAN"} />}
                   />
                   <p className="err-msg">{errors.maxLoanDays?.message}</p>
@@ -261,27 +258,24 @@ const PartyMaster = () => {
                   <Controller
                     name="kisanType"
                     control={control}
-                    defaultValue=""
                     render={({ field }) => <TextField {...field} fullWidth label="KISAN TYPE" variant="outlined" disabled={currentPartyType == "VYAPARI"} />}
                   />
                   <p className="err-msg">{errors.kisanType?.message}</p>
                 </Grid>
                 <Grid item xs={6} sm={2}>
                   <Controller
-                    name="commisionRate"
+                    name="commission"
                     control={control}
                     rules={vasuliDayLimitValidation}
-                    defaultValue=""
-                    render={({ field }) => <TextField {...field} fullWidth label="COMMISION RATE" variant="outlined" disabled={currentPartyType == "VYAPARI"} />}
+                    render={({ field }) => <TextField {...field} fullWidth label="COMMISSION RATE" variant="outlined" disabled={currentPartyType == "VYAPARI"} />}
                   />
-                  <p className="err-msg">{errors.commisionRate?.message}</p>
+                  <p className="err-msg">{errors.commission?.message}</p>
                 </Grid></>)}
               <Grid item xs={6} sm={2}>
                 <Controller
                   name="contact"
                   control={control}
                   rules={{ required: "Enter Contact" }}
-                  defaultValue=""
                   render={({ field }) => <TextField {...field} fullWidth label="CONTACT" variant="outlined" />}
                 />
                 <p className="err-msg">{errors.contact?.message}</p>
