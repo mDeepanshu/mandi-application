@@ -40,14 +40,14 @@ const PartyMaster = () => {
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
   const [alertData, setAlertData] = useState({});
 
-  const [partyColumns, setPartyColumns] = useState(["INDEX", "CONTACT", "ID NO", "PARTY NAME", "OWED AMOUNT", "MAX LOAN DAYS", "Last Vasuli Date", "Ledger Order", "Auto Ledger", "Days Exceded", "PARTY TYPE","PARTY CODE", "EDIT"]);
-  const [keyArray, setKeyArray] = useState(["index", "contact", "idNo", "name", "owedAmount", "maxLoanDays", "lastVasuliDate", "ledgerOrder", "autoLedger", "daysExceded", "partyType","partyCode", "edit"]);
+  const [partyColumns, setPartyColumns] = useState(["INDEX", "CONTACT", "ID NO", "PARTY NAME", "KISAN TYPE", "COMMISSION", "OWED AMOUNT", "MAX LOAN DAYS", "Last Vasuli Date", "Ledger Order", "Auto Ledger", "Days Exceded", "PARTY TYPE", "PARTY CODE", "EDIT"]);
+  const [keyArray, setKeyArray] = useState(["index", "contact", "idNo", "name", "kisanType", "commission", "owedAmount", "maxLoanDays", "lastVasuliDate", "ledgerOrder", "autoLedger", "daysExceded", "partyType", "partyCode", "edit"]);
   const currentPartyType = watch("partyType", "KISAN");
 
-  const partyTypeSelected = watch("partyType", "KISAN");
+  // const partyTypeSelected = watch("partyType", "KISAN");
 
   // Conditionally set the validation rules based on partyType
-  const vasuliDayLimitValidation = partyTypeSelected === "VYAPARI" ? { required: "Enter Vasuli Day Limit" } : {}; // No validation for "KISAN"
+  const vasuliDayLimitValidation = currentPartyType === "VYAPARI" ? { required: "Enter Vasuli Day Limit" } : {}; // No validation for "KISAN"
 
   const sortOnId = () => {
     const sortedData = [...tableDataFiltered].sort((a, b) => a.idNo - b.idNo);
@@ -133,7 +133,7 @@ const PartyMaster = () => {
         // setTableData([...tableData, newTableData[0]]);
         // setTableDataFiltered([...tableDataFiltered, newTableData[0]]);
       }
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const handleClose = (event, reason) => {
@@ -148,7 +148,7 @@ const PartyMaster = () => {
   };
 
   const print = () => {
-    const table = tableDataFiltered.filter((elem) => elem.daysExceded > 0 && elem.owedAmount>0);
+    const table = tableDataFiltered.filter((elem) => elem.daysExceded > 0 && elem.owedAmount > 0);
     setPrintTableData(table);
   };
 
@@ -199,7 +199,6 @@ const PartyMaster = () => {
                   name="name"
                   control={control}
                   rules={{ required: "Enter Party Name" }}
-                  defaultValue=""
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -236,31 +235,47 @@ const PartyMaster = () => {
                 />
                 <p className="err-msg">{errors.partyType?.message}</p>
               </Grid>
-              <Grid item xs={4} sm={2}>
-                <Controller
-                  name="ledgerOrder"
-                  control={control}
-                  defaultValue=""
-                  render={({ field }) => <TextField {...field} fullWidth label="LEDGER INDEX" variant="outlined" disabled={currentPartyType == "KISAN"} />}
-                />
-                <p className="err-msg">{errors.maxLoanDays?.message}</p>
-              </Grid>
-              <Grid item xs={6} sm={2}>
-                <Controller
-                  name="maxLoanDays"
-                  control={control}
-                  rules={vasuliDayLimitValidation}
-                  defaultValue=""
-                  render={({ field }) => <TextField {...field} fullWidth label="VASULI DAY LIMIT" variant="outlined" disabled={currentPartyType == "KISAN"} />}
-                />
-                <p className="err-msg">{errors.maxLoanDays?.message}</p>
-              </Grid>
+              {currentPartyType == "VYAPARI" && (<>
+                <Grid item xs={4} sm={2}>
+                  <Controller
+                    name="ledgerOrder"
+                    control={control}
+                    render={({ field }) => <TextField {...field} fullWidth label="LEDGER INDEX" variant="outlined" disabled={currentPartyType == "KISAN"} />}
+                  />
+                  <p className="err-msg">{errors.maxLoanDays?.message}</p>
+                </Grid>
+                <Grid item xs={6} sm={2}>
+                  <Controller
+                    name="maxLoanDays"
+                    control={control}
+                    rules={vasuliDayLimitValidation}
+                    render={({ field }) => <TextField {...field} fullWidth label="VASULI DAY LIMIT" variant="outlined" disabled={currentPartyType == "KISAN"} />}
+                  />
+                  <p className="err-msg">{errors.maxLoanDays?.message}</p>
+                </Grid></>)}
+              {currentPartyType == "KISAN" && (<>
+                <Grid item xs={4} sm={2}>
+                  <Controller
+                    name="kisanType"
+                    control={control}
+                    render={({ field }) => <TextField {...field} fullWidth label="KISAN TYPE" variant="outlined" disabled={currentPartyType == "VYAPARI"} />}
+                  />
+                  <p className="err-msg">{errors.kisanType?.message}</p>
+                </Grid>
+                <Grid item xs={6} sm={2}>
+                  <Controller
+                    name="commission"
+                    control={control}
+                    rules={vasuliDayLimitValidation}
+                    render={({ field }) => <TextField {...field} fullWidth label="COMMISSION RATE" variant="outlined" disabled={currentPartyType == "VYAPARI"} />}
+                  />
+                  <p className="err-msg">{errors.commission?.message}</p>
+                </Grid></>)}
               <Grid item xs={6} sm={2}>
                 <Controller
                   name="contact"
                   control={control}
                   rules={{ required: "Enter Contact" }}
-                  defaultValue=""
                   render={({ field }) => <TextField {...field} fullWidth label="CONTACT" variant="outlined" />}
                 />
                 <p className="err-msg">{errors.contact?.message}</p>
