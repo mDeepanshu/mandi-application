@@ -71,6 +71,7 @@ function KisanBill() {
   const today = new Date(todayd.getTime() - todayd.getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
   const [itemsList, setItemsList] = useState([]);
+  const [fetchedBill, setFetchedBill] = useState(false);
 
   const fetchList = async () => {
     const list = await getItem("items");
@@ -83,13 +84,21 @@ function KisanBill() {
   };
 
   const fetchBill = async () => {
-    setNoEntries(false);
     // const isValid = await trigger(["kisan", "date"]);
     const isValid = await trigger(["billId"]);
     if (isValid) {
+      setNoEntries(false);
       let formValues = getValues();
+      resetFullBill();
+
       const billData = await getKisanBill(formValues.billId);
+      if (!billData?.responseBody?.items) {
+        snackbarChange({ open: true, alertType: "error", alertMsg: "BILL NOT FOUND" });
+        return;
+      }
       if (billData) {
+        setFetchedBill(true);
+        snackbarChange({ open: true, alertType: "success", alertMsg: "BILL FETCHED" });
         if (billData?.responseBody?.pendingStock?.length) {
           setRemainingList(billData?.responseBody?.pendingStock);
         }
@@ -99,6 +108,11 @@ function KisanBill() {
         setTableData(billData?.responseBody?.items);
         if (billData?.responseBody?.bill) {
           const billConstant = billData?.responseBody?.bill;
+          const selectedKisan = kisanList.find(
+            (party) => party.partyId == billConstant.kisan_id
+          );
+          setValue("kisan", selectedKisan);
+          setValue("billId", billConstant.kisan_bill_id, { shouldValidate: true });
           reset({ ...getValues(), ...billConstant });
         } else {
           reset({ kisan: null });
@@ -181,6 +195,8 @@ function KisanBill() {
   };
 
   const saveBill = async () => {
+    const isValid = await trigger(["kisan", "date", "kaccha_total", "kharcha_total", "pakki_bikri", "mandi_kharcha", "bhada", "driver_inaam", "nagdi", "hammali", "nagar_palika_tax"]);
+    if (!isValid) return;
     const formValues = getValues();
     const bill = {
       mandi_kharcha: formValues.mandi_kharcha,
@@ -203,9 +219,8 @@ function KisanBill() {
     const saveRes = await saveKisanBill(bill);
     if (saveRes?.responseCode == "200") {
       setOpen(true);
-      setTableData([]);
-      setAddRemainingList([]);
-      reset();
+      setFormData(getValues());
+      resetFullBill();
     }
   };
 
@@ -239,8 +254,6 @@ function KisanBill() {
       bag,
       rate,
       hammali,
-      bhada,
-      bhada_rate,
       nagar_palika_tax,
       kaccha_total,
       mandi_kharcha,
@@ -254,10 +267,8 @@ function KisanBill() {
     const nBag = Number(bag);
     const nRate = Number(rate);
 
-    const nHammali = Number(hammali);
-    const nBhada = Number(bhada);
-    const nBhadaRate = Number(bhada_rate);
-    const nNagarTax = Number(nagar_palika_tax);
+    const nHammali = Number(hammali || 0);
+    const nNagarTax = Number(nagar_palika_tax || 0);
     const nKacchaTotal = Number(kaccha_total);
     const nMandiKharcha = Number(mandi_kharcha || 0);
 
@@ -269,7 +280,6 @@ function KisanBill() {
     const itemTotal = nQty * nRate;
 
     const updatedHammali = nHammali + 5 * nBag;
-    const updatedBhada = nBhada + nBhadaRate * nBag;
     const updatedNagarTax = nNagarTax + nBag;
     const updatedKacchaTotal = nKacchaTotal + itemTotal;
 
@@ -280,7 +290,6 @@ function KisanBill() {
       updatedCommission +
       updatedHammali +
       updatedNagarTax +
-      updatedBhada +
       nDriverInaam +
       nNagdi;
 
@@ -427,8 +436,23 @@ function KisanBill() {
     setAddRemainingList([]);
     setRemainingList([]);
     reset();
-    setValue("kisan", null);
-    setValue("kisanType", null);
+    reset({
+      kisan: null,
+      kisanType: null,
+      hammali: null,
+      nagar_palika_tax: null,
+      mandi_kharcha: null,
+      bhada: null,
+      commission_rate: null,
+      driver_inaam: null,
+      nagdi: null,
+      bhada_rate: null,
+      kaccha_total: null,
+      kharcha_total: null,
+      pakki_bikri: null,
+      billId: null,
+    });
+    setFetchedBill(false);
   };
 
   const action = (
@@ -453,6 +477,7 @@ function KisanBill() {
                       name={fieldDef.name}
                       control={control}
                       rules={fieldDef.validation}
+                      defaultValue=""
                       render={({ field }) => (
                         <TextField
                           {...field}
@@ -554,12 +579,15 @@ function KisanBill() {
                 <Controller
                   name="billId"
                   control={control}
+                  rules={{ required: "Enter Bill Number" }}
                   render={({ field }) =>
                     <TextField
                       style={{ width: '100%' }}
                       {...field}
                       label="Kisan Bill"
                       variant="outlined"
+                      error={!!errors[field.name]}
+                      helperText={errors[field.name] ? errors[field.name].message : ""}
                       size="small" />
                   }
                 />
@@ -767,7 +795,7 @@ function KisanBill() {
                   </Button>
                 </Grid>
                 <Grid item xs={2}>
-                  <Button variant="contained" color="success" type="button" onClick={saveBill} ref={printButtonRef} fullWidth>
+                  <Button variant="contained" disabled={fetchedBill} color="success" type="button" onClick={saveBill} ref={printButtonRef} fullWidth>
                     Save & Print
                   </Button>
                   <ReactToPrint

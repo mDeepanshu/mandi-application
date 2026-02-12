@@ -75,8 +75,6 @@ function VasuliList() {
   };
 
   const handleConformationClose = (action) => {
-    console.log("Final Edit Global Data:", finalEditGlobal);
-
     const day = String(new Date(finalEditGlobal.date).getDate()).padStart(2, "0");
     const month = String(new Date(finalEditGlobal.date).getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
     const year = new Date(finalEditGlobal.date).getFullYear();
