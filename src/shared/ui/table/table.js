@@ -29,7 +29,7 @@ function SharedTable(props) {
   const [qty, setQty] = useState([]);
   const [qtyTotal, setQtyTotal] = useState(0);
   const [chungiTxn, setChungiTxn] = useState();
-
+  
   const {
     control,
     formState: { errors },
@@ -38,7 +38,7 @@ function SharedTable(props) {
     getValues,
   } = useForm();
   const [rowVariables, setRowVariables] = useState([]);
-
+  
   const excludeArr = [
     "edit",
     "delete",
@@ -91,7 +91,7 @@ function SharedTable(props) {
   const editFromTable = (index, tranIdx) => {
     let isChungiTxn = false;
     let fieldIndex;
-    if (tableData[index][0].bag == null) {
+    if (tableData[index].bag == null) {
       fieldIndex = fieldDefinitions.findIndex(obj => obj.name === "bag");
       setChungiTxn(true);
       isChungiTxn = true;
@@ -123,12 +123,12 @@ function SharedTable(props) {
         if (keyArray[int] == "partyName") {
           let defaultOption;
           if (props.bill_vyapari_id) defaultOption = vyapariList.find((option) => option.partyId == props.bill_vyapari_id);
-          else defaultOption = vyapariList.find((option) => option.name == tableData[index]?.[tranIdx]?.partyName);
+          else defaultOption = vyapariList.find((option) => option.name == tableData[index]?.partyName);
           setValue("partyName", defaultOption || null);
         } else if (keyArray[int] == "quantity" && !isChungiTxn) {
-          setQtyTotal(tableData?.[index]?.[tranIdx]?.[keyArray[int]]);
-          setQty(tableData?.[index]?.[tranIdx]?.bagWiseQuantityArray);
-        } else setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
+          setQtyTotal(tableData?.[index]?.[keyArray[int]]);
+          setQty(tableData?.[index]?.bagWiseQuantityArray);
+        } else setValue(keyArray[int], tableData[index]?.[keyArray[int]]);
     }
     setOpen(true);
   };
@@ -147,7 +147,7 @@ function SharedTable(props) {
       setAllTableData(props.tableData);
       setTotalPages(Math.floor(props.tableData.length / 10));
       setKeyArray(props.keyArray);
-
+      
       let fields = [];
       for (let int = 0; int < props.keyArray.length; int++) {
         if (!excludeArr.includes(props.keyArray[int])) {
@@ -183,17 +183,19 @@ function SharedTable(props) {
     if (!isValid) return;
     if (saveAndReflect) {
       let changedValues = {
-        ...tableData[editingIndex][tableData[editingIndex]?.length - 1],
+        ...tableData[editingIndex],
         ...getValues(),
         vyapariId: getValues().partyName.partyId,
       };
       changedValues.bagWiseQuantity = [];
       if (changedValues.chungi && changedValues.chungi !=0 ) changedValues.chungi = Number(changedValues.chungi);
       if (!chungiTxn) {
-        changedValues.bagWiseQuantity = qty;
+        changedValues.bagWiseQuantity = qty.join(",");
         changedValues.quantity = qtyTotal;
       }
       delete changedValues.auctionDate;
+      console.log(changedValues);
+      
       await updateAuctionTransaction(changedValues);
       props.refreshBill();
       handleClose();
@@ -222,7 +224,7 @@ function SharedTable(props) {
         ...tableData[editingIndex][tableData[editingIndex]?.length - 1],
         ...finalEdit,
       };
-      let previousTableData = tableData[editingIndex].push(updatedObject);
+      // let previousTableData = tableData[editingIndex].push(updatedObject);
       // previousTableData[editingIndex][tableData[editingIndex].length - 1] = updatedObject;
       // setTableData(previousTableData);
       handleClose();
@@ -250,7 +252,6 @@ function SharedTable(props) {
   const newQty = (event) => {
     event.preventDefault();
     const value = getValues("quantity");
-    const rateValue = getValues("rate");
     setQty([...qty, Number(value)]);
     const currentVal = getValues("bag");
     setValue("bag", Number(currentVal) + 1, {
@@ -324,10 +325,10 @@ function SharedTable(props) {
                           } else {
                             return "No Edit History";
                           }
-                        case "auctionDate":
-                          return handleConvertDate(rowData?.[rowData?.length - 1 - rowVariables?.[index]]?.[key]);
+                        // case "auctionDate":
+                        //   return handleConvertDate(rowData?.[key]);
                         default:
-                          return rowData?.[rowData?.length - 1 - rowVariables?.[index]]?.[key];
+                          return rowData?.[key];
                       }
                     })()}
                   </TableCell>
