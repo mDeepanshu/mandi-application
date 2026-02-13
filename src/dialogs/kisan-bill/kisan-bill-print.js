@@ -66,11 +66,11 @@ const KisanBillPrint = forwardRef((props, ref) => {
         </div>
         <div className={styles.levelTwo}>
           <div className={styles.constants}>
-            <div>मंडी खर्चा: {props.formData?.mandiKharcha}</div>
+            <div>मंडी खर्चा: {props.formData?.mandi_kharcha}</div>
             <div>हम्माली: {props.formData?.hammali}</div>
-            <div>न. पा. टैक्स: {props.formData?.nagarPalikaTax}</div>
+            <div>न. पा. टैक्स: {props.formData?.nagar_palika_tax}</div>
             <div>भाड़ा: {props.formData?.bhada}</div>
-            <div>ड्राइवर इनाम: {props.formData?.driver}</div>
+            <div>ड्राइवर इनाम: {props.formData?.driver_inaam}</div>
             <div>नगद: {props.formData?.nagdi}</div>
           </div>
           <div className={styles.tableContainer}>
@@ -106,17 +106,17 @@ const KisanBillPrint = forwardRef((props, ref) => {
         </div>
         <div className={styles.lastRow}>
           <div className={styles.constantsTotal}>
-            <b>खर्चा कुल: {props.formData?.kharchaTotal}</b>
+            <b>खर्चा कुल: {props.formData?.kharcha_total}</b>
           </div>
           <div className={styles.totals}>
             <div>
-              कुल बिक्र: {props.formData?.total}
+              कुल बिक्र: {props.formData?.kaccha_total}
             </div>
             <div>
-              खर्चा कुल: {props.formData?.kharchaTotal}
+              खर्चा कुल: {props.formData?.kharcha_total}
             </div>
             <div>
-              कुल: {props.formData?.totalBikri}
+              कुल: {props.formData?.pakki_bikri}
             </div>
           </div>
         </div>
