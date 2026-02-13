@@ -146,13 +146,11 @@ function KisanBill() {
 
   const editKisanTable = (index) => {
     const rowToEdit = tableData[index];
+    deleteFromTable(index);
     setValue("item_name", rowToEdit.item_name, { shouldValidate: true });
     setValue("bag", rowToEdit.bag, { shouldValidate: true });
     setValue("qty", rowToEdit.quantity, { shouldValidate: true });
     setValue("rate", rowToEdit.rate, { shouldValidate: true });
-    const updatedTableData = [...tableData];
-    updatedTableData.splice(index, 1);
-    setTableData(updatedTableData);
   };
 
   const deleteFromTable = (index) => {
@@ -497,7 +495,7 @@ function KisanBill() {
                   )
               )}
             </Grid>
-            <Grid container justifyContent="center" alignItems="center" style={{ marginTop: '16px' }}>
+            <Grid container justifyContent="center" alignItems="center">
               {/* <PreviousBills billData={{ id: getValues()?.kisan?.partyId, date: getValues()?.date }} partyType={"kisan"} /> */}
 
               <div className={styles.itemlist}>
