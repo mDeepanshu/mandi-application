@@ -92,12 +92,12 @@ const KisanBillPrint = forwardRef((props, ref) => {
                 {printTable?.map((row, index) => (
                   <tr key={index} sx={{ padding: "4px 8px", lineHeight: "1.2rem" }}>
                     <td component="th" scope="row">
-                      {row?.itemName}
+                      {row?.item_name}
                     </td>
                     <td align="right">{row?.bag}</td>
                     <td align="right">{row?.quantity}</td>
                     <td align="right">{row?.rate}</td>
-                    <td align="right">{row?.itemTotal}</td>
+                    <td align="right">{row?.item_total}</td>
                   </tr>
                 ))}
               </tbody>
