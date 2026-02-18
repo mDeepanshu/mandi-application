@@ -808,7 +808,7 @@ function KisanBill() {
         </Grid>
       </form>
       <div style={{ display: "none" }}>
-        <KisanBillPrint ref={componentRef} tableDataPrint={structuredClone(tableData)} restructureTable={false} formData={formData} />
+        <KisanBillPrint ref={componentRef} remainingStock={remaininglist} tableDataPrint={structuredClone(tableData)} restructureTable={false} formData={formData} />
       </div>
       <div>
         <Snackbar open={open} autoHideDuration={2500} onClose={handleClose}>

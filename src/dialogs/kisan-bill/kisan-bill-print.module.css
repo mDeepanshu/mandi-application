@@ -55,6 +55,9 @@
 .constants>* {
     padding: 0.5rem 0;
     border-top: 1px solid black;
+    display: flex;
+    justify-content: space-between;
+
 }
 
 
@@ -92,7 +95,7 @@ tr {
 .totals {
     display: flex;
     flex-direction: column;
-    width: 50%;
+    width: 25%;
     font-size: 12px;
     font-weight: 550;
     height: 2.1cm;
@@ -100,14 +103,15 @@ tr {
 
 .totals>div {
     text-align: right;
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
+    padding: 0.1rem;
 }
 
-/* @media print {
-
+@media print {
     @page {
         size: 14cm 20cm;
         margin: 0;
-
     }
-
-} */
+}
