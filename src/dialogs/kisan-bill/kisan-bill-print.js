@@ -66,12 +66,17 @@ const KisanBillPrint = forwardRef((props, ref) => {
         </div>
         <div className={styles.levelTwo}>
           <div className={styles.constants}>
-            <div>मंडी खर्चा: {props.formData?.mandi_kharcha}</div>
-            <div>हम्माली: {props.formData?.hammali}</div>
-            <div>न. पा. टैक्स: {props.formData?.nagar_palika_tax}</div>
-            <div>भाड़ा: {props.formData?.bhada}</div>
-            <div>ड्राइवर इनाम: {props.formData?.driver_inaam}</div>
-            <div>नगद: {props.formData?.nagdi}</div>
+            <div><div>मंडी खर्चा: </div><div>{props.formData?.mandi_kharcha}</div></div>
+            <div><div>हम्माली: </div><div>{props.formData?.hammali}</div></div>
+            <div><div>न. पा. टैक्स: </div><div>{props.formData?.nagar_palika_tax}</div></div>
+            <div><div>भाड़ा: </div><div>{props.formData?.bhada}</div></div>
+            <div><div>ड्राइवर इनाम: </div><div>{props.formData?.driver_inaam}</div></div>
+            <div><div>नगद: </div><div>{props.formData?.nagdi}</div></div>
+            <div><div><b>खर्चा कुल:</b></div><div><b>{props.formData?.kharcha_total}</b></div></div>
+            {props.remainingStock?.length > 0 && <div><div><b>पुराना बकाया स्टॉक</b></div><div><b></b></div></div>}
+            {props.remainingStock?.map((row,index) => (
+            <div><div>{row?.item_name}</div><div><b>{row?.quantity}</b></div></div>
+            ))}
           </div>
           <div className={styles.tableContainer}>
             <table
@@ -106,17 +111,16 @@ const KisanBillPrint = forwardRef((props, ref) => {
         </div>
         <div className={styles.lastRow}>
           <div className={styles.constantsTotal}>
-            <b>खर्चा कुल: {props.formData?.kharcha_total}</b>
           </div>
           <div className={styles.totals}>
             <div>
-              कुल बिक्र: {props.formData?.kaccha_total}
+              <div>कुल बिक्र: </div> <div>{props.formData?.kaccha_total}</div>
             </div>
             <div>
-              खर्चा कुल: {props.formData?.kharcha_total}
+              <div>खर्चा कुल: </div> <div>{props.formData?.kharcha_total}</div>
             </div>
             <div>
-              कुल: {props.formData?.pakki_bikri}
+              <div> कुल: </div> <div>{props.formData?.pakki_bikri}</div>
             </div>
           </div>
         </div>
