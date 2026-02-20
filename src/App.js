@@ -6,7 +6,7 @@ import Login from "./features/login/login";
 import NavBar from "./features/navbar/Nav-Bar";
 import SnackbarGlobal from "./shared/ui/snackbar/snackbar";
 
-function App() {
+function App({ variant }) {
   const [loginStatus, setLoginStatus] = useState(true);
   const [snackbarData, setSnackbarData] = useState({});
   const [syncComplete, setSyncComplete] = useState("");
@@ -14,26 +14,6 @@ function App() {
     isLoading: false,
     message: "Loading...",
   });
-
-  const variant = useMemo(() => {
-    if (typeof window === "undefined") return "full";
-
-    const hostname = window.location.hostname;
-
-    if (hostname === "hiskisanbill.make73.com") {
-      return "kisan-only";
-    }
-
-    if (hostname === "mandiapplication.make73.com") {
-      return "main-app";
-    }
-
-    if (hostname.includes("localhost")) {
-      return "local";
-    }
-
-    return "main-app";
-  }, []);
 
   const changeLoginState = (value) => setLoginStatus(value);
   const snackbarChange = (data) => setSnackbarData(data);

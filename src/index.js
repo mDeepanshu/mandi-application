@@ -20,18 +20,20 @@ const KisanBillSummaryComponent = lazy(() =>
 const hostname =
   typeof window !== "undefined" ? window.location.hostname : "";
 
-const isKisanOnly = hostname === "hiskisanbill.make73.com";
-const isMainApp = hostname === "mandiapplication.make73.com";
+const isKisanOnly = hostname.includes("hiskisanbill");
+const isMainApp = hostname.includes("mandiapplication");
 const isLocalhost = hostname.includes("localhost");
+const isVercelPreview = hostname.includes("vercel.app");
 
 let childrenRoutes = [];
+let variant = "main-app";
 
 if (isKisanOnly) {
   childrenRoutes = [
-    { path: "/", element: <Kisan /> }, 
-    { path: "kisan-bill", element: <Kisan /> },
+    { path: "/", element: <Kisan /> },
     { path: "kisan-bill-summry", element: <KisanBillSummaryComponent /> },
   ];
+  variant = "kisan-only";
 }
 
 else if (isMainApp) {
@@ -46,9 +48,10 @@ else if (isMainApp) {
     { path: "vasuli-list", element: <VasuliList /> },
     { path: "device-control", element: <DeviceControl /> },
   ];
+  variant = "main-app";
 }
 
-else if (isLocalhost) {
+else if (isLocalhost || isVercelPreview) {
   childrenRoutes = [
     { path: "/", element: <Ledger /> },
     { path: "ledger", element: <Ledger /> },
@@ -62,16 +65,18 @@ else if (isLocalhost) {
     { path: "vasuli-list", element: <VasuliList /> },
     { path: "device-control", element: <DeviceControl /> },
   ];
+  variant = "local";
 }
 
 else {
   childrenRoutes = [{ path: "/", element: <Ledger /> }];
+  variant = "main-app";
 }
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <App variant={variant} />,
     children: childrenRoutes,
   },
 ]);

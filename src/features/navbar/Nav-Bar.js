@@ -54,23 +54,26 @@ function NavBar(props) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hostname = window?.location?.hostname;
-    const isKisanOnly = hostname === "hiskisanbill.make73.com";
-    const isMainApp = hostname === "mandiapplication.make73.com";
-    const isLocal = hostname?.includes("localhost");
-
-    if (isKisanOnly) {
-      setNavItems(kisanBillNavItems);
-      setShowMoreMenu(false); 
-    } else if (isMainApp) {
-      setNavItems(navItemsMain);
-      setShowMoreMenu(true);
-    } else if (isLocal) {
-      setNavItems([...kisanBillNavItems, ...navItemsMain]);
-      setShowMoreMenu(true);
-    } else {
-      setNavItems(navItemsMain);
-      setShowMoreMenu(true);
+    switch (props.variant) {
+      case "kisan-only":
+        setNavItems(kisanBillNavItems);
+        setShowMoreMenu(false);
+        setLabel("KISAN BILL");
+        break;
+      case "main-app":
+        setNavItems(navItemsMain);
+        setShowMoreMenu(true);
+        setLabel("MANDI APPLICATION");
+        break;
+      case "local":
+        setNavItems([...kisanBillNavItems, ...navItemsMain]);
+        setShowMoreMenu(true);
+        setLabel("LOCAL TESTING");
+        break;
+      default:
+        setNavItems(navItemsMain);
+        setShowMoreMenu(true);
+        setLabel("MANDI APPLICATION");
     }
   }, []);
 
