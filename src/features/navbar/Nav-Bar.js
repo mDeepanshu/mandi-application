@@ -149,13 +149,11 @@ function NavBar(props) {
             </Link>
           ))}
 
-        {showMoreMenu && (
-          <ListItem disablePadding onClick={syncPartyItem}>
-            <ListItemButton sx={{ textAlign: "left" }}>
-              <ListItemText primary="SYNC PARTY & ITEM LIST" />
-            </ListItemButton>
-          </ListItem>
-        )}
+        <ListItem disablePadding onClick={syncPartyItem}>
+          <ListItemButton sx={{ textAlign: "left" }}>
+            <ListItemText primary="SYNC PARTY & ITEM LIST" />
+          </ListItemButton>
+        </ListItem>
       </List>
     </Box>
   );
@@ -179,7 +177,7 @@ function NavBar(props) {
               </Link>
             ))}
 
-            {showMoreMenu && (
+            {(
               <>
                 <Button onClick={handleClick} sx={{ color: "#fff" }}>
                   MORE
@@ -190,7 +188,7 @@ function NavBar(props) {
                   open={open}
                   onClose={handleClose}
                 >
-                  {remNavItems.map((item, index) => (
+                  {showMoreMenu && remNavItems.map((item, index) => (
                     <MenuItem
                       key={index}
                       onClick={() => handleMenuItemClick(item.name)}
