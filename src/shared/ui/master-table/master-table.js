@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { Delete, Edit, ArrowForwardIos, ArrowBackIos } from "@mui/icons-material";
 import { Button } from "@mui/material";
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import styles from "./masterTable.module.css";
 import Pagination from "@mui/material/Pagination";
 import { useForm, Controller } from "react-hook-form";
@@ -418,6 +418,36 @@ function MasterTable(props) {
               {fieldDefinitions.map((fieldDef) => {
                 if (fieldDef.name === "vyapariName")
                   return <VyapariField name="vyapariName" control={control} errors={errors} size="small" />;
+                else if (fieldDef.name === "kisanType") {
+                  return (
+                    <Controller
+                      name="kisanType"
+                      control={control}
+                      rules={{ required: "TYPE" }}
+                      render={({ field }) => (
+                        <FormControl
+                          fullWidth
+                          variant="outlined"
+                          error={!!errors.kisanType}
+                          sx={{ mb: 2.5 }}
+                        >
+                          <InputLabel id="party-type-label">TYPE</InputLabel>
+                          <Select
+                            {...field}
+                            label="TYPE"
+                            size="small"
+                            value={field.value || ""}
+                          >
+                            <MenuItem value="A">BPL</MenuItem>
+                            <MenuItem value="B">Kisan Bill</MenuItem>
+                            <MenuItem value="C">Aalo</MenuItem>
+                            <MenuItem value="D">Local Bill</MenuItem>
+                          </Select>
+                        </FormControl>
+                      )}
+                    />
+                  );
+                }
                 else {
                   return (
                     <>
@@ -453,7 +483,7 @@ function MasterTable(props) {
                           style={{
                             display: "flex",
                             width: "100%",
-                            marginTop: -20,
+                            // marginTop: -20,
                           }}
                         >
                           <div className={styles.quantitylist}>

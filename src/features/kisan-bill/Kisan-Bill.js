@@ -123,11 +123,7 @@ function KisanBill() {
 
   const getKisanNames = async () => {
     const allKisan = await getAllPartyList("KISAN");
-    if (allKisan?.responseBody) {
-      setKisanList(allKisan?.responseBody);
-      const filteredList = kisanList?.filter((kisan) => kisan.kisanType === "A");
-      setFilteredKisanList(filteredList);
-    }
+    if (allKisan?.responseBody) setKisanList(allKisan?.responseBody);
   };
 
   useEffect(() => {
@@ -599,7 +595,7 @@ function KisanBill() {
                     <Autocomplete
                       {...field}
                       value={field.value || null}
-                      options={kisanList}
+                      options={kisanFilteredList}
                       getOptionLabel={(option) => option.name}
                       getOptionKey={(option) => option.partyId}
                       freeSolo
@@ -673,9 +669,10 @@ function KisanBill() {
                         }}
                       >
                         <MenuItem value="">None</MenuItem> {/* optional */}
-                        <MenuItem value="A">A</MenuItem>
-                        <MenuItem value="B">B</MenuItem>
-                        <MenuItem value="C">C</MenuItem>
+                        <MenuItem value="A">BPL</MenuItem>
+                        <MenuItem value="B">Kisan Bill</MenuItem>
+                        <MenuItem value="C">Aalo</MenuItem>
+                        <MenuItem value="D">Local Bill</MenuItem>
                       </Select>
                     </FormControl>
                   )}

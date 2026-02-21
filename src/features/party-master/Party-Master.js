@@ -255,10 +255,34 @@ const PartyMaster = () => {
                 </Grid></>)}
               {currentPartyType == "KISAN" && (<>
                 <Grid item xs={4} sm={2}>
-                  <Controller
+                  {/* <Controller
                     name="kisanType"
                     control={control}
                     render={({ field }) => <TextField {...field} fullWidth label="KISAN TYPE" variant="outlined" disabled={currentPartyType == "VYAPARI"} />}
+                  /> */}
+                  <Controller
+                    name="kisanType"
+                    control={control}
+                    rules={{ required: "TYPE" }}
+                    render={({ field }) => (
+                      <FormControl
+                        fullWidth
+                        variant="outlined"
+                        error={!!errors.kisanType}
+                      >
+                        <InputLabel id="party-type-label">TYPE</InputLabel>
+                        <Select
+                          {...field}
+                          label="TYPE"
+                          value={field.value || ""}
+                        >
+                          <MenuItem value="A">BPL</MenuItem>
+                          <MenuItem value="B">Kisan Bill</MenuItem>
+                          <MenuItem value="C">Aalo</MenuItem>
+                          <MenuItem value="D">Local Bill</MenuItem>
+                        </Select>
+                      </FormControl>
+                    )}
                   />
                   <p className="err-msg">{errors.kisanType?.message}</p>
                 </Grid>
