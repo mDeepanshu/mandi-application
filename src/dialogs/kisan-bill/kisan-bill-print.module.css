@@ -109,9 +109,9 @@ tr {
     padding: 0.1rem;
 }
 
-/* @media print {
+@media print {
     @page {
         size: 14cm 20cm;
         margin: 0;
     }
-} */
+}
