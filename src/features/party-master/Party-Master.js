@@ -157,6 +157,7 @@ const PartyMaster = () => {
   }, [printTableData]);
 
   const editParty = async (data) => {
+    data.owedAmount = parseInt(data.owedAmount);
     let editRes = await editPartyGlobal(data);
     if (editRes.responseCode == "200") {
       fetchItems();

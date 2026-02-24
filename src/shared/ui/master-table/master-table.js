@@ -42,7 +42,6 @@ function MasterTable(props) {
     "lastVasuliDate",
     "idNo",
     "daysExceded",
-    "owedAmount",
     "partyType",
   ];
   const [adjustHeight, setAdjustHeight] = useState("370px");
@@ -193,7 +192,6 @@ function MasterTable(props) {
       delete editedData.daysExceded;
       delete editedData.idNo;
       delete editedData.partyId;
-      delete editedData.owedAmount;
 
       props.editParty(editedData);
       handleClose();
