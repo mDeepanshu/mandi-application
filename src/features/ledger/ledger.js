@@ -321,8 +321,8 @@ THANK YOU
               </div>
               <div>
                 <b>
-                  <span className={styles.fulllabel}>CLOSING BALANCE: </span>
-                  <span className={styles.shortlabel}>CLS: </span>
+                  <span className={styles.fulllabel}>बकाया: </span>
+                  <span className={styles.shortlabel}>बकाया: </span>
                   {getValues().closingAmount}
                 </b>
               </div>
