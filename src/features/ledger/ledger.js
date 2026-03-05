@@ -19,8 +19,8 @@ function Ledger() {
   const triggerRef = useRef();
 
   const [tableData, setTableData] = useState([]);
-  const [ledgerColumns, setledgerColumns] = useState(["DATE", "ITEM NAME", "DEBIT", "CREDIT", "REMARK"]);
-  const [keyArray, setKeyArray] = useState(["date", "itemNameWithCheckbox", "dr", "cr", "remark"]);
+  const [ledgerColumns, setledgerColumns] = useState(["DATE", "ITEM NAME", "QTY", "DEBIT", "CREDIT", "REMARK"]);
+  const [keyArray, setKeyArray] = useState(["date", "itemNameWithCheckbox", "quantity", "dr", "cr", "remark"]);
   const [showAllLedgerPrint, setShowAllLedgerPrint] = useState(false);
   const [showDuplicateVasuli, setShowDuplicateVasuli] = useState({ display: false, message: "" });
   const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
