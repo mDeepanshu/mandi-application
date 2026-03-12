@@ -16,14 +16,23 @@ const Kisan = lazy(() => import("./features/kisan-bill/Kisan-Bill"));
 const KisanBillSummaryComponent = lazy(() =>
   import("./features/kisan-bill-summary/kisanBillSummary")
 );
+//Crate Components
+const CrateFirstEntry = lazy(() => import("./features/crate_Module/crate-first-entry/crate-first-entry"));
+const CrateLedger = lazy(() => import("./features/crate_Module/crate-ledger/crate-ledger"));
+const CrateMaster = lazy(() => import("./features/crate_Module/crate-master/crate-master"));
+const CrateStockReport = lazy(() => import("./features/crate_Module/crate-stock-report/crate-stock-report"));
+const CrateVasuliSheet = lazy(() => import("./features/crate_Module/crate-vasuli-sheet/crate-vasuli-sheet"));
+const PendingCrate = lazy(() => import("./features/crate_Module/pending-crate/pending-crate"));
+//
 
 const hostname =
   typeof window !== "undefined" ? window.location.hostname : "";
 
 const isKisanOnly = hostname.includes("hiskisanbill");
 const isMainApp = hostname.includes("mandiapplication");
-const isLocalhost = hostname.includes("localhost");
-const isVercelPreview = hostname.includes("vercel.app");
+const isCrateModule = hostname.includes("crate") || true;
+const isLocalhost = hostname.includes("localhost") || false;
+const isVercelPreview = hostname.includes("vercel.app") || false;
 
 let childrenRoutes = [];
 let variant = "main-app";
@@ -51,6 +60,19 @@ else if (isMainApp) {
   variant = "main-app";
 }
 
+else if (isCrateModule) {
+  
+  childrenRoutes = [
+    { path: "/", element: <CrateFirstEntry /> },
+    { path: "pending-crate", element: <PendingCrate /> },
+    { path: "crate-ledger", element: <CrateLedger /> },
+    { path: "crate-master", element: <CrateMaster /> },
+    { path: "crate-stock-report", element: <CrateStockReport /> },
+    { path: "crate-vasuli-sheet", element: <CrateVasuliSheet /> },
+  ];
+  variant = "crate-app";
+}
+
 else if (isLocalhost || isVercelPreview) {
   childrenRoutes = [
     { path: "/", element: <Ledger /> },
@@ -76,7 +98,7 @@ else {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App variant={variant} />,
+    element: <App variant={"crate-app"} />,
     children: childrenRoutes,
   },
 ]);

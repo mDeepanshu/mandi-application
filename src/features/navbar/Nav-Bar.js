@@ -28,19 +28,25 @@ const kisanBillNavItems = [
   { name: "kisan-bill-summry", label: "Kisan Bill Summary" },
 ];
 
+const CrateModuleNavItems = [
+  { name: "/", label: "Crate First Entry" },
+  { name: "crate-ledger", label: "Crate Ledger" },
+  { name: "crate-stock-report", label: "Crate Stock Report" },
+];
+
+const remainingCrateItems = [
+  { name: "crate-master", label: "Crate Master" },
+  { name: "crate-vasuli-sheet", label: "Crate Vasuli Sheet" },
+  { name: "pending-crate", label: "Pending Crate" },
+];
+
 const navItemsMain = [
   { name: "vyapari-bill", label: "Vyapari Bill" },
   { name: "ledger", label: "Ledger" },
   { name: "vyapari-vasuli-sheet", label: "Vyapari Vasuli Sheet" },
 ];
 
-const remNavItems = [
-  { name: "item-master", label: "ITEM MASTER" },
-  { name: "party-master", label: "PARTY MASTER" },
-  { name: "auction-entry", label: "AUCTION ENTRIES" },
-  { name: "vasuli-list", label: "VASULI LIST" },
-  { name: "device-control", label: "DEVICE CONTROL" },
-];
+
 
 const drawerWidth = 240;
 
@@ -51,9 +57,17 @@ function NavBar(props) {
   const [navItems, setNavItems] = useState([]);
   const [showMoreMenu, setShowMoreMenu] = useState(true);
 
+  const [remNavItems, setRemNavItems] = useState([
+    { name: "vyapari-bill", label: "Vyapari Bill" },
+    { name: "ledger", label: "Ledger" },
+    { name: "vyapari-vasuli-sheet", label: "Vyapari Vasuli Sheet" },
+  ]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log(props.variant);
+
     switch (props.variant) {
       case "kisan-only":
         setNavItems(kisanBillNavItems);
@@ -64,6 +78,12 @@ function NavBar(props) {
         setNavItems(navItemsMain);
         setShowMoreMenu(true);
         setLabel("MANDI APPLICATION");
+        break;
+      case "crate-app":
+        setNavItems(CrateModuleNavItems);
+        setShowMoreMenu(true);
+        setRemNavItems(remainingCrateItems);
+        setLabel("CRATE");
         break;
       case "local":
         setNavItems([...kisanBillNavItems, ...navItemsMain]);
