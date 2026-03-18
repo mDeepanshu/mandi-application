@@ -1,0 +1,179 @@
+.dialogBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.dialog {
+  background: white;
+  width: 500px;
+  margin: 100px auto;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Rows */
+.rows {
+  margin-top: 10px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.row input {
+  flex: 1;
+  padding: 8px;
+}
+
+/* Buttons */
+button {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.btnContainer{
+  display: flex;
+  justify-content:center;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Space between '+' and 'Add Row' */
+  
+  background-color: #ffffff;
+  border: 1px solid #d1d9e0; /* Light grey-blue border */
+  border-radius: 6px;
+  
+  padding: 6px 16px;
+  color: #44515f; /* Deep blue-grey text color */
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  margin-top: 10px;
+  width: 30%;
+}
+
+.addBtn:hover {
+  background-color: #f8f9fa;
+  border-color: #b0bac5;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.saveBtn {
+  background: green;
+  color: white;
+  border-radius: 4px;
+}
+
+.cancelBtn {
+  background: #f0f0f0;
+  color: #333;
+  border-radius: 4px;
+}
+
+/* Total */
+.total {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* table.module.css */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background-color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid #d1d9e0;
+}
+
+.table thead tr {
+  background-color: #e9eff5; /* Light grey-blue header */
+  border-top: 1px solid #d1d9e0;
+  border-bottom: 1px solid #d1d9e0;
+}
+
+.table th {
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #55606b;
+  font-size: 0.9rem;
+  border: 1px solid #d1d9e0;
+}
+
+.table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+  font-size: 0.9rem;
+  border: 1px solid #d1d9e0;
+}
+
+/* Optional: Subtle hover effect for rows */
+.table tbody tr:hover {
+  background-color: #fcfcfc;
+}
+
+/* Aligning numbers to the left to match your screenshot */
+.table td:last-child, 
+.table th:last-child {
+  width: 40%; /* Adjusting width for the count column */
+}
+
+hr{
+  margin-left: -20px;
+  margin-right: -20px;
+}
+.select {
+  width: 100%; /* Or a specific width like 120px if you want it compact */
+  padding: 4px 8px;
+  border: 1px solid #767676; /* Standard thin border color seen in your image */
+  border-radius: 2px;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  outline: none;
+  border-radius: 4px;
+}
+
+.select:focus {
+  border-color: #005fcc; /* Subtle blue highlight on focus */
+}
+
+.input{
+  width: 90%; /* Or a specific width like 120px if you want it compact */
+  padding: 4px 8px;
+  border: 1px solid #767676; /* Standard thin border color seen in your image */
+  border-radius: 2px;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  outline: none;
+  border-radius: 4px;
+}

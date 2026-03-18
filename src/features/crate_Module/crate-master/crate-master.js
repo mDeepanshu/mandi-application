@@ -80,7 +80,7 @@ const CrateMaster = () => {
                         />
                         <p className='err-msg'>{errors.crateName?.message}</p>
                     </Grid>
-                    <Grid item xs={4}>
+                    {/* <Grid item xs={4}>
                         <Controller
                             name="crateType"
                             control={control}
@@ -100,7 +100,7 @@ const CrateMaster = () => {
                             )}
                         />
                         <p className='err-msg'>{errors.crateType?.message}</p>
-                    </Grid>
+                    </Grid> */}
 
                     <Grid item xs={2}>
                         <Button variant="contained" color="primary" fullWidth type="submit" sx={{ height: '3.438rem' }}>

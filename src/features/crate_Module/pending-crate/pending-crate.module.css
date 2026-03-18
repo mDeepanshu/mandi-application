@@ -1,0 +1,62 @@
+.container {
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
+}
+
+.heading {
+  margin-bottom: 10px;
+}
+
+/* Filter */
+.filterBar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.fetchBtn {
+  padding: 8px 14px;
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.fetchBtn:hover {
+  background-color: #1b5e20;
+}
+
+/* Table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.table th,
+.table td {
+  border: 1px solid #eee;
+  padding: 12px;
+  text-align: left;
+}
+
+.table th {
+  background: #f5f5f5;
+}
+
+/* Column styling */
+.pending {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.lastDate {
+  color: #1976d2;
+}
