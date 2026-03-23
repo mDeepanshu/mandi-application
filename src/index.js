@@ -31,6 +31,7 @@ let variant = "main-app";
 if (isKisanOnly) {
   childrenRoutes = [
     { path: "/", element: <Kisan /> },
+    { path: "kisan-bill", element: <Kisan /> },
     { path: "kisan-bill-summry", element: <KisanBillSummaryComponent /> },
   ];
   variant = "kisan-only";
