@@ -387,6 +387,8 @@ function MasterTable(props) {
                             ) : (
                               ""
                             );
+                          case "amountVasuli":
+                            return rowData["amount"] + '/-';
                           default:
                             return rowData.date === "TOTAL" ? <b>{rowData[key]}</b> : rowData[key];
                         }

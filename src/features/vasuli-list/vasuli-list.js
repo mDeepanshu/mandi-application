@@ -13,7 +13,7 @@ function VasuliList() {
 
   const [tableData, setTableData] = useState([]);
   const [vasuliListColumns, setVasuliListColumns] = useState(["INDEX", "AMOUNT", "DATE", "NAME", "REMARK", "EDIT"]);
-  const [keyArray, setKeyArray] = useState(["index", "amount", "date", "vyapariName", "remark", "edit"]);
+  const [keyArray, setKeyArray] = useState(["index", "amountVasuli", "date", "vyapariName", "remark", "edit"]);
   const currentDate = new Date().toISOString().split("T")[0];
   const [vasuliTotal, setVasuliTotal] = useState([]);
   const { snackbarChange, syncComplete } = useOutletContext();
