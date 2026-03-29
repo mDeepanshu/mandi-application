@@ -1,14 +1,7 @@
-import React, { forwardRef, useEffect, useState } from "react";
+import { forwardRef } from "react";
 import styles from "./partyPrint.module.css";
-import { use } from "react";
 
 const PartyPrint = forwardRef((props, ref) => {
-
-  const [data,setData]=useState([]);
-
-  useEffect(() => {
-    setData(props.tableData);
-  }, [props.tableData]);
 
   return (
     <div ref={ref} className={styles.container}>
@@ -23,7 +16,7 @@ const PartyPrint = forwardRef((props, ref) => {
           </tr>
         </thead>
         <tbody>
-          {data?.map((row, index) => (
+          {props.tableData?.map((row, index) => (
             <tr key={index}>
               <td align="left">{row.name}</td>
               <td align="left">{row.contact}</td>
