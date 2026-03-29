@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { TextField, Button, InputAdornment } from "@mui/material";
 import ReactToPrint from "react-to-print";
 import SearchIcon from "@mui/icons-material/Search";
-import { getVyapariVasuliSheet } from "../../../gateway/vyapari-vasuli-sheet-apis";
+import { getCrateVasuliSheet } from "../../../gateway/crateModule/vasuli-sheet-api";
 import MasterTable from "../../../shared/ui/master-table/master-table";
 // import VyapariVasuliPrint from "../../dialogs/vyapari-vasuli-print/vyapari-vasuli-print";
 
@@ -29,11 +29,11 @@ const CrateVasuliSheet = () => {
   ]);
   const [keyArray, setKeyArray] = useState([
     "vyapariIdNo",
-    "partyName",
-    "openingAmount",
+    "vyapari_name",
+    "opening_balance",
     "dayBill",
     "ttl",
-    "closingAmount",
+    "closing_balance",
   ]);
   const [totals, setTotals] = useState({
     openingAmountSum: 0,
@@ -48,38 +48,60 @@ const CrateVasuliSheet = () => {
   } = useForm();
 
   const fetch_vasuli_sheet = async (data) => {
-    const { fromDate, toDate } = data;
-    getLedgerData(fromDate, toDate);
+    const { fromDate } = data;
+    getLedgerData(fromDate);
   };
 
-  const getLedgerData = async (fromDate, toDate = null) => {
-    let data;
-    if (toDate) {
-      data = {
-        startDate: fromDate,
-        endDate: toDate,
-      };
-    } else data = { startDate: fromDate };
+  const getLedgerData = async (fromDate) => {
+    const ledger = await getCrateVasuliSheet(fromDate);
 
-    const ledger = await getVyapariVasuliSheet(data);
-    let dayBillTotal = 0;
-    ledger?.responseBody?.vasuliList?.forEach((element) => {
-      let total = element.dayBill
-        .split(",")
-        .map(Number)
-        .reduce((sum, num) => sum + num, 0);
-      element.ttl = total;
-      dayBillTotal += total;
-    });
-    setTotals({
-      openingAmountSum: ledger?.responseBody?.openingAmountSum,
-      daybill: dayBillTotal,
-      closingAmountSum: ledger?.responseBody?.closingAmountSum,
-    });
-    if (ledger) {
-      setTableData(ledger?.responseBody?.vasuliList);
-      setTableDataFiltered(ledger?.responseBody?.vasuliList);
+    if (!ledger || !ledger.responseBody?.length) {
+      setTableData([]);
+      setTableDataFiltered([]);
+      setTotals({
+        openingAmountSum: 0,
+        daybill: 0,
+        closingAmountSum: 0,
+      });
+      return;
     }
+
+    let dayBillTotal = 0;
+    let openingAmountSum = 0;
+    let closingAmountSum = 0;
+
+    // 🔁 Transform API response
+    const formattedList = ledger.responseBody.map((item) => {
+      // ✅ sum of crate_count
+      const total = item.transactions
+        ?.map((t) => t.crate_count || 0)
+        .reduce((sum, num) => sum + num, 0);
+
+      const dayBill = item.transactions
+        ?.map((t) => `${t.crate_name}:${t.crate_count}`)
+        .join(", ");
+
+      dayBillTotal += total;
+      openingAmountSum += item.opening_balance || 0;
+      closingAmountSum += item.closing_balance || 0;
+
+      return {
+        ...item,
+        ttl: total, // same as old "ttl"
+        dayBill,
+      };
+    });
+
+    // ✅ Set totals
+    setTotals({
+      openingAmountSum,
+      daybill: dayBillTotal,
+      closingAmountSum,
+    });
+
+    // ✅ Set table data
+    setTableData(formattedList);
+    setTableDataFiltered(formattedList);
   };
 
   useEffect(() => {
@@ -178,7 +200,7 @@ const CrateVasuliSheet = () => {
             <span>{totals.closingAmountSum}</span>
           </div>
         </div> */}
-        <div style={{display:"flex",marginTop:"20px",gap:"20px"}}>
+        <div style={{ display: "flex", marginTop: "20px", gap: "20px" }}>
           <div className={styles.search}>
             <TextField
               fullWidth

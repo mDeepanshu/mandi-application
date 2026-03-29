@@ -20,7 +20,7 @@ function CrateLedger() {
 
   const [tableData, setTableData] = useState([]);
   const [ledgerColumns, setledgerColumns] = useState(["DATE", "CRATE TYPE", "DEBIT", "CREDIT", "REMARK"]);
-  const [keyArray, setKeyArray] = useState(["date", "itemNameWithCheckbox", "dr", "cr", "remark"]);
+  const [keyArray, setKeyArray] = useState(["date", "crate_name", "dr", "cr", "remark"]);
   const [showAllLedgerPrint, setShowAllLedgerPrint] = useState(false);
   const [showDuplicateVasuli, setShowDuplicateVasuli] = useState({ display: false, message: "" });
   const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
@@ -63,19 +63,31 @@ function CrateLedger() {
     }
   };
 
-  const getLedgerData = async (vyapari_id, fromDate, toDate) => {
-    const ledger = await getLedger(vyapari_id, fromDate, toDate);
-    if (ledger) {
-      if (ledger.responseBody?.transactions.length) {
-        const transactionWithTotals = insertDateWiseTotal([...ledger.responseBody?.transactions]);
-        setTableData(transactionWithTotals);
-      } else {
-        setTableData([{ date: null, itemName: "", dr: "NO DATA", cr: "", remark: "" }]);
-      }
-      setValue("closingAmount", ledger.responseBody?.closingAmount);
-      setValue("openingAmount", ledger.responseBody?.openingAmount);
+const getLedgerData = async (vyapari_id, fromDate, toDate) => {
+  const ledger = await getLedger(vyapari_id, fromDate, toDate);
+
+  if (ledger) {
+    if (ledger.responseBody?.length) {
+      // 🔁 Transform API response → table format
+      const formattedData = ledger.responseBody.map((item) => ({
+        date: item.date,
+        crate_name: item.crate_name, // column 2
+        dr: item.crate_count, // treat as debit (or change if needed)
+        cr: "", // no credit in response
+        remark: "",
+      }));
+
+      const transactionWithTotals = insertDateWiseTotal([...formattedData]);
+      setTableData(transactionWithTotals);
+    } else {
+      setTableData([{ date: null, itemName: "", dr: "NO DATA", cr: "", remark: "" }]);
     }
-  };
+
+    // ❌ These don't exist in your new response (remove or keep if backend adds later)
+    setValue("closingAmount", ledger.responseBody?.closingAmount || 0);
+    setValue("openingAmount", ledger.responseBody?.openingAmount || 0);
+  }
+};
 
   const printLedger = () => {
     triggerRef.current.click();
@@ -264,12 +276,12 @@ function CrateLedger() {
                 <Button className={styles.fetch} variant="contained" color="success" type="button" onClick={() => fetch_ledger(getValues())}>
                   FETCH
                 </Button>
-                <Button className={styles.vasuliBtn} variant="contained" color="success" type="button" onClick={() => make_vasuli()}>
+                {/* <Button className={styles.vasuliBtn} variant="contained" color="success" type="button" onClick={() => make_vasuli()}>
                   VASULI
                 </Button>
                 <Button className={styles.send_ledger_btn} variant="contained" color="success" type="button" onClick={() => sendLedgerNoti(getValues())}>
                   SEND LEDGER<PhoneAndroidIcon />
-                </Button>
+                </Button> */}
                 {/* <Button variant="contained" color="success" type="button">
                   <a href={`sms:+918349842228?body=${encodeURIComponent(smsMessage)}`}>Send SMS</a>
                 </Button> */}
@@ -288,9 +300,9 @@ function CrateLedger() {
                   PRINT ALL
                 </Button>
               </div> */}
-              <Button variant="contained" color="success" type="button" className={styles.send_all_ledger_btn} onClick={() => sendAllLedgerNoti()}>
+              {/* <Button variant="contained" color="success" type="button" className={styles.send_all_ledger_btn} onClick={() => sendAllLedgerNoti()}>
                 SEND ALL LEDGER<PhoneAndroidIcon />
-              </Button>
+              </Button> */}
               <ReactToPrint
                 trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>}
                 content={() => componentRef.current}

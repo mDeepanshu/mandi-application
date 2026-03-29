@@ -1,14 +1,10 @@
 import React, { useState } from "react";
 import styles from "./pending-crate.module.css";
+import { getPendingCrateSummary } from "../../../gateway/crateModule/pending-crate-api";
 
 export default function PendingCrateSummary() {
     const [date, setDate] = useState("");
-    const [data, setData] = useState([
-        { name: "P Ankit Rampur", lastDate: null, pending: 20 },
-        { name: "P Badry Knw", lastDate: null, pending: 1 },
-        { name: "P Brijesh Rampur Et", lastDate: "2025-05-24", pending: 70 },
-        { name: "P Rady Rampur", lastDate: "2025-05-29", pending: 61 },
-    ]);
+    const [data, setData] = useState();
     const [loading, setLoading] = useState(false);
 
     const handleFetch = async () => {
@@ -20,19 +16,15 @@ export default function PendingCrateSummary() {
         try {
             setLoading(true);
 
+            const result = await getPendingCrateSummary();
+
             // 🔥 Replace with API
             // const res = await fetch(`/api/pending-crates?date=${date}`);
             // const result = await res.json();
 
             // Dummy data
-            const result = [
-                { name: "P Ankit Rampur", lastDate: null, pending: 20 },
-                { name: "P Badry Knw", lastDate: null, pending: 1 },
-                { name: "P Brijesh Rampur Et", lastDate: "2025-05-24", pending: 70 },
-                { name: "P Rady Rampur", lastDate: "2025-05-29", pending: 61 },
-            ];
 
-            setData(result);
+            setData(result?.responseBody || []);
         } catch (err) {
             console.error(err);
             alert("Error fetching data");
@@ -64,7 +56,7 @@ export default function PendingCrateSummary() {
             </div>
 
             {/* 🔹 Table */}
-            {data.length > 0 && (
+            {data?.length > 0 && (
                 <table className={styles.table}>
                     <thead>
                         <tr>
@@ -77,7 +69,7 @@ export default function PendingCrateSummary() {
                     <tbody>
                         {data.map((row, index) => (
                             <tr key={index}>
-                                <td>{row.name}</td>
+                                <td>{row.vyapari_name}</td>
 
                                 <td className={styles.lastDate}>
                                     {row.lastDate
@@ -86,7 +78,7 @@ export default function PendingCrateSummary() {
                                 </td>
 
                                 <td className={styles.pending}>
-                                    {row.pending}
+                                    {row.total_pending_crates}
                                 </td>
                             </tr>
                         ))}

@@ -2,21 +2,51 @@ import React, { useState } from "react";
 import EditDialog from "./dialog/crate-first-edit-dialog";
 import styles from "./crate-first-entry.module.css";
 import { Edit } from '@mui/icons-material';
-
-const initialData = [
-  { id: 1, vyapari: "Sharma Traders", cratesArr: [{ type: "Plastic", count: 50 },{ type: "Wooden", count: 40 }], total: 50 },
-  { id: 2, vyapari: "Gupta & Sons", cratesArr: [{ type: "Wooden", count: 40 }], total: 40 },
-];
+import { getCrateSummaryByDate } from "../../../gateway/crateModule/first-entry-api";
 
 export default function CrateManagement() {
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState();
   const [selected, setSelected] = useState(null);
+
+  const fetchData = () => {
+    // Placeholder for fetch logic
+    const dateInput = document.getElementById("summaryDate").value;
+    if (!dateInput) {
+      alert("Please select a date.");
+      return;
+    }
+
+    getCrateSummaryByDate(dateInput)
+      .then((summary) => {
+        setData(summary?.responseBody || []);
+      })
+      .catch((error) => {
+        console.error("Error fetching crate summary:", error);
+      });
+
+  };
 
   return (
     <div className={styles.container}>
       <h2>Summary After Mandi Completion</h2>
 
-      <hr/>
+      {/* Date + Fetch */}
+      <div className={styles.dateContainer}>
+        <div className={styles.dateLeft}>
+          <label htmlFor="summaryDate">Date: </label>
+          <input
+            type="date"
+            id="summaryDate"
+            className={styles.dateInput}
+          />
+        </div>
+
+        <button className={styles.fetchBtn} onClick={fetchData}>
+          FETCH
+        </button>
+      </div>
+
+      <hr />
 
       <table className={styles.table}>
         <thead>
@@ -29,13 +59,31 @@ export default function CrateManagement() {
         </thead>
 
         <tbody>
-          {data.map((row) => (
-            <tr key={row.id}>
-              <td>{row.vyapari}</td>
-              <td>{row.cratesArr.map((crate) => `${crate.type} (${crate.count})`).join(", ")}</td>
-              <td>{row.total}</td>
+          {data?.map((row) => (
+            <tr key={row.vyapari_id}>
+              <td>{row.vyapari_name}</td>
+
               <td>
-                <button className={styles.editBtn}onClick={() => setSelected(row)}>
+                {row.crates
+                  ?.map(
+                    (crate) =>
+                      `${crate.crate_name} (${crate.crate_count})`
+                  )
+                  .join(", ")}
+              </td>
+
+              <td>
+                {row.crates?.reduce(
+                  (sum, crate) => sum + crate.crate_count,
+                  0
+                )}
+              </td>
+
+              <td>
+                <button
+                  className={styles.editBtn}
+                  onClick={() => setSelected(row)}
+                >
                   <Edit />
                 </button>
               </td>
