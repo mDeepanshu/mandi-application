@@ -162,10 +162,25 @@ const PartyMaster = () => {
     });
   };
 
-  const print = () => {
-    const table = tableDataFiltered.filter((elem) => elem.daysExceded > 0 && elem.owedAmount>0);
-    setPrintTableData(table);
-  };
+const print = () => {
+  const dataToPrint = tableData
+    .filter((elem) => {
+      return (
+        elem.partyType === "1" &&                 
+        typeof elem.daysExceded === "number" &&  
+        elem.daysExceded > 0                     
+      );
+    })
+    .map((elem) => ({
+      name: elem.name,
+      contact: elem.contact,
+      owedAmount: elem.owedAmount ?? 0,
+      daysExceded: elem.daysExceded,
+    }))
+    .sort((a, b) => b.daysExceded - a.daysExceded); 
+
+  setPrintTableData(dataToPrint);
+};
 
   useEffect(() => {
     if (printTableData.length) triggerRef.current.click();
@@ -309,7 +324,7 @@ const PartyMaster = () => {
             </Grid>
             <Grid item xs={0} md={2}>
               <Button type="button" variant="contained" color="primary" fullWidth sx={{ height: "2.438rem" }} onClick={print}>
-                Print
+                Print Vyapari
               </Button>
               <ReactToPrint trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>} content={() => componentRef.current} />
             </Grid>
@@ -320,7 +335,7 @@ const PartyMaster = () => {
         </Grid>
       </Grid>
       <div style={{ display: "none" }}>
-        <PartyPrint ref={componentRef} columns={["PARTY NAME", "CONTACT", "OWED AMOUNT"]} tableData={printTableData} keyArray={["name", "contact", "owedAmount"]} />
+        <PartyPrint ref={componentRef} columns={["PARTY NAME", "CONTACT", "OWED AMOUNT", "DAYS EXCEEDED"]} tableData={printTableData} keyArray={["name", "contact", "owedAmount", "daysExceded"]} />
       </div>
       <div>
         <Snackbar open={alertData.open} autoHideDuration={4000} onClose={handleClose}>
