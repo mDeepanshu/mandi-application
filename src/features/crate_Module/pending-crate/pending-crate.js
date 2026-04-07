@@ -63,6 +63,7 @@ export default function PendingCrateSummary() {
                             <th>Vyapari Name</th>
                             <th>Last Transaction</th>
                             <th>Pending Crates</th>
+                            <th>Details</th>
                         </tr>
                     </thead>
 
@@ -79,6 +80,9 @@ export default function PendingCrateSummary() {
 
                                 <td className={styles.pending}>
                                     {row.total_pending_crates}
+                                </td>
+                                <td>
+                                    <button className={styles.detailsBtn}>View</button>
                                 </td>
                             </tr>
                         ))}

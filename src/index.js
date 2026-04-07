@@ -23,6 +23,7 @@ const CrateMaster = lazy(() => import("./features/crate_Module/crate-master/crat
 const CrateStockReport = lazy(() => import("./features/crate_Module/crate-stock-report/crate-stock-report"));
 const CrateVasuliSheet = lazy(() => import("./features/crate_Module/crate-vasuli-sheet/crate-vasuli-sheet"));
 const PendingCrate = lazy(() => import("./features/crate_Module/pending-crate/pending-crate"));
+const CrateReturnEntry = lazy(() => import("./features/crate_Module/crate-return-entry/crate-return-entry"));
 //
 
 const hostname =
@@ -66,6 +67,7 @@ else if (isCrateModule) {
     { path: "/", element: <CrateFirstEntry /> },
     { path: "pending-crate", element: <PendingCrate /> },
     { path: "crate-ledger", element: <CrateLedger /> },
+    { path: "crate-return-entry", element: <CrateReturnEntry /> },
     { path: "crate-master", element: <CrateMaster /> },
     { path: "crate-stock-report", element: <CrateStockReport /> },
     { path: "crate-vasuli-sheet", element: <CrateVasuliSheet /> },

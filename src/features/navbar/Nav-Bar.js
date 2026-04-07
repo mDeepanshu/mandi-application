@@ -31,6 +31,7 @@ const kisanBillNavItems = [
 const CrateModuleNavItems = [
   { name: "/", label: "Crate First Entry" },
   { name: "crate-ledger", label: "Crate Ledger" },
+  { name: "crate-return-entry", label: "Crate Return Entry" },
   { name: "crate-stock-report", label: "Crate Stock Report" },
 ];
 

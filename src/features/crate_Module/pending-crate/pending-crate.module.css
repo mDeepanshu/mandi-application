@@ -60,3 +60,12 @@
 .lastDate {
   color: #1976d2;
 }
+
+.detailsBtn {
+  padding: 6px 12px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
