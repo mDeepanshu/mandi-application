@@ -6,6 +6,8 @@ import MasterTable from "../../shared/ui/master-table/master-table";
 import styles from "./vasuli-list.module.css";
 import { useOutletContext } from "react-router-dom";
 import AlertDialog from "../../dialogs/corformation/conformation";
+import TablePrint from "../../dialogs/Table-Print/TablePrint";
+import ReactToPrint from "react-to-print";
 
 function VasuliList() {
   const componentRef = useRef();
@@ -13,6 +15,7 @@ function VasuliList() {
 
   const [tableData, setTableData] = useState([]);
   const [vasuliListColumns, setVasuliListColumns] = useState(["INDEX", "AMOUNT", "DATE", "NAME", "REMARK", "EDIT"]);
+  const [printColumns, setPrintColumns] = useState(["INDEX", "AMOUNT", "DATE", "NAME", "REMARK"]);
   const [keyArray, setKeyArray] = useState(["index", "amountVasuli", "date", "vyapariName", "remark", "edit"]);
   const currentDate = new Date().toISOString().split("T")[0];
   const [vasuliTotal, setVasuliTotal] = useState([]);
@@ -97,6 +100,10 @@ function VasuliList() {
     }
   };
 
+  const printVasuliList = () => {
+    triggerRef.current.click();
+  }
+
   return (
     <>
       <div className={styles.container}>
@@ -118,6 +125,9 @@ function VasuliList() {
             <Button variant="contained" color="success" type="button" onClick={() => fetch_vasuliList(getValues())}>
               FETCH
             </Button>
+            <Button variant="contained" color="success" type="button" onClick={() => printVasuliList()}>
+              PRINT
+            </Button>
             &nbsp;
             <div>
               <b>VASULI TOTAL:</b> {vasuliTotal}
@@ -136,6 +146,15 @@ function VasuliList() {
         handleClose={handleConformationClose}
         confirmMessage={<span>SEND UPDATE ON WHATSAPP</span>}
         btnText={"SEND"}
+      />
+      <div style={{ display: "none" }}>
+        <TablePrint ref={componentRef} title={"VASULI LIST"} headers={printColumns} tableData={tableData} />
+      </div>
+      <ReactToPrint
+        trigger={() => {
+          return <button ref={triggerRef}>Print</button>;
+        }}
+        content={() => componentRef.current}
       />
     </>
   );
