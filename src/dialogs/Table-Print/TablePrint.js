@@ -10,22 +10,24 @@ const TablePrint = forwardRef((props, ref) => {
         <thead>
           <tr>
             {
-                props.headers.map((header, index) => (
-                    <th key={index}>{header}</th>
-                ))   
+              props.headers.map((header, index) => (
+                <th key={index}>{header}</th>
+              ))
             }
           </tr>
         </thead>
         <tbody>
-          {props.tableData?.map((row, index) => (
-            <tr key={index}>
-              {
-                props.headers.map((header, index) => (
-                  <td key={index} align="left">
-                    {row[header.toLowerCase().replace(/\s+/g, '')]}
-                  </td>
-                ))
-              }
+          {props.tableData?.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              <td>{rowIndex + 1}</td>
+              {props.keyArray.map((key, colIndex) => {
+                switch (key) {
+                  case "date":
+                    return <td key={colIndex}>{new Date(row?.date).toLocaleDateString("en-Gb")}</td>;
+                  default:
+                    return <td key={colIndex}>{row[key]}</td>;
+                }
+              })}
             </tr>
           ))}
         </tbody>

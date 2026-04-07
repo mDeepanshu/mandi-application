@@ -15,8 +15,10 @@ function VasuliList() {
 
   const [tableData, setTableData] = useState([]);
   const [vasuliListColumns, setVasuliListColumns] = useState(["INDEX", "AMOUNT", "DATE", "NAME", "REMARK", "EDIT"]);
-  const [printColumns, setPrintColumns] = useState(["INDEX", "AMOUNT", "DATE", "NAME", "REMARK"]);
+  const [printColumns, setPrintColumns] = useState(["INDEX","NAME","AMOUNT", "DATE",  "REMARK"]);
   const [keyArray, setKeyArray] = useState(["index", "amountVasuli", "date", "vyapariName", "remark", "edit"]);
+  const [printKeyArray, setPrintKeyArray] = useState(["vyapariName","amount", "date",  "remark"]);
+
   const currentDate = new Date().toISOString().split("T")[0];
   const [vasuliTotal, setVasuliTotal] = useState([]);
   const { snackbarChange, syncComplete } = useOutletContext();
@@ -148,14 +150,14 @@ function VasuliList() {
         btnText={"SEND"}
       />
       <div style={{ display: "none" }}>
-        <TablePrint ref={componentRef} title={"VASULI LIST"} headers={printColumns} tableData={tableData} />
+        <TablePrint ref={componentRef} title={"VASULI LIST"} headers={printColumns} tableData={tableData} keyArray={printKeyArray} />
+        <ReactToPrint
+          trigger={() => {
+            return <button ref={triggerRef}>Print</button>;
+          }}
+          content={() => componentRef.current}
+        />
       </div>
-      <ReactToPrint
-        trigger={() => {
-          return <button ref={triggerRef}>Print</button>;
-        }}
-        content={() => componentRef.current}
-      />
     </>
   );
 }
