@@ -79,6 +79,7 @@ function AuctionEntries() {
     "auctionDate",
   ]);
 
+  const [itemTotals, setItemTotals] = useState([]);
 
   const {
     control,
@@ -109,6 +110,10 @@ function AuctionEntries() {
       vasuliList.responseBody.forEach((obj, index) => {
         obj.entryIdx = index + 1;
       });
+
+      const itemWiseTotals = getItemWiseQuantity(vasuliList.responseBody);
+      setItemTotals(itemWiseTotals);
+
       setTableData(vasuliList.responseBody);
       setTableDataFiltered(vasuliList.responseBody);
       setCheckedEntries(Array(vasuliList.responseBody.length).fill(false));
@@ -182,94 +187,155 @@ function AuctionEntries() {
     }
   };
 
+  const getItemWiseQuantity = (data) => {
+    const resultMap = {};
+
+    data.forEach((item) => {
+      const name = item.itemName;
+
+      if (!resultMap[name]) {
+        resultMap[name] = 0;
+      }
+
+      resultMap[name] += item.quantity;
+    });
+
+    // Convert to desired array format
+    return Object.keys(resultMap).map((key) => ({
+      name: key,
+      quantity: resultMap[key],
+    }));
+  };
+
   return (
     <>
       <div className={styles.container}>
-        <h1>AUCTION ENTRIES</h1>
-        <form onSubmit={(e) => e.preventDefault()}>
-          {/* <div className={styles.row_two}> */}
-          <div className={styles.dateFields}>
-            <div className={styles.date}>
-              <Controller
-                name="fromDate"
-                control={control}
-                rules={{ required: "Enter From Date" }}
-                defaultValue=""
-                render={({ field }) => <TextField {...field} label="FROM DATE" variant="outlined" type="date" />}
-              />
-              <p className="error">{errors.fromDate?.message}</p>
+        <div className={styles.headerComponent}>
+          <div className={styles.left}>
+            <h1>AUCTION ENTRIES</h1>
+            <form onSubmit={(e) => e.preventDefault()}>
+              {/* <div className={styles.row_two}> */}
+              <div className={styles.dateFields}>
+                <div className={styles.date}>
+                  <Controller
+                    name="fromDate"
+                    control={control}
+                    rules={{ required: "Enter From Date" }}
+                    defaultValue=""
+                    render={({ field }) => <TextField {...field} label="FROM DATE" variant="outlined" type="date" />}
+                  />
+                  <p className="error">{errors.fromDate?.message}</p>
+                </div>
+                <Autocomplete
+                  disablePortal
+                  options={tabletList}
+                  getOptionLabel={(option) => option.name} // Display the "name" property
+                  sx={{ width: 300 }}
+                  value={selectedTablet}
+                  onChange={(event, newValue) => setSelectedTablet(newValue)}
+                  renderInput={(params) => <TextField {...params} label="TABLET" />}
+                />
+                <h2 className={styles.auctionTotal}>
+                  <b>TOTAL:{Number(total).toFixed(0)}</b>
+                </h2>
+              </div>
+              {/* </div> */}
+              <div className={styles.btns}>
+                <Button variant="contained" color="success" type="button" onClick={() => fetch_auctionEntriesList()}>
+                  FETCH
+                </Button>
+                &nbsp;
+                <Button variant="contained" color="secondary" type="button" onClick={() => edit()}>
+                  EDIT
+                </Button>
+                &nbsp;
+                <Button variant="contained" color="success" type="button" onClick={printLedger} className={styles.print_btn}>
+                  PRINT
+                </Button>
+                <ReactToPrint
+                  trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>}
+                  content={() => componentRef.current}
+                />
+              </div>
+            </form>
+            <div style={{ display: "flex" }}>
+              <div className={styles.search}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  size="small"
+                  label="SEARCH BY IDX"
+                  variant="outlined"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                  onChange={findById}
+                />
+              </div>
+              <div className={styles.search}>
+                <TextField
+                  fullWidth
+                  type="text"
+                  size="small"
+                  label="SEARCH"
+                  variant="outlined"
+                  inputProps={{
+                    style: {
+                      textTransform: "uppercase", // Ensure the input content is transformed
+                    },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                  onChange={find}
+                />
+              </div>
             </div>
-            <Autocomplete
-              disablePortal
-              options={tabletList}
-              getOptionLabel={(option) => option.name} // Display the "name" property
-              sx={{ width: 300 }}
-              value={selectedTablet}
-              onChange={(event, newValue) => setSelectedTablet(newValue)}
-              renderInput={(params) => <TextField {...params} label="TABLET" />}
-            />
-            <h2 className={styles.auctionTotal}>
-              <b>TOTAL:{Number(total).toFixed(0)}</b>
-            </h2>
           </div>
-          {/* </div> */}
-          <div className={styles.btns}>
-            <Button variant="contained" color="success" type="button" onClick={() => fetch_auctionEntriesList()}>
-              FETCH
-            </Button>
-            &nbsp;
-            <Button variant="contained" color="secondary" type="button" onClick={() => edit()}>
-              EDIT
-            </Button>
-            &nbsp;
-            <Button variant="contained" color="success" type="button" onClick={printLedger} className={styles.print_btn}>
-              PRINT
-            </Button>
-            <ReactToPrint
-              trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>}
-              content={() => componentRef.current}
-            />
-          </div>
-        </form>
-        <div style={{ display: "flex" }}>
-          <div className={styles.search}>
-            <TextField
-              fullWidth
-              type="number"
-              size="small"
-              label="SEARCH BY IDX"
-              variant="outlined"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              onChange={findById}
-            />
-          </div>
-          <div className={styles.search}>
-            <TextField
-              fullWidth
-              type="text"
-              size="small"
-              label="SEARCH"
-              variant="outlined"
-              inputProps={{
-                style: {
-                  textTransform: "uppercase", // Ensure the input content is transformed
-                },
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              onChange={find}
-            />
+          {/* <div className={styles.right}>
+            <ul>
+              <li>ITEM - QUANTITY</li>
+              {itemTotals && itemTotals.length > 0 ? (
+                itemTotals.map((item, index) => (
+                  <li key={index}>{item.name} - {item.quantity}</li>
+                ))
+              ) : (
+                <li>No item totals available</li>
+              )
+              }
+            </ul>
+          </div> */}
+          <div className={styles.right}>
+            <div className={styles.summaryCard}>
+              {itemTotals && itemTotals.length > 0 ? (
+                <table className={styles.summaryTable}>
+                  <thead>
+                    <tr>
+                      <th>ITEM</th>
+                      <th>QUANTITY</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {itemTotals.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.name}</td>
+                        <td>{item.quantity}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className={styles.noData}>No item totals available</p>
+              )}
+            </div>
           </div>
         </div>
         <div>
@@ -287,7 +353,7 @@ function AuctionEntries() {
       </div>
       <div>
         {/* {showAuctionEdit && <AuctionEdit/>} */}
-        <AuctionEdit open={showAuctionEdit} onClose={(refreshTable) => handleToClose(refreshTable)} auctionToEdit={auctionToEdit} toggleLoading={changeLoading}/>
+        <AuctionEdit open={showAuctionEdit} onClose={(refreshTable) => handleToClose(refreshTable)} auctionToEdit={auctionToEdit} toggleLoading={changeLoading} />
       </div>
     </>
   );
