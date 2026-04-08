@@ -57,8 +57,62 @@ h1 {
   width: 20%;
 }
 
+.headerComponent {
+  display: flex;
+}
+
+.left {
+  width: 50%;
+}
+
+.right {
+  display: flex;
+  justify-content: end;
+  width: 100%;
+}
+
 @media (max-width: 485px) {
   .search {
     width: 100%;
   }
+}
+
+
+
+.summaryCard {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 16px;
+  margin-left: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  max-height: 12rem;
+  overflow: auto;
+}
+
+.title {
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.summaryTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.summaryTable th {
+  text-align: left;
+  padding: 8px;
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+.summaryTable td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.noData {
+  color: #777;
+  font-size: 14px;
 }
