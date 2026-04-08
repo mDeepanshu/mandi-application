@@ -31,7 +31,7 @@ const hostname =
 
 const isKisanOnly = hostname.includes("hiskisanbill");
 const isMainApp = hostname.includes("mandiapplication");
-const isCrateModule = hostname.includes("crate") || true;
+const isCrateModule = hostname.includes("crate");
 const isLocalhost = hostname.includes("localhost") || false;
 const isVercelPreview = hostname.includes("vercel.app") || false;
 
@@ -39,6 +39,7 @@ let childrenRoutes = [];
 let variant = "main-app";
 
 if (isKisanOnly) {
+  console.log("Kisan-only environment detected", isKisanOnly);
   childrenRoutes = [
     { path: "/", element: <Kisan /> },
     { path: "kisan-bill-summry", element: <KisanBillSummaryComponent /> },
@@ -47,6 +48,8 @@ if (isKisanOnly) {
 }
 
 else if (isMainApp) {
+  console.log("Main app detected", isMainApp);
+  
   childrenRoutes = [
     { path: "/", element: <Ledger /> },
     { path: "ledger", element: <Ledger /> },
@@ -62,7 +65,8 @@ else if (isMainApp) {
 }
 
 else if (isCrateModule) {
-  
+console.log("Crate module detected", isCrateModule);
+
   childrenRoutes = [
     { path: "/", element: <CrateFirstEntry /> },
     { path: "pending-crate", element: <PendingCrate /> },
@@ -76,6 +80,8 @@ else if (isCrateModule) {
 }
 
 else if (isLocalhost || isVercelPreview) {
+  console.log("Localhost or Vercel Preview detected",isLocalhost,isVercelPreview);
+  
   childrenRoutes = [
     { path: "/", element: <Ledger /> },
     { path: "ledger", element: <Ledger /> },
@@ -88,6 +94,12 @@ else if (isLocalhost || isVercelPreview) {
     { path: "auction-entry", element: <AuctionEntries /> },
     { path: "vasuli-list", element: <VasuliList /> },
     { path: "device-control", element: <DeviceControl /> },
+    { path: "pending-crate", element: <PendingCrate /> },
+    { path: "crate-ledger", element: <CrateLedger /> },
+    { path: "crate-return-entry", element: <CrateReturnEntry /> },
+    { path: "crate-master", element: <CrateMaster /> },
+    { path: "crate-stock-report", element: <CrateStockReport /> },
+    { path: "crate-vasuli-sheet", element: <CrateVasuliSheet /> },
   ];
   variant = "local";
 }
@@ -100,7 +112,7 @@ else {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App variant={"crate-app"} />,
+    element: <App variant={variant} />,
     children: childrenRoutes,
   },
 ]);

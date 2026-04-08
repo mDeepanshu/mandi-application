@@ -87,7 +87,7 @@ function NavBar(props) {
         setLabel("CRATE");
         break;
       case "local":
-        setNavItems([...kisanBillNavItems, ...navItemsMain]);
+        setNavItems([...kisanBillNavItems, ...navItemsMain, ...CrateModuleNavItems]);
         setShowMoreMenu(true);
         setLabel("LOCAL TESTING");
         break;
