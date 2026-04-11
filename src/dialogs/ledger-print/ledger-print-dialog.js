@@ -2,9 +2,62 @@ import React, { forwardRef, useEffect, useState } from 'react';
 import styles from "./ledgerPrint.module.css";
 import { dateFormat } from "../../constants/config";
 
+const itemNameHindiMap = {
+    "AAM": "आम",
+    "TAMATAR": "टमाटर",
+    "AALU": "आलू",
+    "BHATA": "भटा",
+    "HARI MIRCH": "हरी मिर्च",
+    "LOKI": "लौकी",
+    "GOBHI": "गोभी",
+    "PATTA GOBHI": "पत्ता गोभी",
+    "DHANIYA PATTI": "धनिया पत्ती",
+    "PIYAJ": "प्याज",
+    "GAJAR": "गाजर",
+    "MULI": "मूली",
+    "CUKANDAR": "चुकंदर",
+    "ARBI": "अरबी",
+    "PALAK": "पालक",
+    "METHE": "मेथी",
+    "METHE BHAJI": "मेथी भाजी",
+    "KADDU": "कद्दू",
+    "KAKDI": "ककड़ी",
+    "PALAK BHAJI": "पालक भाजी",
+    "KARELA": "करेला",
+    "BHINDI": "भिंडी",
+    "SHIMLA MIRCH": "शिमला मिर्च",
+    "LAHSUN": "लहसुन",
+    "ADRAK": "अदरक",
+    "MATAR": "मटर",
+    "SEM": "सेम",
+    "PARMAL": "परमल",
+    "GILKE": "गिलकी",
+    "BEHE": "बिही",
+    "TARBUJ": "तरबूज",
+    "CHIMRI": "चिमरी",
+    "केथा": "केथा",
+    "NIBU": "नींबू",
+    "BARBATI": "बरबटी",
+    "KATHAL": "कटहल",
+    "CHEETAFAL": "सीताफल",
+    "KELA": "केला",
+    "TINDA": "टिंडा",
+    "LAL MIRCH": "लाल मिर्च",
+    "BEENS": "बीन्स",
+    "LAL PIKA": "लाल पिका",
+    "KALA BHATA": "काला भटा",
+    "TAR KAKDI": "तर ककड़ी",
+    "MUNGA": "मुनगा",
+    "HAMMALI": "हमाली"
+};
+
 const LedgerPrint = forwardRef((props, ref) => {
     const [tableData, setTableData] = useState([]);
     const checkArr = ["OPN AMOUNT", "CLS AMOUNT", "TOTAL"];
+
+    const getHindiName = (key) => {
+        return itemNameHindiMap[key] || key;
+    };
 
     useEffect(() => {
         if (props.tableData.length) {
@@ -75,7 +128,7 @@ const LedgerPrint = forwardRef((props, ref) => {
                             </tr> :
                             <tr key={index} style={{ lineHeight: '0.8', padding: '0' }}>
                                 <td align="left">{new Date(row.date).toLocaleString('en-IN', dateFormat)}</td>
-                                <td align="right">{row.itemName}</td>
+                                <td align="right">{getHindiName(row.itemName)}</td>
                                 <td align="right">{parseInt(row.quantity)}</td>
                                 <td align="right">{row.cr}</td>
                                 <td align="right">{row.dr}</td>
