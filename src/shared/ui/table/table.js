@@ -125,10 +125,12 @@ function SharedTable(props) {
           if (props.bill_vyapari_id) defaultOption = vyapariList.find((option) => option.partyId == props.bill_vyapari_id);
           else defaultOption = vyapariList.find((option) => option.name == tableData[index]?.[tranIdx]?.partyName);
           setValue("partyName", defaultOption || null);
-        } else if (keyArray[int] == "quantity" && !isChungiTxn) {
-          setQtyTotal(tableData?.[index]?.[tranIdx]?.[keyArray[int]]);
-          setQty(tableData?.[index]?.[tranIdx]?.bagWiseQuantityArray);
-        } else setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
+        }
+        // else if (keyArray[int] == "quantity" && !isChungiTxn) {
+        //   setQtyTotal(tableData?.[index]?.[tranIdx]?.[keyArray[int]]);
+        //   setQty(tableData?.[index]?.[tranIdx]?.bagWiseQuantityArray);
+        // } 
+        else setValue(keyArray[int], tableData[index]?.[tranIdx]?.[keyArray[int]]);
     }
     setOpen(true);
   };
@@ -178,56 +180,33 @@ function SharedTable(props) {
     setTimeout(() => {
       throttleUpdateRecord = true;
     }, 3000);
-    if(props.toggleLoading) props.toggleLoading(true, "UPDATING RECORD...");
+    if (props.toggleLoading) props.toggleLoading(true, "UPDATING RECORD...");
     const isValid = await trigger(["partyName", "rate", "quantity"]);
     if (!isValid) return;
-    if (saveAndReflect) {
-      let changedValues = {
-        ...tableData[editingIndex][tableData[editingIndex]?.length - 1],
-        ...getValues(),
-        vyapariId: getValues().partyName.partyId,
-      };
-      changedValues.bagWiseQuantity = [];
-      if (changedValues.chungi && changedValues.chungi !=0 ) changedValues.chungi = Number(changedValues.chungi);
-      if (!chungiTxn) {
-        changedValues.bagWiseQuantity = qty;
-        changedValues.quantity = qtyTotal;
-      }
-      delete changedValues.auctionDate;
-      await updateAuctionTransaction(changedValues);
-      props.refreshBill();
-      handleClose();
-      props.toggleLoading({ isLoading: false, message: "" });
-      setSync({
-        syncSeverity: true ? "success" : "error",
-        syncStatus: true ? "EDIT SUCCESSFUL" : "EDIT UNSUCCESSFUL",
-      });
-      setOpenSync(true);
-    } else {
-      let editedData = getValues();
-      let finalEdit;
-      if (editedData.itemTotal) {
-        finalEdit = {
-          ...editedData,
-          itemTotal: Number(editedData.rate) * Number(editedData.quantity),
-        };
-      } else {
-        finalEdit = {
-          ...editedData,
-          total: Number(editedData.rate) * Number(editedData.quantity),
-        };
-      }
 
-      const updatedObject = {
-        ...tableData[editingIndex][tableData[editingIndex]?.length - 1],
-        ...finalEdit,
-      };
-      let previousTableData = tableData[editingIndex].push(updatedObject);
-      // previousTableData[editingIndex][tableData[editingIndex].length - 1] = updatedObject;
-      // setTableData(previousTableData);
-      handleClose();
-    }
-    if(props.toggleLoading) props.toggleLoading(false, "");
+    let changedValues = {
+      ...tableData[editingIndex][tableData[editingIndex]?.length - 1],
+      ...getValues(),
+      vyapariId: getValues().partyName.partyId,
+    };
+    changedValues.bagWiseQuantity = [];
+    if (changedValues.chungi && changedValues.chungi != 0) changedValues.chungi = Number(changedValues.chungi);
+    // if (!chungiTxn) {
+    //   changedValues.bagWiseQuantity = qty;
+    //   changedValues.quantity = qtyTotal;
+    // }
+    delete changedValues.auctionDate;
+    console.log(changedValues);
+    await updateAuctionTransaction(changedValues);
+    props.refreshBill();
+    handleClose();
+    props.toggleLoading({ isLoading: false, message: "" });
+    setSync({
+      syncSeverity: true ? "success" : "error",
+      syncStatus: true ? "EDIT SUCCESSFUL" : "EDIT UNSUCCESSFUL",
+    });
+    setOpenSync(true);
+    if (props.toggleLoading) props.toggleLoading(false, "");
   };
 
   const closeSnackbar = (event, reason) => {
@@ -372,17 +351,17 @@ function SharedTable(props) {
                             //     ? errors[fieldDef.name].message
                             //     : ""
                             // }
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && fieldDef.name === "quantity") {
-                                //   e.preventDefault();
-                                newQty(e);
-                              }
-                            }}
+                            // onKeyDown={(e) => {
+                            //   if (e.key === "Enter" && fieldDef.name === "quantity") {
+                            //     //   e.preventDefault();
+                            //     newQty(e);
+                            //   }
+                            // }}
                             size="small"
                           />
                         )}
                       />
-                      {fieldDef.name === "quantity" && !chungiTxn && (
+                      {/* {fieldDef.name === "quantity" && !chungiTxn && (
                         <div
                           style={{
                             display: "flex",
@@ -407,7 +386,7 @@ function SharedTable(props) {
                             ADD{" "}
                           </button>
                         </div>
-                      )}
+                      )} */}
                     </>
                   );
                 }
@@ -416,7 +395,7 @@ function SharedTable(props) {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={() => updateRecord(false)}>Save</Button>
+            {/* <Button onClick={() => updateRecord(false)}>Save</Button> */}
             <Button onClick={() => updateRecord(true)}>Save And Reflect</Button>
           </DialogActions>
         </Dialog>
