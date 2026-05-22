@@ -80,6 +80,7 @@ else if (isLocalhost || isVercelPreview) {
     { path: "vasuli-list", element: <VasuliList /> },
     { path: "device-control", element: <DeviceControl /> },
     { path: "pending-crate", element: <PendingCrate /> },
+    { path: "crate-first-entry", element: <CrateFirstEntry /> },
     { path: "crate-ledger", element: <CrateLedger /> },
     { path: "crate-return-entry", element: <CrateReturnEntry /> },
     { path: "crate-master", element: <CrateMaster /> },
