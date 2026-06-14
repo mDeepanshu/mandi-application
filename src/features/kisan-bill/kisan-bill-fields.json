@@ -103,7 +103,7 @@
             }
         },
         {
-            "name": "commission_rate",
+            "name": "commission",
             "hidden": true,
             "label": "Commission Rate",
             "defaultValue": ""

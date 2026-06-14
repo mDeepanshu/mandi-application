@@ -113,6 +113,7 @@ function KisanBill() {
           );
           setValue("kisan", selectedKisan);
           setValue("billId", billConstant.kisan_bill_id, { shouldValidate: true });
+          getCommisionRate(selectedKisan?.commission);
           reset({ ...getValues(), ...billConstant });
         } else {
           reset({ kisan: null });
@@ -157,7 +158,7 @@ function KisanBill() {
     const updatedHammali = Number(values.hammali) - 5 * tableData[index].bag;
     const updatedBhada = Number(values.bhada) - Number(values.bhada_rate) * tableData[index].bag;
     const updatedNagarTax = Number(values.nagar_palika_tax) - tableData[index].bag;
-    const updatedCommission = Number(values.mandi_kharcha) - (Number(values.commission_rate) * itemTotal) / 100;
+    const updatedCommission = Number(values.mandi_kharcha) - (Number(values.commission) * itemTotal) / 100;
 
     const kharchaTotal =
       updatedCommission +
@@ -251,7 +252,7 @@ function KisanBill() {
       nagar_palika_tax,
       kaccha_total,
       mandi_kharcha,
-      commission_rate,
+      commission,
       driver_inaam,
       nagdi,
     } = values;
@@ -266,7 +267,7 @@ function KisanBill() {
     const nKacchaTotal = Number(kaccha_total);
     const nMandiKharcha = Number(mandi_kharcha || 0);
 
-    const nCommissionRate = Number(commission_rate);
+    const nCommissionRate = Number(commission);
     const nDriverInaam = Number(driver_inaam);
     const nNagdi = Number(nagdi);
 
@@ -397,11 +398,11 @@ function KisanBill() {
     }
   };
 
-  const getCommisionRate = (commission_rate) => {
-    if (!commission_rate) {
+  const getCommisionRate = (commissionRate) => {
+    if (commissionRate == null) {
       console.error("Commission rate not found for this kisan");
     }
-    else setValue("commission_rate", Number(commission_rate), { shouldValidate: true });
+    else setValue("commission", Number(commissionRate), { shouldValidate: true });
   };
 
   const moveToAddItem = async (index, pendingId) => {
@@ -437,7 +438,7 @@ function KisanBill() {
       nagar_palika_tax: null,
       mandi_kharcha: null,
       bhada: null,
-      commission_rate: null,
+      commission: null,
       driver_inaam: null,
       nagdi: null,
       bhada_rate: null,
@@ -796,7 +797,7 @@ function KisanBill() {
                   <ReactToPrint
                     trigger={() => <button type="button" style={{ display: "none" }} ref={triggerRef}></button>}
                     content={() => componentRef.current}
-                    pageStyle="@page { size: 14cm 20cm}"
+                    pageStyle="@page { size: 14cm 20cm; margin: 0; }"
                   />
                 </Grid>
               </Grid>
