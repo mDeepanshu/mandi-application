@@ -106,14 +106,25 @@ function AuctionEntries() {
 
     const vasuliList = await getAuctionEntriesList(fromDate, fromDate, deviceId);
     if (vasuliList) {
-      vasuliList.responseBody.forEach((obj, index) => {
+      const responseBody = vasuliList.responseBody;
+      const isNewFormat = !Array.isArray(responseBody) && responseBody?.auctionTransactions;
+
+      const transactions = isNewFormat ? responseBody.auctionTransactions : responseBody;
+
+      transactions.forEach((obj, index) => {
         obj.entryIdx = index + 1;
       });
-      setTableData(vasuliList.responseBody);
-      setTableDataFiltered(vasuliList.responseBody);
-      setCheckedEntries(Array(vasuliList.responseBody.length).fill(false));
+
+      const itemWiseTotals = isNewFormat
+        ? responseBody.itemTotals.map((item) => ({ name: item.name, quantity: item.quantity, bag: item.bags ?? 0 }))
+        : getItemWiseQuantity(transactions);
+      setItemTotals(itemWiseTotals);
+
+      setTableData(transactions);
+      setTableDataFiltered(transactions);
+      setCheckedEntries(Array(transactions.length).fill(false));
       let total = 0;
-      vasuliList.responseBody.forEach((element) => {
+      transactions.forEach((element) => {
         total += element.amount;
       });
       setTotal(total);
