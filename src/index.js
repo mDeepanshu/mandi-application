@@ -42,6 +42,7 @@ if (isKisanOnly) {
   console.log("Kisan-only environment detected", isKisanOnly);
   childrenRoutes = [
     { path: "/", element: <Kisan /> },
+    { path: "kisan-bill", element: <Kisan /> },
     { path: "kisan-bill-summry", element: <KisanBillSummaryComponent /> },
   ];
   variant = "kisan-only";

@@ -80,7 +80,7 @@ function KisanBillSummaryComponent() {
           <div className={styles.deviceSelect}>
             DEVICE: <select {...register('device')}>
               <option value="">All</option>
-              {deviceList.map((device) => (
+              {deviceList?.map((device) => (
                 <option key={device?.id} value={device?.id}>{device?.name}</option>
               ))}
             </select>
@@ -103,7 +103,7 @@ function KisanBillSummaryComponent() {
             <div><b>PAKKA TOTAL: {apiResponse?.pakki_bikri}</b></div>
           </div>
           <div>
-            <table border="1">
+            <table border="1" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr>
                   <th>BILL DATE</th>

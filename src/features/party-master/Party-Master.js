@@ -55,12 +55,27 @@ const PartyMaster = () => {
   };
 
   const sortOnDaysExceded = () => {
-    const sortedData = [...tableDataFiltered].sort((a, b) => b.daysExceded - a.daysExceded);
-    setTableDataFiltered(sortedData); // Update the state with the sorted array
+    const computeDaysExceeded = (elem) => {
+      if (!elem || !elem.lastVasuliDate || elem.maxLoanDays == null) return Number.NEGATIVE_INFINITY;
+      // ensure the date string is parseable (replace space with T for ISO-like parsing)
+      const lastDate = new Date(String(elem.lastVasuliDate).replace(" ", "T"));
+      if (isNaN(lastDate)) return Number.NEGATIVE_INFINITY;
+      const today = new Date();
+      const diffInMs = today - lastDate;
+      const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
+      // daysExceeded = (today - lastVasuliDate) - maxLoanDays
+      return diffInDays - Number(elem.maxLoanDays);
+    };
+
+    const sortedData = [...tableDataFiltered].sort((a, b) => {
+      return computeDaysExceeded(b) - computeDaysExceeded(a);
+    });
+
+    setTableDataFiltered(sortedData);
   };
 
   const filterVyapari = () => {
-    if (!filterVyapariText) setTableDataFiltered(tableData.filter((elem) => elem.name.toLowerCase().includes(getValues().name)));
+    if (!filterVyapariText) setTableDataFiltered(tableData);
     else {
       const sortedData = [...tableDataFiltered].filter((elem) => elem.partyType === "1");
       setTableDataFiltered(sortedData); // Update the state with the sorted array
