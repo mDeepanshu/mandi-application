@@ -30,7 +30,6 @@ const kisanBillNavItems = [
 
 const CrateModuleNavItems = [
   { name: "crate-first-entry", label: "Crate First Entry" },
-  { name: "/", label: "Crate First Entry" },
   { name: "crate-ledger", label: "Crate Ledger" },
   { name: "crate-return-entry", label: "Crate Return Entry" },
   { name: "crate-stock-report", label: "Crate Stock Report" },
@@ -63,6 +62,7 @@ function NavBar(props) {
     { name: "vyapari-bill", label: "Vyapari Bill" },
     { name: "ledger", label: "Ledger" },
     { name: "vyapari-vasuli-sheet", label: "Vyapari Vasuli Sheet" },
+    { name: "device-control", label: "Device Control" },
   ]);
 
   const navigate = useNavigate();

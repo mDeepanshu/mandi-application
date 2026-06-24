@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import "./App.css";
 import { Box } from "@mui/material";
 import Login from "./features/login/login";
 import NavBar from "./features/navbar/Nav-Bar";
 import SnackbarGlobal from "./shared/ui/snackbar/snackbar";
+import { registerSnackbar } from "./shared/services/snackbar-service";
 
 function App({ variant }) {
   const [loginStatus, setLoginStatus] = useState(true);
@@ -17,6 +18,10 @@ function App({ variant }) {
 
   const changeLoginState = (value) => setLoginStatus(value);
   const snackbarChange = (data) => setSnackbarData(data);
+
+  useEffect(() => {
+    registerSnackbar(snackbarChange);
+  }, []);
   const changeLoading = (newState, apiRes) =>
     setLoading({ isLoading: newState, message: apiRes });
 

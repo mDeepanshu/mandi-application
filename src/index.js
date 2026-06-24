@@ -96,6 +96,7 @@ else if (isCrateModule) {
 
   childrenRoutes = [
     { path: "/", element: <CrateFirstEntry /> },
+    { path: "crate-first-entry", element: <CrateFirstEntry /> },
     { path: "pending-crate", element: <PendingCrate /> },
     { path: "crate-ledger", element: <CrateLedger /> },
     { path: "crate-return-entry", element: <CrateReturnEntry /> },

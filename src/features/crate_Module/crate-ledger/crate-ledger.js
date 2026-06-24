@@ -71,9 +71,9 @@ const getLedgerData = async (vyapari_id, fromDate, toDate) => {
       // 🔁 Transform API response → table format
       const formattedData = ledger.responseBody.map((item) => ({
         date: item.date,
-        crate_name: item.crate_name, // column 2
-        dr: item.crate_count, // treat as debit (or change if needed)
-        cr: "", // no credit in response
+        crate_name: item.crate_name,
+        dr: item.crate_count > 0 ? item.crate_count : "",
+        cr: item.crate_count < 0 ? Math.abs(item.crate_count) : "",
         remark: "",
       }));
 
@@ -101,28 +101,34 @@ const getLedgerData = async (vyapari_id, fromDate, toDate) => {
 
   const insertDateWiseTotal = (transactions) => {
     let date = transactions?.[0]?.date;
-    let dateTotal = transactions?.[0]?.dr;
+    let totalDr = transactions?.[0]?.dr || 0;
+    let totalCr = transactions?.[0]?.cr || 0;
     for (let i = 1; i < transactions.length; i++) {
       if (transactions[i].date == date) {
-        dateTotal += transactions[i].dr;
+        totalDr += transactions[i].dr || 0;
+        totalCr += transactions[i].cr || 0;
       } else {
         date = transactions?.[i]?.date;
-        const amt = transactions?.[i]?.dr;
+        const nextDr = transactions?.[i]?.dr || 0;
+        const nextCr = transactions?.[i]?.cr || 0;
         transactions.splice(i, 0, {
           date: "TOTAL",
-          itemName: "",
-          cr: "",
-          dr: dateTotal,
+          crate_name: "",
+          dr: totalDr || "",
+          cr: totalCr || "",
+          remark: "",
         });
-        dateTotal = amt;
+        totalDr = nextDr;
+        totalCr = nextCr;
         i++;
       }
     }
     transactions.push({
       date: "TOTAL",
-      itemName: "",
-      cr: "",
-      dr: dateTotal,
+      crate_name: "",
+      dr: totalDr || "",
+      cr: totalCr || "",
+      remark: "",
     });
     return transactions;
   };

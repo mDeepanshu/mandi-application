@@ -78,7 +78,7 @@ const CrateReturnEntry = () => {
 
   const handleSave = () => {
 
-    if(getValues("vyapari_id") === null){
+    if (getValues("vyapari_id") === null) {
       alert("Please select a Vyapari before saving.");
       return;
     }
@@ -96,14 +96,9 @@ const CrateReturnEntry = () => {
 
     saveReturnedCrates(payload)
       .then((response) => {
-        alert("Returned crates saved successfully!");
         // Optionally, you can clear the form or refetch data here
         setData([]);
       })
-      .catch((error) => {
-        alert("Failed to save returned crates. Please try again.");
-      });
-
 
   };
 
