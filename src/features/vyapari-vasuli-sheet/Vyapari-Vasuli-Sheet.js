@@ -63,11 +63,12 @@ function VyapariVasuliSheet() {
     const ledger = await getVyapariVasuliSheet(data);
     let dayBillTotal = 0;
     ledger?.responseBody?.vasuliList?.forEach((element) => {
-      let total = element.dayBill
-        .split(",")
-        .map(Number)
-        .reduce((sum, num) => sum + num, 0);
+      const dayBillArr = Array.isArray(element.dayBill)
+        ? element.dayBill.map(Number)
+        : element.dayBill.split(",").map(Number);
+      let total = dayBillArr.reduce((sum, num) => sum + num, 0);
       element.ttl = total;
+      element.dayBill = dayBillArr.join(",");
       dayBillTotal += total;
     });
     setTotals({

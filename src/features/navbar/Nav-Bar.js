@@ -62,6 +62,7 @@ function NavBar(props) {
     { name: "vyapari-bill", label: "Vyapari Bill" },
     { name: "ledger", label: "Ledger" },
     { name: "vyapari-vasuli-sheet", label: "Vyapari Vasuli Sheet" },
+    { name: "auction-entry", label: "Auction Entries" },
     { name: "device-control", label: "Device Control" },
   ]);
 
