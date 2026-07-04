@@ -129,7 +129,7 @@ const LedgerPrint = forwardRef((props, ref) => {
                             <tr key={index} style={{ lineHeight: '0.8', padding: '0' }}>
                                 <td align="left">{new Date(row.date).toLocaleString('en-IN', dateFormat)}</td>
                                 <td align="right">{getHindiName(row.itemName)}</td>
-                                <td align="right">{parseInt(row.quantity)}</td>
+                                <td align="right">{isNaN(parseFloat(row.quantity)) ? "" : parseFloat(row.quantity)}</td>
                                 <td align="right">{row.cr}</td>
                                 <td align="right">{row.dr}</td>
                             </tr>
