@@ -27,8 +27,6 @@ function MasterTable(props) {
   const [keyArray, setKeyArray] = useState([]);
   const [fieldDefinitions, setFieldDefinitions] = useState([]);
   const [paginationLength, setPaginationLength] = useState(100);
-  const [qty, setQty] = useState([]);
-  const [qtyTotal, setQtyTotal] = useState(0);
   const excludeArr = [
     "edit",
     "delete",
@@ -58,7 +56,6 @@ function MasterTable(props) {
   const handleClose = () => setOpen(false);
 
   const [checkedItems, setCheckedItems] = useState({});
-  const [chungiTxn, setChungiTxn] = useState();
 
   // Reset checked checkboxes when table data changes
   useEffect(() => {
@@ -74,13 +71,6 @@ function MasterTable(props) {
     }));
   };
 
-  useEffect(() => {
-    const sum = qty?.reduce((accumulator, currentValue) => {
-      return accumulator + Number(currentValue);
-    }, 0);
-    setQtyTotal(sum);
-  }, [qty]);
-
   const editFromTable = (index) => {
     if (props.editKisanTable) {
       props.editKisanTable(index);
@@ -91,34 +81,14 @@ function MasterTable(props) {
       let fields = [];
       for (let int = 0; int < props.keyArray?.length; int++) {
         if (!excludeArr.includes(props.keyArray[int])) {
-          if (
-            (props.keyArray[int] == "bag" && allTableData?.[index]?.bag == null) ||
-            (props.keyArray[int] == "chungi" && allTableData?.[index]?.bag != null)
-          ) {
-            if (props.keyArray[int] == "chungi" && allTableData?.[index]?.bag != null) setChungiTxn(false);
-            else setChungiTxn(true);
-            continue;
-          }
-          else {
-            if (props.keyArray[int] == "quantity" && allTableData?.[index]?.bag == null) {
-              fields.push({
-                name: props.keyArray[int],
-                label: "NAG",
-                defaultValue: "",
-                validation: { required: `${columns[int]} is required` },
-              });
-            } else {
-              fields.push({
-                name: props.keyArray[int],
-                label: columns[int],
-                defaultValue: "",
-                validation: { required: `${columns[int]} is required` },
-              });
-            }
-          }
+          fields.push({
+            name: props.keyArray[int],
+            label: columns[int],
+            defaultValue: "",
+            validation: { required: `${columns[int]} is required` },
+          });
         }
       }
-      if (!chungiTxn) setQtyTotal();
       setFieldDefinitions(fields);
     }
   };
@@ -156,10 +126,6 @@ function MasterTable(props) {
         if (keyArray[int] == "vyapariName") {
           const defaultOption = vyapariList.find((option) => option.name == allTableData[editingIndex]?.vyapariName);
           setValue("vyapariName", defaultOption || null);
-        } else if (keyArray[int] == "quantity" && !chungiTxn) {
-          if (allTableData?.[editingIndex]?.bag == null) {
-            setQty([allTableData?.[editingIndex]?.[keyArray[int]]]);
-          } else setQty(allTableData?.[editingIndex]?.bagWiseQuantityArray);
         } else setValue(keyArray[int], allTableData?.[editingIndex]?.[keyArray[int]]);
       }
     }
@@ -204,10 +170,6 @@ function MasterTable(props) {
     if (editedData.vyapariName) {
       editedData.vyapariId = editedData.vyapariName.partyId;
       editedData.vyapariName = editedData.vyapariName.name;
-      if (editedData.bag) {
-        editedData.bagWiseQuantityArray = qty;
-        editedData.quantity = qtyTotal;
-      }
     }
     // delete editedData.vyapariName;
     if (editedData.itemTotal) {
@@ -248,31 +210,6 @@ function MasterTable(props) {
     const checkboxes = document.querySelectorAll('.table_cell input[type="checkbox"]');
     checkboxes?.forEach((checkbox) => {
       checkbox.checked = false;
-    });
-  };
-
-  const newQty = (event) => {
-    event.preventDefault();
-    const value = getValues("quantity");
-    const rateValue = getValues("rate");
-    setQty([...qty, Number(value)]);
-    const currentVal = getValues("bag");
-    setValue("bag", Number(currentVal) + 1, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-    setValue("quantity", "", { shouldValidate: false, shouldDirty: true });
-  };
-
-  const removeQty = (event, index) => {
-    event.preventDefault();
-    const newQty = [...qty];
-    newQty.splice(index, 1);
-    setQty(newQty);
-    const currentVal = getValues("bag");
-    setValue("bag", Number(currentVal) - 1, {
-      shouldValidate: true,
-      shouldDirty: true,
     });
   };
 
@@ -429,61 +366,27 @@ function MasterTable(props) {
                   return <VyapariField name="vyapariName" control={control} errors={errors} size="small" />;
                 else {
                   return (
-                    <>
-                      <Controller
-                        key={fieldDef.name}
-                        name={fieldDef.name}
-                        control={control}
-                        defaultValue={fieldDef.defaultValue}
-                        rules={fieldDef.validation}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            label={fieldDef.label}
-                            // type="number"
-                            variant="outlined"
-                            sx={{ mb: 3 }}
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                            fullWidth
-                            // error={!!errors[fieldDef.name]}
-                            // helperText={
-                            //   errors[fieldDef.name]
-                            //     ? errors[fieldDef.name].message
-                            //     : ""
-                            // }
-                            size="small"
-                          />
-                        )}
-                      />
-                      {fieldDef.name === "quantity" && !chungiTxn && (
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            marginTop: -20,
+                    <Controller
+                      key={fieldDef.name}
+                      name={fieldDef.name}
+                      control={control}
+                      defaultValue={fieldDef.defaultValue}
+                      rules={fieldDef.validation}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label={fieldDef.label}
+                          // type="number"
+                          variant="outlined"
+                          sx={{ mb: 3 }}
+                          InputLabelProps={{
+                            shrink: true,
                           }}
-                        >
-                          <div className={styles.quantitylist}>
-                            <ul className={styles.horizontallist}>
-                              {qty?.map((item, index) => (
-                                <li key={index}>
-                                  {item}
-                                  <button className={styles.qtybtn} onClick={(event) => removeQty(event, index)}>
-                                    x
-                                  </button>
-                                </li>
-                              ))}
-                            </ul>
-                            <div className={styles.qtytotal}>{qtyTotal}</div>
-                          </div>
-                          <button className={styles.addqtybtn} onClick={newQty}>
-                            ADD{" "}
-                          </button>
-                        </div>
+                          fullWidth
+                          size="small"
+                        />
                       )}
-                    </>
+                    />
                   );
                 }
               })}

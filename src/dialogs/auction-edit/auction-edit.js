@@ -34,7 +34,6 @@ const AuctionEdit = (props) => {
     "VYAPARINAME",
     "RATE",
     "QUANTITY",
-    "BAGS W.",
     "AMOUNT",
     "BAG",
     "CHUNGI",
@@ -46,7 +45,6 @@ const AuctionEdit = (props) => {
     "vyapariName",
     "rate",
     "quantity",
-    "bagWiseQuantity",
     "amount",
     "bag",
     "chungi",
@@ -88,8 +86,6 @@ const AuctionEdit = (props) => {
       const updatedItems = [...prevItems];
       updatedItems[index] = { ...updatedItems[index], ...newObject };
       updatedItems[index].quantity = newObject.quantity;
-      updatedItems[index].bagWiseQuantity = newObject?.bagWiseQuantityArray?.join(",");
-      updatedItems[index].bagWiseQuantityArray = newObject.bagWiseQuantityArray;
       return updatedItems;
     });
   };
