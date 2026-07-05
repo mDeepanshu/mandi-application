@@ -108,10 +108,9 @@ const AuctionEdit = (props) => {
           bag: null,
           buyItems: [],
           deviceId: buyItemsArr?.[0]?.deviceId,
-          auctionDate:
-            new Date(getValues()?.auctionSubmitDate).toISOString().split("T")[0] +
-            `T` +
-            new Date(props.auctionToEdit?.[0]?.auctionSubmitDate).toISOString().split("T")[1],
+          // backend times are GMT without a "Z" suffix; keep the original time
+          // string untouched so repeated edits never shift the entry's time
+          auctionDate: getValues()?.auctionSubmitDate + "T" + props.auctionToEdit?.[0]?.auctionSubmitDate.split("T")[1],
         },
       ],
     };
@@ -128,10 +127,7 @@ const AuctionEdit = (props) => {
           chungi: element.chungi,
           quantity: element.quantity,
           bagWiseQuantity: element.bagWiseQuantityArray,
-          auctionDate:
-            new Date(getValues().auctionSubmitDate).toISOString().split("T")[0] +
-            "T" +
-            new Date(element.auctionDate).toISOString().split("T")[1],
+          auctionDate: getValues().auctionSubmitDate + "T" + element.auctionDate.split("T")[1],
         });
       });
     const device_id = buyItemsArr[0]?.deviceId == null ? 1 : buyItemsArr[0].deviceId;
