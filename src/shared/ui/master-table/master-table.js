@@ -385,7 +385,7 @@ function MasterTable(props) {
                                 {rowData.itemName}
                               </>
                             ) : keyArray.includes("drCr") && Number(rowData.cr) ? (
-                              <span className={styles.creditAmount}>CREDIT</span>
+                              <span className={styles.creditAmount}>जमा</span>
                             ) : (
                               ""
                             );
