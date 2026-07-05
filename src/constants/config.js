@@ -17,7 +17,13 @@ export const dateFormat = {
   day: '2-digit',
   month: '2-digit',
   year: 'numeric',
-  timeZone: 'Asia/Kolkata', 
+  timeZone: 'Asia/Kolkata',
+};
+
+export const shortDateFormat = {
+  day: '2-digit',
+  month: '2-digit',
+  timeZone: 'Asia/Kolkata',
 };
 
 

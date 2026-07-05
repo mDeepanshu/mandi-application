@@ -50,6 +50,15 @@
     height: 70%;
 }
 
+.creditAmount {
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.debitAmount {
+    color: #d32f2f;
+}
+
 .tableBody {
     /* height: calc(100vh - 370px); */
     overflow-y: auto;

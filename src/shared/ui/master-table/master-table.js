@@ -7,7 +7,7 @@ import styles from "./masterTable.module.css";
 import Pagination from "@mui/material/Pagination";
 import { useForm, Controller } from "react-hook-form";
 import { getAllPartyList } from "../../../gateway/comman-apis";
-import { dateFormat, dateTimeFormat } from "../../../constants/config";
+import { dateFormat, dateTimeFormat, shortDateFormat } from "../../../constants/config";
 import { useMediaQuery } from "@mui/material";
 import VyapariField from "../../elements/VyapariField";
 
@@ -353,7 +353,7 @@ function MasterTable(props) {
                             } else if (!rowData[key]) {
                               return ""; // or return null; if you want nothing to render
                             } else {
-                              return new Date(rowData[key] + "Z").toLocaleString("en-IN", dateFormat);
+                              return new Date(rowData[key] + "Z").toLocaleString("en-IN", isSmallScreen ? shortDateFormat : dateFormat);
                             }
                           case "auctionDate":
                             return rowData[key] === "TOTAL" ? (
@@ -384,11 +384,20 @@ function MasterTable(props) {
                                 <input type="checkbox" checked={!!checkedItems[index]} onChange={() => handleCheckboxChange(index)} />{" "}
                                 {rowData.itemName}
                               </>
+                            ) : keyArray.includes("drCr") && Number(rowData.cr) ? (
+                              <span className={styles.creditAmount}>CREDIT</span>
                             ) : (
                               ""
                             );
                           case "amountVasuli":
                             return rowData["amount"] + '/-';
+                          case "drCr":
+                            if (rowData.date === "TOTAL") return <b>{rowData.dr}</b>;
+                            if (Number(rowData.cr)) return <span className={styles.creditAmount}>{rowData.cr}</span>;
+                            return Number(rowData.dr) ? <span className={styles.debitAmount}>{rowData.dr}</span> : rowData.dr;
+                          case "quantity":
+                            if (rowData.date === "TOTAL") return <b>{rowData[key]}</b>;
+                            return isNaN(parseFloat(rowData[key])) ? rowData[key] : parseFloat(rowData[key]);
                           default:
                             return rowData.date === "TOTAL" ? <b>{rowData[key]}</b> : rowData[key];
                         }

@@ -30,6 +30,16 @@ function Ledger() {
   const isSmallScreen = useMediaQuery("(max-width:495px)");
   let customTableHeight = "120px";
 
+  useEffect(() => {
+    if (isSmallScreen) {
+      setledgerColumns(["DATE", "ITEM NAME", "QTY", "AMOUNT", "REMARK"]);
+      setKeyArray(["date", "itemNameWithCheckbox", "quantity", "drCr", "remark"]);
+    } else {
+      setledgerColumns(["DATE", "ITEM NAME", "QTY", "DEBIT", "CREDIT", "REMARK"]);
+      setKeyArray(["date", "itemNameWithCheckbox", "quantity", "dr", "cr", "remark"]);
+    }
+  }, [isSmallScreen]);
+
   const [alertData, setAlertData] = useState({
     open: false,
     alertType: "",
