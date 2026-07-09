@@ -176,7 +176,7 @@ function AuctionEntries() {
   const find = (event) => {
     const search = event.target.value;
     setTableDataFiltered(
-      tableData.filter(
+      tableData?.filter(
         (elem) =>
           elem?.vyapariName?.toLowerCase().includes(search.toLowerCase()) ||
           elem?.kisanName?.toLowerCase().includes(search.toLowerCase()) ||
@@ -201,16 +201,17 @@ function AuctionEntries() {
       const name = item.itemName;
 
       if (!resultMap[name]) {
-        resultMap[name] = 0;
+        resultMap[name] = { quantity: 0, bag: 0 };
       }
 
-      resultMap[name] += item.quantity;
+      resultMap[name].quantity += item.quantity;
+      resultMap[name].bag += item.bag || 0;
     });
 
-    // Convert to desired array format
     return Object.keys(resultMap).map((key) => ({
       name: key,
-      quantity: resultMap[key],
+      quantity: resultMap[key].quantity,
+      bag: resultMap[key].bag,
     }));
   };
 
@@ -307,19 +308,6 @@ function AuctionEntries() {
               </div>
             </div>
           </div>
-          {/* <div className={styles.right}>
-            <ul>
-              <li>ITEM - QUANTITY</li>
-              {itemTotals && itemTotals.length > 0 ? (
-                itemTotals.map((item, index) => (
-                  <li key={index}>{item.name} - {item.quantity}</li>
-                ))
-              ) : (
-                <li>No item totals available</li>
-              )
-              }
-            </ul>
-          </div> */}
           <div className={styles.right}>
             <div className={styles.summaryCard}>
               {itemTotals && itemTotals.length > 0 ? (
@@ -328,6 +316,7 @@ function AuctionEntries() {
                     <tr>
                       <th>ITEM</th>
                       <th>QUANTITY</th>
+                      <th>BAG</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -335,6 +324,7 @@ function AuctionEntries() {
                       <tr key={index}>
                         <td>{item.name}</td>
                         <td>{item.quantity}</td>
+                        <td>{item.bag}</td>
                       </tr>
                     ))}
                   </tbody>

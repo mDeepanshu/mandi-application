@@ -63,7 +63,8 @@
 
 .tableContainer {
     width: 80%;
-    height: 13cm;
+    height: 100%;
+    overflow: hidden;
 }
 
 .table {
