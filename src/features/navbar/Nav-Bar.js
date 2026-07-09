@@ -41,13 +41,23 @@ const remainingCrateItems = [
   { name: "pending-crate", label: "Pending Crate" },
 ];
 
+const crateCommonItems = [
+  { name: "party-master", label: "Party Master" },
+];
+
 const navItemsMain = [
   { name: "vyapari-bill", label: "Vyapari Bill" },
   { name: "ledger", label: "Ledger" },
   { name: "vyapari-vasuli-sheet", label: "Vyapari Vasuli Sheet" },
 ];
 
-
+const remNavItemsMain = [
+  { name: "item-master", label: "ITEM MASTER" },
+  { name: "party-master", label: "PARTY MASTER" },
+  { name: "auction-entry", label: "AUCTION ENTRIES" },
+  { name: "vasuli-list", label: "VASULI LIST" },
+  { name: "device-control", label: "DEVICE CONTROL" },
+];
 
 const drawerWidth = 240;
 
@@ -58,19 +68,11 @@ function NavBar(props) {
   const [navItems, setNavItems] = useState([]);
   const [showMoreMenu, setShowMoreMenu] = useState(true);
 
-  const [remNavItems, setRemNavItems] = useState([
-    { name: "vyapari-bill", label: "Vyapari Bill" },
-    { name: "ledger", label: "Ledger" },
-    { name: "vyapari-vasuli-sheet", label: "Vyapari Vasuli Sheet" },
-    { name: "auction-entry", label: "Auction Entries" },
-    { name: "device-control", label: "Device Control" },
-  ]);
+  const [remNavItems, setRemNavItems] = useState(remNavItemsMain);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(props.variant);
-
     switch (props.variant) {
       case "kisan-only":
         setNavItems(kisanBillNavItems);
@@ -85,12 +87,13 @@ function NavBar(props) {
       case "crate-app":
         setNavItems(CrateModuleNavItems);
         setShowMoreMenu(true);
-        setRemNavItems(remainingCrateItems);
+        setRemNavItems([...remainingCrateItems, ...crateCommonItems]);
         setLabel("CRATE");
         break;
       case "local":
         setNavItems([...kisanBillNavItems, ...navItemsMain, ...CrateModuleNavItems]);
         setShowMoreMenu(true);
+        setRemNavItems([...remNavItemsMain, ...remainingCrateItems]);
         setLabel("LOCAL TESTING");
         break;
       default:

@@ -39,7 +39,6 @@ let childrenRoutes = [];
 let variant = "main-app";
 
 if (isKisanOnly) {
-  console.log("Kisan-only environment detected", isKisanOnly);
   childrenRoutes = [
     { path: "/", element: <Kisan /> },
     { path: "kisan-bill", element: <Kisan /> },
@@ -49,8 +48,6 @@ if (isKisanOnly) {
 }
 
 else if (isMainApp) {
-  console.log("Main app detected", isMainApp);
-
   childrenRoutes = [
     { path: "/", element: <Ledger /> },
     { path: "ledger", element: <Ledger /> },
@@ -66,8 +63,6 @@ else if (isMainApp) {
 }
 
 else if (isLocalhost || isVercelPreview) {
-  console.log("Localhost or Vercel Preview detected", isLocalhost, isVercelPreview);
-
   childrenRoutes = [
     { path: "/", element: <Ledger /> },
     { path: "ledger", element: <Ledger /> },
@@ -92,8 +87,6 @@ else if (isLocalhost || isVercelPreview) {
 }
 
 else if (isCrateModule) {
-  console.log("Crate module detected", isCrateModule);
-
   childrenRoutes = [
     { path: "/", element: <CrateFirstEntry /> },
     { path: "crate-first-entry", element: <CrateFirstEntry /> },
@@ -103,6 +96,7 @@ else if (isCrateModule) {
     { path: "crate-master", element: <CrateMaster /> },
     { path: "crate-stock-report", element: <CrateStockReport /> },
     { path: "crate-vasuli-sheet", element: <CrateVasuliSheet /> },
+    { path: "party-master", element: <PartyMaster /> },
   ];
   variant = "crate-app";
 }
