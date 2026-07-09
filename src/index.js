@@ -16,14 +16,24 @@ const Kisan = lazy(() => import("./features/kisan-bill/Kisan-Bill"));
 const KisanBillSummaryComponent = lazy(() =>
   import("./features/kisan-bill-summary/kisanBillSummary")
 );
+//Crate Components
+const CrateFirstEntry = lazy(() => import("./features/crate_Module/crate-first-entry/crate-first-entry"));
+const CrateLedger = lazy(() => import("./features/crate_Module/crate-ledger/crate-ledger"));
+const CrateMaster = lazy(() => import("./features/crate_Module/crate-master/crate-master"));
+const CrateStockReport = lazy(() => import("./features/crate_Module/crate-stock-report/crate-stock-report"));
+const CrateVasuliSheet = lazy(() => import("./features/crate_Module/crate-vasuli-sheet/crate-vasuli-sheet"));
+const PendingCrate = lazy(() => import("./features/crate_Module/pending-crate/pending-crate"));
+const CrateReturnEntry = lazy(() => import("./features/crate_Module/crate-return-entry/crate-return-entry"));
+//
 
 const hostname =
   typeof window !== "undefined" ? window.location.hostname : "";
 
 const isKisanOnly = hostname.includes("hiskisanbill");
 const isMainApp = hostname.includes("mandiapplication");
-const isLocalhost = hostname.includes("localhost");
-const isVercelPreview = hostname.includes("vercel.app");
+const isVercelPreview = hostname.includes("vercel.app") || false;
+const isLocalhost = hostname.includes("localhost") || false;
+const isCrateModule = hostname.includes("crate");
 
 let childrenRoutes = [];
 let variant = "main-app";
@@ -65,8 +75,30 @@ else if (isLocalhost || isVercelPreview) {
     { path: "auction-entry", element: <AuctionEntries /> },
     { path: "vasuli-list", element: <VasuliList /> },
     { path: "device-control", element: <DeviceControl /> },
+    { path: "pending-crate", element: <PendingCrate /> },
+    { path: "crate-first-entry", element: <CrateFirstEntry /> },
+    { path: "crate-ledger", element: <CrateLedger /> },
+    { path: "crate-return-entry", element: <CrateReturnEntry /> },
+    { path: "crate-master", element: <CrateMaster /> },
+    { path: "crate-stock-report", element: <CrateStockReport /> },
+    { path: "crate-vasuli-sheet", element: <CrateVasuliSheet /> },
   ];
   variant = "local";
+}
+
+else if (isCrateModule) {
+  childrenRoutes = [
+    { path: "/", element: <CrateFirstEntry /> },
+    { path: "crate-first-entry", element: <CrateFirstEntry /> },
+    { path: "pending-crate", element: <PendingCrate /> },
+    { path: "crate-ledger", element: <CrateLedger /> },
+    { path: "crate-return-entry", element: <CrateReturnEntry /> },
+    { path: "crate-master", element: <CrateMaster /> },
+    { path: "crate-stock-report", element: <CrateStockReport /> },
+    { path: "crate-vasuli-sheet", element: <CrateVasuliSheet /> },
+    { path: "party-master", element: <PartyMaster /> },
+  ];
+  variant = "crate-app";
 }
 
 else {

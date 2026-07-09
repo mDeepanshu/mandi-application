@@ -1,0 +1,82 @@
+.container {
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
+}
+
+.heading {
+  margin-bottom: 5px;
+}
+
+.date {
+  margin-bottom: 15px;
+  color: gray;
+}
+
+/* Table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table th,
+.table td {
+  border: 1px solid #eee;
+  padding: 12px;
+  text-align: left;
+}
+
+.table th {
+  background: #f5f5f5;
+  font-weight: 500;
+}
+
+/* Colors */
+.debit {
+  color: red;
+  font-weight: 500;
+}
+
+.credit {
+  color: green;
+  font-weight: 500;
+}
+
+.closing {
+  font-weight: 600;
+}
+
+/* Total Row */
+.totalRow {
+  background: #fafafa;
+  border-top: 2px solid #ddd;
+}
+
+.filterBar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+
+.input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 200px;
+}
+
+.fetchBtn {
+  padding: 8px 14px;
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.fetchBtn:hover {
+  background-color: #1b5e20;
+}

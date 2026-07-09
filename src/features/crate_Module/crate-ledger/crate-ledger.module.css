@@ -1,0 +1,189 @@
+.wrapper {
+  display: flex;
+}
+
+.LedgerContainer {
+  padding: 0 10px;
+  width: 25%;
+}
+
+.table_section {
+  width: 70%;
+}
+
+h1 {
+  width: 100%;
+}
+
+.dateFields {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  /* padding-bottom: 20px; */
+}
+
+.constants {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 15px 0;
+  /* justify-content: end; */
+  gap: 10px;
+}
+
+.tableContainer {
+  width: 100%;
+}
+
+.btns {
+  display: flex;
+  gap: 7px;
+}
+
+.print_btns {
+  display: flex;
+  gap: 7px;
+}
+
+.vyapariName {
+  width: 100%;
+}
+
+.tableLedger {
+  /* height: calc(100vh-400px); */
+  /* height: 30vh; */
+  background-color: black;
+}
+
+.errMsg {
+  color: red;
+}
+
+.date {
+  width: 100%;
+}
+
+.btns {
+  flex-direction: column;
+}
+
+.print_btn {
+  width: 49%;
+}
+
+.print_all_btn {
+  width: 49%;
+}
+
+@media (min-width: 485px) {
+  .constants {
+    display: flex;
+  }
+
+  .fulllabel {
+    display: inline;
+  }
+
+  .shortlabel {
+    display: none;
+  }
+
+
+}
+
+@media (min-width: 800px) {
+  .vasuliBtn {
+    display: none !important;
+  }
+}
+
+
+@media (min-width: 1150px) {
+  .date {
+    width: 47%;
+  }
+}
+
+@media (max-width: 495px) {
+  .wrapper {
+    display: flex;
+    padding: 0 5px;
+    flex-direction: column;
+  }
+
+  .LedgerContainer {
+    width: 95%;
+  }
+
+  .table_section {
+    width: 96%;
+  }
+
+  h1 {
+    display: none;
+  }
+
+  .vyapariName {
+    padding-top: 10px;
+    width: 99%;
+  }
+
+  .date {
+    width: 48%;
+    /* padding-right: 10px; */
+  }
+
+  .constants {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 15px 0;
+    gap: 20px;
+  }
+
+  .fulllabel {
+    display: none;
+  }
+
+  .shortlabel {
+    display: inline;
+  }
+
+  .print_btns {
+    display: none;
+  }
+
+  .actionBtns {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .actionBtns>* {
+    display: block;
+    width: 100%;
+  }
+
+  .send_ledger_btn.send_ledger_btn {
+    display: flex;
+    align-items: center;
+  }
+
+  .send_all_ledger_btn.send_all_ledger_btn {
+    display: none;
+  }
+
+  .vasuliBtn.vasuliBtn {
+    width: 33%;
+  }
+
+  .fetch.fetch {
+    width: 33%;
+  }
+
+  /* .vasuliBtn{
+    display: block;
+  } */
+
+}

@@ -4,13 +4,14 @@ import { useForm, Controller } from "react-hook-form";
 import { TextField, Button, InputAdornment } from "@mui/material";
 import ReactToPrint from "react-to-print";
 import SearchIcon from "@mui/icons-material/Search";
-import { getVyapariVasuliSheet } from "../../gateway/vyapari-vasuli-sheet-apis";
-import MasterTable from "../../shared/ui/master-table/master-table";
-import VyapariVasuliPrint from "../../dialogs/vyapari-vasuli-print/vyapari-vasuli-print";
+import { getCrateVasuliSheet } from "../../../gateway/crateModule/vasuli-sheet-api";
+import MasterTable from "../../../shared/ui/master-table/master-table";
+// import VyapariVasuliPrint from "../../dialogs/vyapari-vasuli-print/vyapari-vasuli-print";
 
-import styles from "./vyapari-vasuli-sheet.module.css";
+import styles from "./crate-vasuli-sheet.module.css";
 
-function VyapariVasuliSheet() {
+const CrateVasuliSheet = () => {
+
   const componentRef = useRef();
   const triggerRef = useRef();
   const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
@@ -28,11 +29,11 @@ function VyapariVasuliSheet() {
   ]);
   const [keyArray, setKeyArray] = useState([
     "vyapariIdNo",
-    "partyName",
-    "openingAmount",
+    "vyapari_name",
+    "opening_balance",
     "dayBill",
     "ttl",
-    "closingAmount",
+    "closing_balance",
   ]);
   const [totals, setTotals] = useState({
     openingAmountSum: 0,
@@ -47,39 +48,60 @@ function VyapariVasuliSheet() {
   } = useForm();
 
   const fetch_vasuli_sheet = async (data) => {
-    const { fromDate, toDate } = data;
-    getLedgerData(fromDate, toDate);
+    const { fromDate } = data;
+    getLedgerData(fromDate);
   };
 
-  const getLedgerData = async (fromDate, toDate = null) => {
-    let data;
-    if (toDate) {
-      data = {
-        startDate: fromDate,
-        endDate: toDate,
-      };
-    } else data = { startDate: fromDate };
+  const getLedgerData = async (fromDate) => {
+    const ledger = await getCrateVasuliSheet(fromDate);
 
-    const ledger = await getVyapariVasuliSheet(data);
-    let dayBillTotal = 0;
-    ledger?.responseBody?.vasuliList?.forEach((element) => {
-      const dayBillArr = Array.isArray(element.dayBill)
-        ? element.dayBill.map(Number)
-        : element.dayBill.split(",").map(Number);
-      let total = dayBillArr.reduce((sum, num) => sum + num, 0);
-      element.ttl = total;
-      element.dayBill = dayBillArr.join(",");
-      dayBillTotal += total;
-    });
-    setTotals({
-      openingAmountSum: ledger?.responseBody?.openingAmountSum,
-      daybill: dayBillTotal,
-      closingAmountSum: ledger?.responseBody?.closingAmountSum,
-    });
-    if (ledger) {
-      setTableData(ledger?.responseBody?.vasuliList);
-      setTableDataFiltered(ledger?.responseBody?.vasuliList);
+    if (!ledger || !ledger.responseBody?.length) {
+      setTableData([]);
+      setTableDataFiltered([]);
+      setTotals({
+        openingAmountSum: 0,
+        daybill: 0,
+        closingAmountSum: 0,
+      });
+      return;
     }
+
+    let dayBillTotal = 0;
+    let openingAmountSum = 0;
+    let closingAmountSum = 0;
+
+    // 🔁 Transform API response
+    const formattedList = ledger.responseBody.map((item) => {
+      // ✅ sum of crate_count
+      const total = item.transactions
+        ?.map((t) => t.crate_count || 0)
+        .reduce((sum, num) => sum + num, 0);
+
+      const dayBill = item.transactions
+        ?.map((t) => `${t.crate_name}:${t.crate_count}`)
+        .join(", ");
+
+      dayBillTotal += total;
+      openingAmountSum += item.opening_balance || 0;
+      closingAmountSum += item.closing_balance || 0;
+
+      return {
+        ...item,
+        ttl: total, // same as old "ttl"
+        dayBill,
+      };
+    });
+
+    // ✅ Set totals
+    setTotals({
+      openingAmountSum,
+      daybill: dayBillTotal,
+      closingAmountSum,
+    });
+
+    // ✅ Set table data
+    setTableData(formattedList);
+    setTableDataFiltered(formattedList);
   };
 
   useEffect(() => {
@@ -116,7 +138,7 @@ function VyapariVasuliSheet() {
 
   return (
     <>
-      <h1 className={styles.heading}>VASULI SHEET</h1>
+      <h1 className={styles.heading}>CRATE VASULI SHEET</h1>
       <div className={styles.container}>
         <form
           className={styles.dateFields}
@@ -144,7 +166,7 @@ function VyapariVasuliSheet() {
               Fetch
             </Button>
             &nbsp;
-            <Button
+            {/* <Button
               variant="contained"
               color="success"
               type="button"
@@ -158,10 +180,10 @@ function VyapariVasuliSheet() {
                 <button style={{ display: "none" }} ref={triggerRef}></button>
               )}
               content={() => componentRef.current}
-            />
+            /> */}
           </div>
         </form>
-        <div className={styles.totals}>
+        {/* <div className={styles.totals}>
           <div>
             <span className={styles.fulllabel}>OPENING TOTAL: </span>
             <span className={styles.shortlabel}>OPN: </span>
@@ -177,8 +199,8 @@ function VyapariVasuliSheet() {
             <span className={styles.shortlabel}>CLS: </span>
             <span>{totals.closingAmountSum}</span>
           </div>
-        </div>
-        <div style={{display:"flex"}}>
+        </div> */}
+        <div style={{ display: "flex", marginTop: "20px", gap: "20px" }}>
           <div className={styles.search}>
             <TextField
               fullWidth
@@ -225,15 +247,16 @@ function VyapariVasuliSheet() {
           keyArray={keyArray}
         />
       </div>
-      <div style={{ display: "none" }}>
+      {/* <div style={{ display: "none" }}>
         <VyapariVasuliPrint
           ref={componentRef}
           tableData={tableData}
           formData={{ ...getValues(), ...totals }}
         />
-      </div>
+      </div> */}
     </>
   );
 }
 
-export default VyapariVasuliSheet;
+export default CrateVasuliSheet;
+

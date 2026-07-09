@@ -28,13 +28,30 @@ const kisanBillNavItems = [
   { name: "kisan-bill-summry", label: "Kisan Bill Summary" },
 ];
 
+const CrateModuleNavItems = [
+  { name: "crate-first-entry", label: "Crate First Entry" },
+  { name: "crate-ledger", label: "Crate Ledger" },
+  { name: "crate-return-entry", label: "Crate Return Entry" },
+  { name: "crate-stock-report", label: "Crate Stock Report" },
+];
+
+const remainingCrateItems = [
+  { name: "crate-master", label: "Crate Master" },
+  { name: "crate-vasuli-sheet", label: "Crate Vasuli Sheet" },
+  { name: "pending-crate", label: "Pending Crate" },
+];
+
+const crateCommonItems = [
+  { name: "party-master", label: "Party Master" },
+];
+
 const navItemsMain = [
   { name: "vyapari-bill", label: "Vyapari Bill" },
   { name: "ledger", label: "Ledger" },
   { name: "vyapari-vasuli-sheet", label: "Vyapari Vasuli Sheet" },
 ];
 
-const remNavItems = [
+const remNavItemsMain = [
   { name: "item-master", label: "ITEM MASTER" },
   { name: "party-master", label: "PARTY MASTER" },
   { name: "auction-entry", label: "AUCTION ENTRIES" },
@@ -51,6 +68,8 @@ function NavBar(props) {
   const [navItems, setNavItems] = useState([]);
   const [showMoreMenu, setShowMoreMenu] = useState(true);
 
+  const [remNavItems, setRemNavItems] = useState(remNavItemsMain);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,9 +84,16 @@ function NavBar(props) {
         setShowMoreMenu(true);
         setLabel("MANDI APPLICATION");
         break;
-      case "local":
-        setNavItems([...kisanBillNavItems, ...navItemsMain]);
+      case "crate-app":
+        setNavItems(CrateModuleNavItems);
         setShowMoreMenu(true);
+        setRemNavItems([...remainingCrateItems, ...crateCommonItems]);
+        setLabel("CRATE");
+        break;
+      case "local":
+        setNavItems([...kisanBillNavItems, ...navItemsMain, ...CrateModuleNavItems]);
+        setShowMoreMenu(true);
+        setRemNavItems([...remNavItemsMain, ...remainingCrateItems]);
         setLabel("LOCAL TESTING");
         break;
       default:
