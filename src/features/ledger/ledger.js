@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef, lazy } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { getLedger, makeVasuli, sendLedgerNotiApi, markVyapariAllowedTransactions, sendAllLedgerNotiApi } from "../../gateway/ledger-apis";
+import { syncAllLedgers, getCachedLedger, getLastSync } from "../../gateway/ledger-cache";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import LedgerPrint from "../../dialogs/ledger-print/ledger-print-dialog";
 import ReactToPrint from "react-to-print";
@@ -23,6 +24,9 @@ function Ledger() {
   const [keyArray, setKeyArray] = useState(["date", "itemNameWithCheckbox", "quantity", "dr", "cr", "remark"]);
   const [showAllLedgerPrint, setShowAllLedgerPrint] = useState(false);
   const [showDuplicateVasuli, setShowDuplicateVasuli] = useState({ display: false, message: "" });
+  const [dataSource, setDataSource] = useState("network");
+  const [lastSync, setLastSync] = useState(null);
+  const [syncing, setSyncing] = useState(false);
   const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
   const twoDaysPrior = new Date();
   twoDaysPrior.setDate(twoDaysPrior.getDate() - 2);
@@ -62,19 +66,50 @@ function Ledger() {
     },
   });
 
+  useEffect(() => {
+    getLastSync().then(setLastSync);
+  }, []);
+
   const fetch_ledger = async (data) => {
     const isValid = await trigger(); // Validates all fields
     if (isValid) {
       const { fromDate, toDate } = data;
-      getLedgerData(data.vyapari_id.partyId, fromDate, toDate);
+      getLedgerData(data.vyapari_id, fromDate, toDate);
       // setValue("vyapariId", data.vyapari_id.idNo);
     } else {
       console.log("Validation failed");
     }
   };
 
-  const getLedgerData = async (vyapari_id, fromDate, toDate) => {
-    const ledger = await getLedger(vyapari_id, fromDate, toDate);
+  const getLedgerData = async (vyapari, fromDate, toDate) => {
+    let ledger;
+    // In cached mode, ranges starting before the synced window can't be answered
+    // from cache (opening balance and older rows are missing). Serve this one
+    // request from the network instead, without changing the toggle.
+    const outsideCache = dataSource === "cached" && lastSync && fromDate < lastSync.fromDate;
+    if (dataSource === "cached" && !outsideCache) {
+      ledger = await getCachedLedger(vyapari.idNo, fromDate, toDate);
+      if (!ledger) {
+        setAlertData({
+          open: true,
+          alertType: "error",
+          alertMsg: "NO CACHED DATA FOR THIS VYAPARI. PRESS SYNC FIRST.",
+        });
+        setTableData([{ date: null, itemName: "", dr: "NO DATA", cr: "", remark: "" }]);
+        return;
+      }
+    } else {
+      ledger = await getLedger(vyapari.partyId, fromDate, toDate);
+      if (outsideCache && !ledger) {
+        setAlertData({
+          open: true,
+          alertType: "error",
+          alertMsg: "DATE RANGE IS OLDER THAN CACHED DATA AND THE SERVER IS NOT REACHABLE.",
+        });
+        setTableData([{ date: null, itemName: "", dr: "NO DATA", cr: "", remark: "" }]);
+        return;
+      }
+    }
     if (ledger) {
       if (ledger.responseBody?.transactions.length) {
         const transactionWithTotals = insertDateWiseTotal([...ledger.responseBody?.transactions]);
@@ -170,6 +205,26 @@ function Ledger() {
       alertType: "",
       alertMsg: "",
     });
+  };
+
+  const syncLedgerCache = async () => {
+    setSyncing(true);
+    const meta = await syncAllLedgers();
+    setSyncing(false);
+    if (meta) {
+      setLastSync(meta);
+      setAlertData({
+        open: true,
+        alertType: "success",
+        alertMsg: "LEDGER DATA SYNCED",
+      });
+    } else {
+      setAlertData({
+        open: true,
+        alertType: "error",
+        alertMsg: "SYNC FAILED",
+      });
+    }
   };
 
   const closeDuplicateVasuli = () => setShowDuplicateVasuli({ display: false, message: "" });
@@ -283,6 +338,23 @@ THANK YOU
                 />
                 <p className="error">{errors.toDate?.message}</p>
               </div>
+            </div>
+            <div className={styles.cacheControls}>
+              <ToggleButtonGroup
+                value={dataSource}
+                exclusive
+                size="small"
+                onChange={(e, value) => value && setDataSource(value)}
+              >
+                <ToggleButton value="network" color="success">NETWORK</ToggleButton>
+                <ToggleButton value="cached" color="warning">CACHED</ToggleButton>
+              </ToggleButtonGroup>
+              <Button variant="outlined" size="small" type="button" disabled={syncing} onClick={() => syncLedgerCache()}>
+                {syncing ? "SYNCING..." : "SYNC"}
+              </Button>
+              <span className={styles.lastSynced}>
+                {lastSync ? `LAST SYNCED: ${new Date(lastSync.lastSyncedAt).toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" })}` : "NOT SYNCED YET"}
+              </span>
             </div>
             <div className={styles.btns}>
               <div className={`${styles.btns} ${styles.actionBtns}`}>
