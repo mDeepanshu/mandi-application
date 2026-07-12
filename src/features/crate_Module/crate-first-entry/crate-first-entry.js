@@ -4,13 +4,19 @@ import styles from "./crate-first-entry.module.css";
 import { Edit } from '@mui/icons-material';
 import { getCrateSummaryByDate } from "../../../gateway/crateModule/first-entry-api";
 
+const getTodayDate = () => {
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  return new Date(now.getTime() - offset * 60 * 1000).toISOString().split("T")[0];
+};
+
 export default function CrateManagement() {
   const [data, setData] = useState();
   const [selected, setSelected] = useState(null);
+  const [summaryDate, setSummaryDate] = useState(getTodayDate);
 
   const fetchData = () => {
-    // Placeholder for fetch logic
-    const dateInput = document.getElementById("summaryDate").value;
+    const dateInput = summaryDate;
     if (!dateInput) {
       alert("Please select a date.");
       return;
@@ -38,6 +44,8 @@ export default function CrateManagement() {
             type="date"
             id="summaryDate"
             className={styles.dateInput}
+            value={summaryDate}
+            onChange={(e) => setSummaryDate(e.target.value)}
           />
         </div>
 
