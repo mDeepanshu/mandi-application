@@ -5,6 +5,9 @@ const DB_VERSION = 1;
 const LEDGER_STORE = "ledgers";
 const META_STORE = "meta";
 const SYNC_DAYS = 180;
+// A single ledger-list call for all active parties exceeds the 120s prod gateway
+// timeout, so request them in sequential chunks that each stay well under it
+const BATCH_SIZE = 100;
 
 const openDb = () =>
   new Promise((resolve, reject) => {
@@ -45,11 +48,14 @@ export const syncAllLedgers = async () => {
     const activeParties = activeRes?.responseBody;
     if (!activeParties) return null;
 
-    let ledgers = [];
-    if (activeParties.length) {
-      const ledgerRes = await getEveryLedger(fromDate, toDate, activeParties.map((party) => party.partyId));
-      if (!ledgerRes?.responseBody) return null;
-      ledgers = ledgerRes.responseBody;
+    const activeIds = activeParties.map((party) => party.partyId);
+    const ledgers = [];
+    for (let i = 0; i < activeIds.length; i += BATCH_SIZE) {
+      const batch = activeIds.slice(i, i + BATCH_SIZE);
+      let res = await getEveryLedger(fromDate, toDate, batch);
+      if (!res?.responseBody) res = await getEveryLedger(fromDate, toDate, batch); // one retry
+      if (!res?.responseBody) return null; // abort the whole sync; keep previous cache intact
+      ledgers.push(...res.responseBody);
     }
 
     const records = new Map();
