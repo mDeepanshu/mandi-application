@@ -15,6 +15,10 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 
+// Ledger cache (offline/IndexedDB) is turned off: the toggle and SYNC button are
+// hidden and every fetch goes to the network. Flip to true to bring it back.
+const LEDGER_CACHE_ENABLED = false;
+
 function Ledger() {
   const componentRef = useRef();
   const triggerRef = useRef();
@@ -57,6 +61,7 @@ function Ledger() {
   });
 
   useEffect(() => {
+    if (!LEDGER_CACHE_ENABLED) return;
     getLastSync().then(setLastSync);
   }, []);
 
@@ -76,8 +81,9 @@ function Ledger() {
     // In cached mode, ranges starting before the synced window can't be answered
     // from cache (opening balance and older rows are missing). Serve this one
     // request from the network instead, without changing the toggle.
-    const outsideCache = dataSource === "cached" && lastSync && fromDate < lastSync.fromDate;
-    if (dataSource === "cached" && !outsideCache) {
+    const cachedMode = LEDGER_CACHE_ENABLED && dataSource === "cached";
+    const outsideCache = cachedMode && lastSync && fromDate < lastSync.fromDate;
+    if (cachedMode && !outsideCache) {
       ledger = await getCachedLedger(vyapari.idNo, fromDate, toDate);
       if (!ledger) {
         setAlertData({
@@ -329,23 +335,25 @@ THANK YOU
                 <p className="error">{errors.toDate?.message}</p>
               </div>
             </div>
-            <div className={styles.cacheControls}>
-              <ToggleButtonGroup
-                value={dataSource}
-                exclusive
-                size="small"
-                onChange={(e, value) => value && setDataSource(value)}
-              >
-                <ToggleButton value="network" color="success">NETWORK</ToggleButton>
-                <ToggleButton value="cached" color="warning">CACHED</ToggleButton>
-              </ToggleButtonGroup>
-              <Button variant="outlined" size="small" type="button" disabled={syncing} onClick={() => syncLedgerCache()}>
-                {syncing ? "SYNCING..." : "SYNC"}
-              </Button>
-              <span className={styles.lastSynced}>
-                {lastSync ? `LAST SYNCED: ${new Date(lastSync.lastSyncedAt).toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" })}` : "NOT SYNCED YET"}
-              </span>
-            </div>
+            {LEDGER_CACHE_ENABLED && (
+              <div className={styles.cacheControls}>
+                <ToggleButtonGroup
+                  value={dataSource}
+                  exclusive
+                  size="small"
+                  onChange={(e, value) => value && setDataSource(value)}
+                >
+                  <ToggleButton value="network" color="success">NETWORK</ToggleButton>
+                  <ToggleButton value="cached" color="warning">CACHED</ToggleButton>
+                </ToggleButtonGroup>
+                <Button variant="outlined" size="small" type="button" disabled={syncing} onClick={() => syncLedgerCache()}>
+                  {syncing ? "SYNCING..." : "SYNC"}
+                </Button>
+                <span className={styles.lastSynced}>
+                  {lastSync ? `LAST SYNCED: ${new Date(lastSync.lastSyncedAt).toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" })}` : "NOT SYNCED YET"}
+                </span>
+              </div>
+            )}
             <div className={styles.btns}>
               <div className={`${styles.btns} ${styles.actionBtns}`}>
                 <Button className={styles.fetch} variant="contained" color="success" type="button" onClick={() => fetch_ledger(getValues())}>
