@@ -11,3 +11,15 @@ export const getCrateSummaryByDate = async (date) => {
         throw error;
     }
 };
+
+export const updateCrateSummary = async (payload) => {
+    try {
+        const response = await axiosHttp.put(`/crate/summary`, payload, {
+            snackbar: { showOnSuccess: true, successMsg: "Crate summary updated", showOnError: true, errorMsg: "Failed to update crate summary" },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error updating crate summary:", error);
+        throw error;
+    }
+};

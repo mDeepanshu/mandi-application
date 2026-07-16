@@ -1,9 +1,66 @@
-.fetchBtn{
-    border: none;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    cursor: pointer;
-    height: 3.5rem;
+.fetchRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.vyapariField {
+  flex: 1;
+  max-width: 420px;
+}
+
+.fetchRow button {
+  height: 40px;
+}
+
+.nameCell {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.returnedHead,
+.returnedCell {
+  text-align: right;
+  width: 140px;
+}
+
+.returnInput {
+  width: 90px;
+  padding: 7px 10px;
+  border: 1px solid #dbe1e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 14px;
+  font-family: inherit;
+  text-align: right;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.returnInput::-webkit-outer-spin-button,
+.returnInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.returnInput:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.returnedTotal {
+  display: inline-block;
+  width: 90px;
+  padding-right: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.saveRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
 }

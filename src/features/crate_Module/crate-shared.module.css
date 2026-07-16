@@ -1,17 +1,20 @@
+/* Shared design language for the crate module screens.
+   Import as:  import ui from "../crate-shared.module.css";  */
+
 .page,
 .page * {
   box-sizing: border-box;
 }
 
 .page {
-  max-width: 960px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 28px 24px 40px;
   font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: #1e293b;
 }
 
-/* ---------- Header ---------- */
+/* ---------- Page header ---------- */
 
 .header {
   display: flex;
@@ -38,10 +41,13 @@
 .toolbar {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
-.dateInput {
+/* ---------- Inputs & buttons ---------- */
+
+.input {
   padding: 8px 12px;
   border: 1px solid #dbe1e8;
   border-radius: 8px;
@@ -53,12 +59,12 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.dateInput:focus {
+.input:focus {
   border-color: #16a34a;
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
 }
 
-.fetchBtn {
+.btn {
   padding: 8px 20px;
   border: none;
   border-radius: 8px;
@@ -71,16 +77,34 @@
   transition: background 0.15s ease;
 }
 
-.fetchBtn:hover {
+.btn:hover {
   background: #15803d;
 }
 
-.fetchBtn:disabled {
+.btn:disabled {
   background: #86efac;
   cursor: default;
 }
 
-/* ---------- Table card ---------- */
+.btnGhost {
+  padding: 8px 18px;
+  border: 1px solid #dbe1e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btnGhost:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* ---------- Card + table ---------- */
 
 .card {
   background: #ffffff;
@@ -88,6 +112,10 @@
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
   overflow-x: auto;
+}
+
+.cardPad {
+  padding: 18px 20px;
 }
 
 .table {
@@ -128,78 +156,29 @@
   background: #fafbfc;
 }
 
-.nameCell {
-  font-weight: 500;
-  color: #0f172a;
-  white-space: nowrap;
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: #f1f5f9;
-  color: #475569;
-  font-size: 12.5px;
-  white-space: nowrap;
-}
-
-.chip b {
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.totalHead,
-.totalCell {
+.num {
   text-align: right;
-}
-
-.totalCell {
-  font-weight: 600;
-  color: #0f172a;
   font-variant-numeric: tabular-nums;
 }
 
-.actionHead {
-  width: 56px;
+.debit {
+  color: #b91c1c;
+  font-weight: 500;
 }
 
-.actionCell {
-  text-align: right;
-}
-
-.editBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: #94a3b8;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.editBtn:hover {
-  background: #f0fdf4;
+.credit {
   color: #15803d;
+  font-weight: 500;
 }
 
-.editBtn svg {
-  width: 18px;
-  height: 18px;
+.totalRow td {
+  background: #fafbfc;
+  border-top: 1px solid #eef1f5;
+  font-weight: 600;
+  color: #0f172a;
 }
+
+/* ---------- States & misc ---------- */
 
 .emptyState {
   margin: 0;
@@ -207,4 +186,33 @@
   text-align: center;
   font-size: 13.5px;
   color: #94a3b8;
+}
+
+.errorText {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+.muted {
+  color: #94a3b8;
+}
+
+.statPill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.statPill b {
+  font-weight: 600;
+  font-size: 13.5px;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
 }

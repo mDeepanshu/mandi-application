@@ -1,91 +1,59 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@mui/material";
-import { useMediaQuery } from "@mui/material";
-
+import { useForm } from "react-hook-form";
 import { getPendingCrates, saveReturnedCrates } from "../../../gateway/crateModule/return-entry-apis";
 import VyapariField from "../../../shared/elements/VyapariField";
-import { useForm } from "react-hook-form";
+import ui from "../crate-shared.module.css";
 import styles from "./crate-return-entry.module.css";
 
 const CrateReturnEntry = () => {
-  const [vyapariId, setVyapariName] = useState("");
   const [data, setData] = useState([]);
-  const isSmallScreen = useMediaQuery("(max-width:495px)");
+  const [fetched, setFetched] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const { formState: { errors }, control, getValues } = useForm({
+  const { formState: { errors }, control, getValues, trigger } = useForm({
     defaultValues: {
       vyapari_id: null,
     },
   });
 
-  // Mock fetch (replace with API)
-  const handleFetch = () => {
+  const handleFetch = async () => {
+    const isValid = await trigger("vyapari_id");
+    if (!isValid) return;
 
-
-    const vyapariId = getValues("vyapari_id");
-    console.log(vyapariId);
-
-    getPendingCrates(vyapariId?.partyId)
+    const vyapari = getValues("vyapari_id");
+    getPendingCrates(vyapari?.partyId)
       .then((response) => {
-        setData(response?.responseBody || []);
+        setData(
+          (response?.responseBody || []).map((row) => ({ ...row, returned: "" }))
+        );
+        setFetched(true);
       })
       .catch((error) => {
         console.error("Error fetching pending crates:", error);
       });
-
-
   };
 
-  // Handle input change with validation
   const handleChange = (index, value) => {
-    const updated = [...data];
-
     let val = value === "" ? "" : Number(value);
-
-    // Prevent negative
     if (val < 0) return;
+    if (val > data[index].pending_count) return;
 
-    // Prevent exceeding pending
-    if (val > updated[index].pending_count) return;
-
-    updated[index].returned = val;
-    setData(updated);
+    setData(
+      data.map((row, i) => (i === index ? { ...row, returned: val } : row))
+    );
   };
 
   const totalPending = data.reduce((sum, row) => sum + row.pending_count, 0);
-
   const totalReturned = data.reduce(
     (sum, row) => sum + Number(row.returned || 0),
     0
   );
+  const hasValidReturn = data.some((row) => Number(row.returned) > 0);
 
-  // Check if at least one valid return exists
-  const hasValidReturn = data.some(
-    (row) => Number(row.returned) > 0
-  );
-
-  const handleSave = () => {
-
-    if (getValues("vyapari_id") === null) {
-      alert("Please select a Vyapari before saving.");
-      return;
-    }
-
+  const handleSave = async () => {
     const payload = {
       vyapariId: getValues("vyapari_id")?.partyId,
-      date: new Date().toISOString().split("T")[0], // current date in YYYY-MM-DD format
+      date: new Date().toISOString().split("T")[0],
       crates: data
         .filter((row) => Number(row.returned) > 0)
         .map((row) => ({
@@ -94,105 +62,105 @@ const CrateReturnEntry = () => {
         })),
     };
 
-    saveReturnedCrates(payload)
-      .then((response) => {
-        // Optionally, you can clear the form or refetch data here
-        setData([]);
-      })
-
+    setSaving(true);
+    try {
+      await saveReturnedCrates(payload);
+      setData([]);
+      setFetched(false);
+    } catch (error) {
+      console.error("Error saving returned crates:", error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <Box p={4}>
-      {/* Header */}
-      <Typography variant="h5" fontWeight="bold" mb={3}>
-        Crate Return Entry
-      </Typography>
+    <div className={ui.page}>
+      <div className={ui.header}>
+        <div>
+          <h2 className={ui.title}>Crate Return Entry</h2>
+          <p className={ui.subtitle}>
+            Record crates a vyapari has returned today
+          </p>
+        </div>
+      </div>
 
-      {/* Vyapari Input */}
-      <Box display="flex" gap={2} mb={3}>
-        <VyapariField
-          name="vyapari_id"
-          control={control}
-          errors={errors}
-          size={isSmallScreen ? "small" : "medium"}
-        // onKeyDownFunc={onVyapariKeyDown}
-        // customOnSelect={handleClose}
-        />
-        <Button variant="contained" onClick={handleFetch} className={styles.fetchBtn}>
+      <div className={styles.fetchRow}>
+        <div className={styles.vyapariField}>
+          <VyapariField
+            name="vyapari_id"
+            control={control}
+            errors={errors}
+            size="small"
+          />
+        </div>
+        <button className={ui.btn} onClick={handleFetch}>
           Fetch
-        </Button>
-      </Box>
+        </button>
+      </div>
 
-      {/* Table */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell><b>Crate Type</b></TableCell>
-              <TableCell><b>Pending Crates</b></TableCell>
-              <TableCell><b>Crates Returned</b></TableCell>
-            </TableRow>
-          </TableHead>
+      <div className={ui.card}>
+        {!fetched && (
+          <p className={ui.emptyState}>
+            Select a vyapari and fetch to see their pending crates.
+          </p>
+        )}
 
-          <TableBody>
-            {data?.map((row, index) => {
-              const isError =
-                row.returned !== "" &&
-                (row.returned > row.pending_count || row.returned < 0);
+        {fetched && data.length === 0 && (
+          <p className={ui.emptyState}>No pending crates for this vyapari.</p>
+        )}
 
-              return (
-                <TableRow key={row.id}>
-                  <TableCell>{row.crate_name}</TableCell>
-                  <TableCell>{row.pending_count}</TableCell>
-                  <TableCell>
-                    <TextField
-                      size="small"
+        {fetched && data.length > 0 && (
+          <table className={ui.table}>
+            <thead>
+              <tr>
+                <th>Crate Type</th>
+                <th className={ui.num}>Pending</th>
+                <th className={styles.returnedHead}>Returned</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((row, index) => (
+                <tr key={row.crate_id ?? index}>
+                  <td className={styles.nameCell}>{row.crate_name}</td>
+                  <td className={ui.num}>{row.pending_count}</td>
+                  <td className={styles.returnedCell}>
+                    <input
                       type="number"
+                      min="0"
+                      max={row.pending_count}
+                      className={styles.returnInput}
                       value={row.returned}
-                      error={isError}
-                      helperText={
-                        isError
-                          ? `Max allowed: ${row.pending_count}`
-                          : ""
-                      }
-                      onChange={(e) =>
-                        handleChange(index, e.target.value)
-                      }
-                      inputProps={{
-                        min: 0,
-                        max: row.pending_count,
-                      }}
+                      placeholder="0"
+                      onChange={(e) => handleChange(index, e.target.value)}
                     />
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+                  </td>
+                </tr>
+              ))}
+              <tr className={ui.totalRow}>
+                <td>Total</td>
+                <td className={ui.num}>{totalPending}</td>
+                <td className={styles.returnedCell}>
+                  <span className={styles.returnedTotal}>{totalReturned}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        )}
+      </div>
 
-            {/* Total Pending */}
-            <TableRow>
-              <TableCell><b>Total</b></TableCell>
-              <TableCell><b>{totalPending}</b></TableCell>
-              <TableCell><b>{totalReturned}</b></TableCell>
-              <TableCell />
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Save Button */}
-      <Box mt={3} textAlign="center">
-        <Button
-          variant="contained"
-          color="success"
-          size="large"
-          onClick={handleSave}
-          disabled={!hasValidReturn}
-        >
-          Save
-        </Button>
-      </Box>
-    </Box>
+      {fetched && data.length > 0 && (
+        <div className={styles.saveRow}>
+          <button
+            className={ui.btn}
+            onClick={handleSave}
+            disabled={!hasValidReturn || saving}
+          >
+            {saving ? "Saving…" : "Save"}
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 

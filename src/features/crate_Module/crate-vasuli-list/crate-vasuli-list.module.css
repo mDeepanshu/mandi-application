@@ -1,0 +1,66 @@
+.nameCell {
+  font-weight: 500;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.chip b {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.totalCell {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.actionHead {
+  width: 56px;
+}
+
+.actionCell {
+  text-align: right;
+}
+
+.editBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.editBtn:hover {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.editBtn svg {
+  width: 18px;
+  height: 18px;
+}

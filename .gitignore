@@ -28,3 +28,4 @@ yarn-error.log*
 deploy.sh
 deploy_prod.sh
 mandi-server-curr.pem
+scripts

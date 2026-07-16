@@ -1,0 +1,318 @@
+/* Shared styles for the crate module's edit dialogs.
+   Used by crate-first-entry and crate-vasuli-list. */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.15s ease-out;
+}
+
+.dialog,
+.dialog * {
+  box-sizing: border-box;
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 460px;
+  max-height: 85vh;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow:
+    0 10px 15px -3px rgba(15, 23, 42, 0.12),
+    0 25px 50px -12px rgba(15, 23, 42, 0.3);
+  overflow: hidden;
+  animation: popIn 0.18s ease-out;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1e293b;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Header ---------- */
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid #eef1f5;
+}
+
+.title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.subtitle {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.closeBtn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.closeBtn:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+/* ---------- Body ---------- */
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 22px 4px;
+}
+
+.rowsHeader {
+  display: grid;
+  grid-template-columns: 1fr 84px 32px;
+  gap: 10px;
+  padding: 0 2px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.emptyHint {
+  margin: 4px 0 12px;
+  font-size: 13.5px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 84px 32px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.select,
+.countInput {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #dbe1e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+}
+
+.countInput {
+  text-align: right;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.countInput::-webkit-outer-spin-button,
+.countInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.select:focus,
+.countInput:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.fieldError {
+  border-color: #dc2626;
+}
+
+.fieldError:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.removeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.removeBtn:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.addBtn {
+  width: 100%;
+  margin: 4px 0 14px;
+  padding: 9px 0;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.addBtn:hover {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+/* ---------- Footer ---------- */
+
+.footer {
+  padding: 12px 22px 18px;
+  border-top: 1px solid #eef1f5;
+  background: #fafbfc;
+}
+
+.errorText {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+.footerBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.totalPill {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.totalNeutral {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.totalOk {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.totalBad {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.changed {
+  margin-left: 8px;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.cancelBtn,
+.saveBtn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.cancelBtn {
+  border: 1px solid #dbe1e8;
+  background: #ffffff;
+  color: #334155;
+}
+
+.cancelBtn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.saveBtn {
+  border: none;
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.saveBtn:hover {
+  background: #15803d;
+}
+
+.saveBtn:disabled {
+  background: #86efac;
+  cursor: default;
+}

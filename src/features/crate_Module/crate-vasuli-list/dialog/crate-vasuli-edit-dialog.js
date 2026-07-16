@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { getCrateMasterData } from "../../../../gateway/crateModule/master-api";
-import { updateCrateSummary } from "../../../../gateway/crateModule/first-entry-api";
+import { updateCrateVasuli } from "../../../../gateway/crateModule/vasuli-list-api";
 import styles from "../../crate-dialog.module.css";
 
-export default function EditDialog({ data, date, onClose, onSaved }) {
+export default function VasuliEditDialog({ data, date, onClose, onSaved }) {
   const [rows, setRows] = useState([]);
   const [crateTypes, setCrateTypes] = useState([]);
   const [saving, setSaving] = useState(false);
@@ -14,15 +14,15 @@ export default function EditDialog({ data, date, onClose, onSaved }) {
     getCrateMasterData().then((res) => setCrateTypes(res?.responseBody || []));
   }, []);
 
-  // initialize rows from API data
   useEffect(() => {
     if (data) {
-      const formatted = data.crates.map((c) => ({
-        crate_id: c.crate_id,
-        crate_name: c.crate_name,
-        crate_count: c.crate_count,
-      }));
-      setRows(formatted);
+      setRows(
+        (data.crates || []).map((c) => ({
+          crate_id: c.crate_id,
+          crate_name: c.crate_name,
+          crate_count: c.crate_count,
+        }))
+      );
     }
   }, [data]);
 
@@ -38,7 +38,7 @@ export default function EditDialog({ data, date, onClose, onSaved }) {
     const updated = [...rows];
     updated[index] = {
       ...updated[index],
-      [field]: field === "crate_name" ? value : Number(value),
+      [field]: field === "crate_id" ? value : Number(value),
     };
     setRows(updated);
     setError("");
@@ -59,7 +59,7 @@ export default function EditDialog({ data, date, onClose, onSaved }) {
   const originalTotal =
     data?.crates?.reduce((sum, c) => sum + c.crate_count, 0) || 0;
 
-  const totalMatches = total === originalTotal;
+  const difference = total - originalTotal;
 
   const handleSave = async () => {
     if (rows.some((r) => !r.crate_id)) {
@@ -68,8 +68,8 @@ export default function EditDialog({ data, date, onClose, onSaved }) {
       return;
     }
 
-    if (!totalMatches) {
-      setError(`Total must equal ${originalTotal}.`);
+    if (rows.some((r) => r.crate_count < 0)) {
+      setError("Counts cannot be negative.");
       return;
     }
 
@@ -93,10 +93,10 @@ export default function EditDialog({ data, date, onClose, onSaved }) {
 
     setSaving(true);
     try {
-      await updateCrateSummary(payload);
+      await updateCrateVasuli(payload);
       onSaved();
     } catch (err) {
-      console.error("Error updating crate summary:", err);
+      console.error("Error updating vasuli:", err);
       setError("Something went wrong while saving. Please try again.");
     } finally {
       setSaving(false);
@@ -113,7 +113,7 @@ export default function EditDialog({ data, date, onClose, onSaved }) {
       <div className={styles.dialog} role="dialog" aria-modal="true">
         <div className={styles.header}>
           <div>
-            <h3 className={styles.title}>Edit Crates</h3>
+            <h3 className={styles.title}>Edit Vasuli</h3>
             <p className={styles.subtitle}>
               {data.vyapari_name}
               {date ? ` · ${date}` : ""}
@@ -138,13 +138,13 @@ export default function EditDialog({ data, date, onClose, onSaved }) {
         <div className={styles.body}>
           <div className={styles.rowsHeader}>
             <span>Crate type</span>
-            <span>Count</span>
+            <span>Returned</span>
             <span />
           </div>
 
           {rows.length === 0 && (
             <p className={styles.emptyHint}>
-              No crates yet — add a row to get started.
+              No crates in this vasuli — add a row, or save to clear it.
             </p>
           )}
 
@@ -206,12 +206,14 @@ export default function EditDialog({ data, date, onClose, onSaved }) {
           {error && <p className={styles.errorText}>{error}</p>}
 
           <div className={styles.footerBar}>
-            <span
-              className={`${styles.totalPill} ${
-                totalMatches ? styles.totalOk : styles.totalBad
-              }`}
-            >
-              Total {total} / {originalTotal}
+            <span className={`${styles.totalPill} ${styles.totalNeutral}`}>
+              Total {total}
+              {difference !== 0 && (
+                <span className={styles.changed}>
+                  ({difference > 0 ? "+" : ""}
+                  {difference})
+                </span>
+              )}
             </span>
 
             <div className={styles.actions}>

@@ -1,5 +1,30 @@
-.err-msg{
-    color: red;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
+.formCard {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 14px;
+  align-items: start;
+  overflow: visible;
+  margin-bottom: 20px;
+}
+
+.addBtn {
+  height: 40px;
+  padding: 8px 24px;
+  white-space: nowrap;
+}
+
+.tableWrap {
+  min-width: 0;
+}
+
+@media (max-width: 800px) {
+  .formCard {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 495px) {
+  .formCard {
+    grid-template-columns: 1fr;
+  }
 }

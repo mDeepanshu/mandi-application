@@ -22,6 +22,8 @@ const CrateLedger = lazy(() => import("./features/crate_Module/crate-ledger/crat
 const CrateMaster = lazy(() => import("./features/crate_Module/crate-master/crate-master"));
 const CrateStockReport = lazy(() => import("./features/crate_Module/crate-stock-report/crate-stock-report"));
 const CrateVasuliSheet = lazy(() => import("./features/crate_Module/crate-vasuli-sheet/crate-vasuli-sheet"));
+const CrateVasuliList = lazy(() => import("./features/crate_Module/crate-vasuli-list/crate-vasuli-list"));
+const AuctionCrateList = lazy(() => import("./features/crate_Module/auction-crate-list/auction-crate-list"));
 const PendingCrate = lazy(() => import("./features/crate_Module/pending-crate/pending-crate"));
 const CrateReturnEntry = lazy(() => import("./features/crate_Module/crate-return-entry/crate-return-entry"));
 //
@@ -82,6 +84,8 @@ else if (isLocalhost || isVercelPreview) {
     { path: "crate-master", element: <CrateMaster /> },
     { path: "crate-stock-report", element: <CrateStockReport /> },
     { path: "crate-vasuli-sheet", element: <CrateVasuliSheet /> },
+    { path: "crate-vasuli-list", element: <CrateVasuliList /> },
+    { path: "auction-crate-list", element: <AuctionCrateList /> },
   ];
   variant = "local";
 }
@@ -96,6 +100,8 @@ else if (isCrateModule) {
     { path: "crate-master", element: <CrateMaster /> },
     { path: "crate-stock-report", element: <CrateStockReport /> },
     { path: "crate-vasuli-sheet", element: <CrateVasuliSheet /> },
+    { path: "crate-vasuli-list", element: <CrateVasuliList /> },
+    { path: "auction-crate-list", element: <AuctionCrateList /> },
     { path: "party-master", element: <PartyMaster /> },
   ];
   variant = "crate-app";

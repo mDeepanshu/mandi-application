@@ -1,94 +1,104 @@
-import React, { useState } from "react";
-import styles from "./pending-crate.module.css";
+import React, { useEffect, useState } from "react";
 import { getPendingCrateSummary } from "../../../gateway/crateModule/pending-crate-api";
+import ui from "../crate-shared.module.css";
+import styles from "./pending-crate.module.css";
+
+// Backend dates are GMT without a trailing "Z"; format by string-splitting
+// instead of new Date() to avoid the IST timezone shift.
+const formatDate = (isoString) => {
+    if (!isoString) return null;
+    const [datePart] = isoString.split("T");
+    const [y, m, d] = datePart.split("-");
+    if (!y || !m || !d) return datePart;
+    return `${d}/${m}/${y}`;
+};
 
 export default function PendingCrateSummary() {
-    const [date, setDate] = useState("");
     const [data, setData] = useState();
     const [loading, setLoading] = useState(false);
 
     const handleFetch = async () => {
-        if (!date) {
-            alert("Please select date");
-            return;
-        }
-
         try {
             setLoading(true);
-
             const result = await getPendingCrateSummary();
-
-            // 🔥 Replace with API
-            // const res = await fetch(`/api/pending-crates?date=${date}`);
-            // const result = await res.json();
-
-            // Dummy data
-
             setData(result?.responseBody || []);
         } catch (err) {
-            console.error(err);
-            alert("Error fetching data");
+            console.error("Error fetching pending crate summary:", err);
         } finally {
             setLoading(false);
         }
     };
 
+    useEffect(() => {
+        handleFetch();
+    }, []);
+
+    const totalPending = (data || []).reduce(
+        (sum, row) => sum + (row.total_pending_crates || 0),
+        0
+    );
+
     return (
-        <div className={styles.container}>
-            <h2 className={styles.heading}>Pending Crate Summary</h2>
+        <div className={ui.page}>
+            <div className={ui.header}>
+                <div>
+                    <h2 className={ui.title}>Pending Crate Summary</h2>
+                    <p className={ui.subtitle}>
+                        Vyaparis who still have crates to return
+                    </p>
+                </div>
 
-            {/* 🔹 Filter */}
-            <div className={styles.filterBar}>
-                <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className={styles.input}
-                />
-
-                <button
-                    onClick={handleFetch}
-                    className={styles.fetchBtn}
-                    disabled={loading}
-                >
-                    {loading ? "Loading..." : "Fetch"}
-                </button>
+                <div className={ui.toolbar}>
+                    {data?.length > 0 && (
+                        <span className={ui.statPill}>
+                            Total pending <b>{totalPending}</b>
+                        </span>
+                    )}
+                    <button
+                        onClick={handleFetch}
+                        className={ui.btn}
+                        disabled={loading}
+                    >
+                        {loading ? "Loading…" : "Refresh"}
+                    </button>
+                </div>
             </div>
 
-            {/* 🔹 Table */}
-            {data?.length > 0 && (
-                <table className={styles.table}>
-                    <thead>
-                        <tr>
-                            <th>Vyapari Name</th>
-                            <th>Last Transaction</th>
-                            <th>Pending Crates</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
+            <div className={ui.card}>
+                {data?.length === 0 && !loading && (
+                    <p className={ui.emptyState}>
+                        No pending crates — everything has been returned.
+                    </p>
+                )}
 
-                    <tbody>
-                        {data.map((row, index) => (
-                            <tr key={index}>
-                                <td>{row.vyapari_name}</td>
-
-                                <td className={styles.lastDate}>
-                                    {row.lastDate
-                                        ? new Date(row.lastDate).toLocaleDateString("en-GB")
-                                        : "Not"}
-                                </td>
-
-                                <td className={styles.pending}>
-                                    {row.total_pending_crates}
-                                </td>
-                                <td>
-                                    <button className={styles.detailsBtn}>View</button>
-                                </td>
+                {data?.length > 0 && (
+                    <table className={ui.table}>
+                        <thead>
+                            <tr>
+                                <th>Vyapari Name</th>
+                                <th>Last Return</th>
+                                <th className={ui.num}>Pending Crates</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+                        </thead>
+
+                        <tbody>
+                            {data.map((row, index) => (
+                                <tr key={row.vyapari_id ?? index}>
+                                    <td className={styles.nameCell}>{row.vyapari_name}</td>
+                                    <td>
+                                        {formatDate(row.last_return_date) || (
+                                            <span className={ui.muted}>—</span>
+                                        )}
+                                    </td>
+                                    <td className={`${ui.num} ${styles.pending}`}>
+                                        {row.total_pending_crates}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
+            </div>
         </div>
     );
 }

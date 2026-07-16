@@ -1,262 +1,177 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Grid } from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import { TextField, Button, InputAdornment } from "@mui/material";
-import ReactToPrint from "react-to-print";
-import SearchIcon from "@mui/icons-material/Search";
+import React, { useEffect, useState } from "react";
 import { getCrateVasuliSheet } from "../../../gateway/crateModule/vasuli-sheet-api";
+import { getAllPartyList } from "../../../gateway/comman-apis";
 import MasterTable from "../../../shared/ui/master-table/master-table";
-// import VyapariVasuliPrint from "../../dialogs/vyapari-vasuli-print/vyapari-vasuli-print";
-
+import ui from "../crate-shared.module.css";
 import styles from "./crate-vasuli-sheet.module.css";
 
+const LEDGER_COLUMNS = [
+  "ID",
+  "PARTY NAME",
+  "OPENING AMOUNT",
+  "DAY BILL",
+  "TTL",
+  "CLOSING AMOUNT",
+];
+const KEY_ARRAY = [
+  "vyapariIdNo",
+  "vyapari_name",
+  "opening_balance",
+  "dayBill",
+  "ttl",
+  "closing_balance",
+];
+
 const CrateVasuliSheet = () => {
+  const currentDate = new Date().toISOString().split("T")[0];
 
-  const componentRef = useRef();
-  const triggerRef = useRef();
-  const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
-
+  const [date, setDate] = useState(currentDate);
   const [tableData, setTableData] = useState([]);
-  const [searchVal, setSearchVal] = useState("");
-  const [tableDataFiltered, setTableDataFiltered] = useState([]);
-  const [ledgerColumns, setledgerColumns] = useState([
-    "ID",
-    "PARTY NAME",
-    "OPENING AMOUNT",
-    "DAY BILL",
-    "TTL",
-    "CLOSING AMOUNT",
-  ]);
-  const [keyArray, setKeyArray] = useState([
-    "vyapariIdNo",
-    "vyapari_name",
-    "opening_balance",
-    "dayBill",
-    "ttl",
-    "closing_balance",
-  ]);
+  const [idQuery, setIdQuery] = useState("");
+  const [nameQuery, setNameQuery] = useState("");
+  const [loading, setLoading] = useState(false);
   const [totals, setTotals] = useState({
     openingAmountSum: 0,
     closingAmountSum: 0,
     daybill: 0,
   });
 
-  const {
-    register,
-    formState: { errors },
-    getValues,
-  } = useForm();
-
-  const fetch_vasuli_sheet = async (data) => {
-    const { fromDate } = data;
-    getLedgerData(fromDate);
-  };
-
   const getLedgerData = async (fromDate) => {
-    const ledger = await getCrateVasuliSheet(fromDate);
+    setLoading(true);
+    try {
+      // party list is cached in localStorage by the gateway; used to map
+      // internal vyapari_id -> human idNo for the ID column and ID search
+      const [ledger, partyList] = await Promise.all([
+        getCrateVasuliSheet(fromDate),
+        getAllPartyList("VYAPARI"),
+      ]);
 
-    if (!ledger || !ledger.responseBody?.length) {
-      setTableData([]);
-      setTableDataFiltered([]);
-      setTotals({
-        openingAmountSum: 0,
-        daybill: 0,
-        closingAmountSum: 0,
+      if (!ledger || !ledger.responseBody?.length) {
+        setTableData([]);
+        setTotals({ openingAmountSum: 0, daybill: 0, closingAmountSum: 0 });
+        return;
+      }
+
+      const idNoByPartyId = new Map(
+        (partyList?.responseBody || []).map((p) => [String(p.partyId), p.idNo])
+      );
+
+      let dayBillTotal = 0;
+      let openingAmountSum = 0;
+      let closingAmountSum = 0;
+
+      const formattedList = ledger.responseBody.map((item) => {
+        const total = item.transactions
+          ?.map((t) => t.crate_count || 0)
+          .reduce((sum, num) => sum + num, 0);
+
+        const dayBill = item.transactions
+          ?.map((t) => `${t.crate_name}:${t.crate_count}`)
+          .join(", ");
+
+        dayBillTotal += total;
+        openingAmountSum += item.opening_balance || 0;
+        closingAmountSum += item.closing_balance || 0;
+
+        return {
+          ...item,
+          vyapariIdNo: idNoByPartyId.get(String(item.vyapari_id)) || "",
+          ttl: total,
+          dayBill,
+        };
       });
-      return;
+
+      setTotals({
+        openingAmountSum,
+        daybill: dayBillTotal,
+        closingAmountSum,
+      });
+      setTableData(formattedList);
+    } finally {
+      setLoading(false);
     }
-
-    let dayBillTotal = 0;
-    let openingAmountSum = 0;
-    let closingAmountSum = 0;
-
-    // 🔁 Transform API response
-    const formattedList = ledger.responseBody.map((item) => {
-      // ✅ sum of crate_count
-      const total = item.transactions
-        ?.map((t) => t.crate_count || 0)
-        .reduce((sum, num) => sum + num, 0);
-
-      const dayBill = item.transactions
-        ?.map((t) => `${t.crate_name}:${t.crate_count}`)
-        .join(", ");
-
-      dayBillTotal += total;
-      openingAmountSum += item.opening_balance || 0;
-      closingAmountSum += item.closing_balance || 0;
-
-      return {
-        ...item,
-        ttl: total, // same as old "ttl"
-        dayBill,
-      };
-    });
-
-    // ✅ Set totals
-    setTotals({
-      openingAmountSum,
-      daybill: dayBillTotal,
-      closingAmountSum,
-    });
-
-    // ✅ Set table data
-    setTableData(formattedList);
-    setTableDataFiltered(formattedList);
   };
 
   useEffect(() => {
-    const init = async () => {
-      const date = new Date();
-      const formattedDate = date.toISOString().slice(0, 10);
-      getLedgerData(formattedDate);
-    };
-
-    init();
+    getLedgerData(currentDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const printLedger = () => {
-    triggerRef.current.click();
-  };
-
-  const find = (event) => {
-    const search = event.target.value;
-    setTableDataFiltered(
-      tableData.filter(
-        (elem) =>
-          elem?.partyName?.toLowerCase().includes(search.toLowerCase())
-      )
-    );
-  };
-
-  const findById = (event) => {
-    const search = event.target.value;
-    // Check if either id is a substring of the other
-    setTableDataFiltered(
-      tableData.filter((elem) => elem?.vyapariIdNo?.toString().includes(search.toString()))
-    );
-  };
+  const tableDataFiltered = tableData.filter((elem) => {
+    const matchesId =
+      !idQuery || elem?.vyapariIdNo?.toString().includes(idQuery);
+    const matchesName =
+      !nameQuery ||
+      elem?.vyapari_name?.toLowerCase().includes(nameQuery.toLowerCase());
+    return matchesId && matchesName;
+  });
 
   return (
-    <>
-      <h1 className={styles.heading}>CRATE VASULI SHEET</h1>
-      <div className={styles.container}>
-        <form
-          className={styles.dateFields}
-          onSubmit={(e) => e.preventDefault()}
-        >
-          <div className={styles.date}>
-            <TextField
-              defaultValue={currentDate}
-              size="small"
-              type="date"
-              {...register("fromDate", { required: "Date is required" })}
-            />
-            <br />
-            {errors.fromDate && (
-              <span className="error">{errors.fromDate.message}</span>
-            )}
-          </div>
-          <div>
-            <Button
-              variant="contained"
-              color="success"
-              type="button"
-              onClick={() => fetch_vasuli_sheet(getValues())}
-            >
-              Fetch
-            </Button>
-            &nbsp;
-            {/* <Button
-              variant="contained"
-              color="success"
-              type="button"
-              onClick={() => printLedger()}
-              className={styles.print_btn}
-            >
-              PRINT
-            </Button>
-            <ReactToPrint
-              trigger={() => (
-                <button style={{ display: "none" }} ref={triggerRef}></button>
-              )}
-              content={() => componentRef.current}
-            /> */}
-          </div>
-        </form>
-        {/* <div className={styles.totals}>
-          <div>
-            <span className={styles.fulllabel}>OPENING TOTAL: </span>
-            <span className={styles.shortlabel}>OPN: </span>
-            <span>{totals.openingAmountSum}</span>
-          </div>
-          <div>
-            <span className={styles.fulllabel}>DAY TOTAL: </span>
-            <span className={styles.shortlabel}>DAY: </span>
-            <span>{totals.daybill}</span>
-          </div>
-          <div>
-            <span className={styles.fulllabel}>CLOSING TOTAL: </span>
-            <span className={styles.shortlabel}>CLS: </span>
-            <span>{totals.closingAmountSum}</span>
-          </div>
-        </div> */}
-        <div style={{ display: "flex", marginTop: "20px", gap: "20px" }}>
-          <div className={styles.search}>
-            <TextField
-              fullWidth
-              type="number"
-              size="small"
-              label="SEARCH BY ID"
-              variant="outlined"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              onChange={findById}
-            />
-          </div>
-          <div className={styles.search}>
-            <TextField
-              fullWidth
-              type="text"
-              size="small"
-              label="SEARCH"
-              variant="outlined"
-              inputProps={{
-                style: {
-                  textTransform: "uppercase", // Ensure the input content is transformed
-                },
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              onChange={find}
-            />
-          </div>
+    <div className={`${ui.page} ${styles.widePage}`}>
+      <div className={ui.header}>
+        <div>
+          <h2 className={ui.title}>Crate Vasuli Sheet</h2>
+          <p className={ui.subtitle}>
+            Day-wise crate balances for all vyaparis
+          </p>
         </div>
-        <MasterTable
-          columns={ledgerColumns}
-          tableData={tableDataFiltered}
-          keyArray={keyArray}
-        />
+
+        <div className={ui.toolbar}>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className={ui.input}
+          />
+          <button
+            className={ui.btn}
+            onClick={() => getLedgerData(date)}
+            disabled={loading || !date}
+          >
+            {loading ? "Fetching…" : "Fetch"}
+          </button>
+        </div>
       </div>
-      {/* <div style={{ display: "none" }}>
-        <VyapariVasuliPrint
-          ref={componentRef}
-          tableData={tableData}
-          formData={{ ...getValues(), ...totals }}
-        />
-      </div> */}
-    </>
+
+      <div className={styles.filterRow}>
+        <div className={styles.searches}>
+          <input
+            type="text"
+            inputMode="numeric"
+            placeholder="Search by ID"
+            className={`${ui.input} ${styles.searchInput}`}
+            value={idQuery}
+            onChange={(e) => setIdQuery(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Search by name"
+            className={`${ui.input} ${styles.searchInput}`}
+            value={nameQuery}
+            onChange={(e) => setNameQuery(e.target.value)}
+          />
+        </div>
+
+        <div className={styles.stats}>
+          <span className={ui.statPill}>
+            Opening <b>{totals.openingAmountSum}</b>
+          </span>
+          <span className={ui.statPill}>
+            Day <b>{totals.daybill}</b>
+          </span>
+          <span className={ui.statPill}>
+            Closing <b>{totals.closingAmountSum}</b>
+          </span>
+        </div>
+      </div>
+
+      <MasterTable
+        columns={LEDGER_COLUMNS}
+        tableData={tableDataFiltered}
+        keyArray={KEY_ARRAY}
+      />
+    </div>
   );
-}
+};
 
 export default CrateVasuliSheet;
-

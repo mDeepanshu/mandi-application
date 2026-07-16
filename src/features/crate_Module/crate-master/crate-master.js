@@ -1,38 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Grid } from "@mui/material";
 import { useForm, Controller } from 'react-hook-form';
-import { TextField, Button, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import { Typography } from '@mui/material';
-import { Delete, AddCircleOutline } from '@mui/icons-material';
-import Snackbar from '@mui/material/Snackbar';
+import { TextField } from "@mui/material";
 import MasterTable from "../../../shared/ui/master-table/master-table";
 import { getCrateMasterData, addCrateMasterData } from "../../../gateway/crateModule/master-api";
+import ui from "../crate-shared.module.css";
 import styles from "./crate-master.module.css";
 
+const CRATE_COLUMNS = ["CRATE NAME", "TOTAL CRATES", "CLOSING AMOUNT"];
+const CRATE_KEY_ARRAY = ["crate_name", "total", "closing_amount"];
+
 const CrateMaster = () => {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-
-
-    const { control, handleSubmit, reset, formState: { errors } } = useForm();
-
+    const { control, handleSubmit, reset, formState: { errors }, setError } = useForm();
     const [crateTableData, setCrateTableData] = useState([]);
-    const crateTableDataFiltered = crateTableData;
-    const crateColumns = ["CRATE NAME", "TOTAL CRATES"];
-    const crateKeyArray = ["crate_name", "total"];
-
-
-    const [open, setOpen] = useState(false);
-
+    const [saving, setSaving] = useState(false);
 
     const fetchData = async () => {
         try {
             const data = await getCrateMasterData();
-            // setData(data?.responseBody || []);
             setCrateTableData(data?.responseBody || []);
         } catch (error) {
-            setError(error.message);
+            console.error("Error fetching crate master data:", error);
         }
     };
 
@@ -40,112 +27,115 @@ const CrateMaster = () => {
         fetchData();
     }, []);
 
-    const action = (
-        <Button onClick={() => setOpen(false)} color="inherit">Close</Button>
-    );
-    const handleClose = () => setOpen(false);
-
-    const onCrateInput = (e, field) => field.onChange(e.target.value);
-
-    const onSubmit = (formData) => {
+    const onSubmit = async (formData) => {
         const name = (formData.crateName || "").trim();
         if (!name) return;
-        const exists = crateTableData.some((it) => (it.crateName || "").toLowerCase() === name.toLowerCase());
+
+        const exists = crateTableData.some(
+            (it) => (it.crate_name || "").toLowerCase() === name.toLowerCase()
+        );
         if (exists) {
-            setOpen(true);
+            setError("crateName", { type: "duplicate", message: "This crate already exists" });
             return;
         }
-        const newEntry = {
-            crateName: name,
-            total: formData.total,
-            closingAmount: formData.closingAmount
-        };
 
-        addCrateMasterData(newEntry).then((res) => {
+        setSaving(true);
+        try {
+            const res = await addCrateMasterData({
+                crateName: name,
+                total: formData.total,
+                closingAmount: formData.closingAmount,
+            });
             if (res) {
                 fetchData();
+                reset();
             }
-        });
-
-        reset();
+        } finally {
+            setSaving(false);
+        }
     };
-
-    const deleteEntry = (index) => {
-        setCrateTableData((prev) => {
-            const arr = [...prev];
-            arr.splice(index, 1);
-            return arr;
-        });
-    };
-
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
 
     return (
-        <div className="crate-master">
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <Grid container spacing={2} p={3}>
-                    <Grid item xs={12}>
-                        <Typography variant="h4" component="h1" align="left">
-                            CRATE MASTER
-                        </Typography>
-                    </Grid>
-
-                    <Grid item xs={4}>
-                        <Controller
-                            name="crateName"
-                            control={control}
-                            rules={{ required: "Enter Crate Name" }}
-                            defaultValue=""
-                            render={({ field }) => <TextField {...field} fullWidth label="CRATE NAME" variant="outlined" onChange={(e) => onCrateInput(e, field)} />}
-
-                        />
-                        <p className={styles['err-msg']}>{errors.crateName?.message}</p>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Controller
-                            name="total"
-                            control={control}
-                            rules={{ required: "Enter Crate Total" }}
-                            defaultValue=""
-                            render={({ field }) => <TextField {...field} fullWidth label="TOTAL CRATES" variant="outlined" onChange={(e) => onCrateInput(e, field)} />}
-
-                        />
-                        <p className={styles['err-msg']}>{errors.total?.message}</p>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Controller
-                            name="closingAmount"
-                            control={control}
-                            rules={{ required: "Enter Closing Amount" }}
-                            defaultValue=""
-                            render={({ field }) => <TextField {...field} fullWidth label="CLOSING AMOUNT" variant="outlined" onChange={(e) => onCrateInput(e, field)} />}
-
-                        />
-                        <p className={styles['err-msg']}>{errors.closingAmount?.message}</p>
-                    </Grid>
-                    <Grid item xs={2}>
-                        <Button variant="contained" color="primary" fullWidth type="submit" sx={{ height: '3.438rem' }}>
-                            <AddCircleOutline /> ADD
-                        </Button>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                        <div className='table-container'>
-                            <MasterTable columns={crateColumns} tableData={crateTableDataFiltered} keyArray={crateKeyArray} />
-                        </div>
-                    </Grid>
-                </Grid>
+        <div className={ui.page}>
+            <div className={ui.header}>
                 <div>
-                    <Snackbar
-                        open={open}
-                        autoHideDuration={4000}
-                        message="CRATE ALREADY EXISTS"
-                        action={action}
-                        onClose={handleClose}
-                    />
+                    <h2 className={ui.title}>Crate Master</h2>
+                    <p className={ui.subtitle}>Crate types and their total stock</p>
                 </div>
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className={`${ui.card} ${ui.cardPad} ${styles.formCard}`}>
+                <Controller
+                    name="crateName"
+                    control={control}
+                    rules={{ required: "Enter crate name" }}
+                    defaultValue=""
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            fullWidth
+                            size="small"
+                            label="Crate Name"
+                            variant="outlined"
+                            error={!!errors.crateName}
+                            helperText={errors.crateName?.message}
+                        />
+                    )}
+                />
+                <Controller
+                    name="total"
+                    control={control}
+                    rules={{
+                        required: "Enter total crates",
+                        validate: (v) => Number(v) > 0 || "Must be a positive number",
+                    }}
+                    defaultValue=""
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            fullWidth
+                            size="small"
+                            type="number"
+                            label="Total Crates"
+                            variant="outlined"
+                            error={!!errors.total}
+                            helperText={errors.total?.message}
+                        />
+                    )}
+                />
+                <Controller
+                    name="closingAmount"
+                    control={control}
+                    rules={{
+                        required: "Enter closing amount",
+                        validate: (v) => Number(v) >= 0 || "Cannot be negative",
+                    }}
+                    defaultValue=""
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            fullWidth
+                            size="small"
+                            type="number"
+                            label="Closing Amount"
+                            variant="outlined"
+                            error={!!errors.closingAmount}
+                            helperText={errors.closingAmount?.message}
+                        />
+                    )}
+                />
+                <button type="submit" className={`${ui.btn} ${styles.addBtn}`} disabled={saving}>
+                    {saving ? "Adding…" : "+ Add"}
+                </button>
             </form>
+
+            <div className={styles.tableWrap}>
+                <MasterTable
+                    columns={CRATE_COLUMNS}
+                    tableData={crateTableData}
+                    keyArray={CRATE_KEY_ARRAY}
+                />
+            </div>
         </div>
     );
 };

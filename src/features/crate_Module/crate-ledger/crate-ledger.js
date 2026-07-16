@@ -1,74 +1,50 @@
-import { useEffect, useState, useRef, lazy } from "react";
+import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { TextField, Button } from "@mui/material";
-import { getLedger, makeVasuli, sendLedgerNotiApi, markVyapariAllowedTransactions, sendAllLedgerNotiApi } from "../../../gateway/crateModule/crate-ledger.api";
+import { TextField } from "@mui/material";
+import { getLedger } from "../../../gateway/crateModule/crate-ledger.api";
 import MasterTable from "../../../shared/ui/master-table/master-table";
-// import LedgerPrint from "../../dialogs/ledger-print/ledger-print-dialog";
-import ReactToPrint from "react-to-print";
-import styles from "./crate-ledger.module.css";
-import { useMediaQuery } from "@mui/material";
-// import PrintAllLedger from "../../dialogs/todays-all-ledger/todays-ledger";
-// import DuplicateVasuli from "../../dialogs/duplicate-vasuli/duplicate-vasuli";
 import VyapariField from "../../../shared/elements/VyapariField";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
-import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
+import ui from "../crate-shared.module.css";
+import styles from "./crate-ledger.module.css";
+
+const LEDGER_COLUMNS = ["DATE", "CRATE TYPE", "DEBIT", "CREDIT", "REMARK"];
+const KEY_ARRAY = ["date", "crate_name", "dr", "cr", "remark"];
 
 function CrateLedger() {
-  const componentRef = useRef();
-  const triggerRef = useRef();
-
   const [tableData, setTableData] = useState([]);
-  const [ledgerColumns, setledgerColumns] = useState(["DATE", "CRATE TYPE", "DEBIT", "CREDIT", "REMARK"]);
-  const [keyArray, setKeyArray] = useState(["date", "crate_name", "dr", "cr", "remark"]);
-  const [showAllLedgerPrint, setShowAllLedgerPrint] = useState(false);
-  const [showDuplicateVasuli, setShowDuplicateVasuli] = useState({ display: false, message: "" });
-  const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
+  const [fetched, setFetched] = useState(false);
+
+  const currentDate = new Date().toISOString().split("T")[0];
   const twoDaysPrior = new Date();
   twoDaysPrior.setDate(twoDaysPrior.getDate() - 2);
   const priorDate = twoDaysPrior.toISOString().split("T")[0];
-  const isSmallScreen = useMediaQuery("(max-width:495px)");
-  let customTableHeight = "120px";
+  const customTableHeight = "120px";
 
-  const [alertData, setAlertData] = useState({
-    open: false,
-    alertType: "",
-    alertMsg: "",
-  });
   const {
-    register,
     control,
-    handleSubmit,
     formState: { errors },
     getValues,
     trigger,
-    setValue,
   } = useForm({
     defaultValues: {
-      toDate: currentDate, // Set the default value to current date
-      fromDate: priorDate, // Default to 2 days prior date
-      // vyapariId: "",
-      // vyapari_id: null
+      toDate: currentDate,
+      fromDate: priorDate,
     },
   });
 
   const fetch_ledger = async (data) => {
-    const isValid = await trigger(); // Validates all fields
-    if (isValid) {
-      const { fromDate, toDate } = data;
-      getLedgerData(data.vyapari_id.partyId, fromDate, toDate);
-      // setValue("vyapariId", data.vyapari_id.idNo);
-    } else {
-      console.log("Validation failed");
-    }
+    const isValid = await trigger();
+    if (!isValid) return;
+    const { fromDate, toDate } = data;
+    getLedgerData(data.vyapari_id.partyId, fromDate, toDate);
   };
 
-const getLedgerData = async (vyapari_id, fromDate, toDate) => {
-  const ledger = await getLedger(vyapari_id, fromDate, toDate);
+  const getLedgerData = async (vyapari_id, fromDate, toDate) => {
+    const ledger = await getLedger(vyapari_id, fromDate, toDate);
+    if (!ledger) return;
 
-  if (ledger) {
+    setFetched(true);
     if (ledger.responseBody?.length) {
-      // 🔁 Transform API response → table format
       const formattedData = ledger.responseBody.map((item) => ({
         date: item.date,
         crate_name: item.crate_name,
@@ -76,21 +52,10 @@ const getLedgerData = async (vyapari_id, fromDate, toDate) => {
         cr: item.crate_count < 0 ? Math.abs(item.crate_count) : "",
         remark: "",
       }));
-
-      const transactionWithTotals = insertDateWiseTotal([...formattedData]);
-      setTableData(transactionWithTotals);
+      setTableData(insertDateWiseTotal([...formattedData]));
     } else {
-      setTableData([{ date: null, itemName: "", dr: "NO DATA", cr: "", remark: "" }]);
+      setTableData([]);
     }
-
-    // ❌ These don't exist in your new response (remove or keep if backend adds later)
-    setValue("closingAmount", ledger.responseBody?.closingAmount || 0);
-    setValue("openingAmount", ledger.responseBody?.openingAmount || 0);
-  }
-};
-
-  const printLedger = () => {
-    triggerRef.current.click();
   };
 
   const enterAction = () => {
@@ -133,8 +98,6 @@ const getLedgerData = async (vyapari_id, fromDate, toDate) => {
     return transactions;
   };
 
-  const toggleState = (state) => setShowAllLedgerPrint(state);
-
   const onVyapariKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -142,223 +105,96 @@ const getLedgerData = async (vyapari_id, fromDate, toDate) => {
     }
   };
 
-  const make_vasuli = async (allowDuplicate = false) => {
-    const vyapariValid = await trigger(`vyapari_id`);
-    if (!vyapariValid) return;
-    let vasuliData = [
-      {
-        amount: null,
-        date: new Date(),
-        vyapariId: getValues().vyapari_id?.partyId,
-        remark: null,
-        name: getValues()?.vyapari_id?.name,
-      },
-    ];
-    const vasuliRes = await makeVasuli(vasuliData, allowDuplicate);
-
-    if (vasuliRes?.responseCode == "400") {
-      setShowDuplicateVasuli({ display: true, message: vasuliRes.responseBody });
-      return;
-    }
-    if (vasuliRes) {
-      setAlertData({
-        open: true,
-        alertType: "success",
-        alertMsg: "SUCCESS",
-      });
-    }
-  };
-
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setAlertData({
-      open: false,
-      alertType: "",
-      alertMsg: "",
-    });
-  };
-
-  const closeDuplicateVasuli = () => setShowDuplicateVasuli({ display: false, message: "" });
-
-  const continueDuplicateVasuli = () => {
-    make_vasuli(true);
-    setShowDuplicateVasuli({ display: false, message: "" });
-  };
-
-  const sendLedgerNoti = async (data) => {
-    const isValid = await trigger();
-    if (isValid) {
-      const { fromDate, toDate } = data;
-      markVyapariAllowedTransactions(data.vyapari_id.partyId, fromDate, toDate).then((res) => {
-        if (res !== "error") {
-          sendLedgerNotiApi(data.vyapari_id.partyId);
-        }
-      });
-    } else {
-      console.log("Validation failed");
-    }
-  };
-
-  const sendAllLedgerNoti = async () => {
-    sendAllLedgerNotiApi(currentDate, currentDate).then((res) => {
-      if (res !== "error") {
-        setAlertData({
-          open: true,
-          alertType: "success",
-          alertMsg: "All Ledger Notifications Sent Successfully",
-        });
-      } else {
-        setAlertData({
-          open: true,
-          alertType: "error",
-          alertMsg: "Error in Sending Notifications",
-        });
-      }
-    });
-  };
-
   return (
-    <>
-      <div className={styles.wrapper}>
-        <div className={styles.LedgerContainer}>
-          <h1>CRATE LEDGER</h1>
-          <form onSubmit={(e) => e.preventDefault()}>
-            <div className={styles.dateFields}>
-              <div className={styles.vyapariName}>
-                <div>
-                  <VyapariField
-                    name="vyapari_id"
-                    control={control}
-                    errors={errors}
-                    size={isSmallScreen ? "small" : "medium"}
-                    onKeyDownFunc={onVyapariKeyDown}
-                    customOnSelect={handleClose}
-                  />
-                </div>
-              </div>
-              <div className={styles.date}>
-                <Controller
-                  name="fromDate"
-                  control={control}
-                  rules={{ required: "Enter From Date" }}
-                  defaultValue=""
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="FROM DATE"
-                      size={isSmallScreen ? "small" : "medium"}
-                      fullWidth
-                      variant="outlined"
-                      type="date"
-                    />
-                  )}
-                />
-                <p className="error">{errors.fromDate?.message}</p>
-              </div>
-              <div className={styles.date}>
-                <Controller
-                  name="toDate"
-                  control={control}
-                  rules={{ required: "Enter To Date" }}
-                  defaultValue=""
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="TO DATE"
-                      size={isSmallScreen ? "small" : "medium"}
-                      fullWidth
-                      variant="outlined"
-                      type="date"
-                    />
-                  )}
-                />
-                <p className="error">{errors.toDate?.message}</p>
-              </div>
-            </div>
-            <div className={styles.btns}>
-              <div className={`${styles.btns} ${styles.actionBtns}`}>
-                <Button className={styles.fetch} variant="contained" color="success" type="button" onClick={() => fetch_ledger(getValues())}>
-                  FETCH
-                </Button>
-                {/* <Button className={styles.vasuliBtn} variant="contained" color="success" type="button" onClick={() => make_vasuli()}>
-                  VASULI
-                </Button>
-                <Button className={styles.send_ledger_btn} variant="contained" color="success" type="button" onClick={() => sendLedgerNoti(getValues())}>
-                  SEND LEDGER<PhoneAndroidIcon />
-                </Button> */}
-                {/* <Button variant="contained" color="success" type="button">
-                  <a href={`sms:+918349842228?body=${encodeURIComponent(smsMessage)}`}>Send SMS</a>
-                </Button> */}
-              </div>
-              {/* <div className={styles.print_btns}>
-                <Button className={styles.print_btn} variant="contained" color="success" type="button" onClick={() => printLedger()}>
-                  PRINT
-                </Button>
-                <Button
-                  className={styles.print_all_btn}
-                  variant="contained"
-                  color="success"
-                  type="button"
-                  onClick={() => toggleState(true)}
-                >
-                  PRINT ALL
-                </Button>
-              </div> */}
-              {/* <Button variant="contained" color="success" type="button" className={styles.send_all_ledger_btn} onClick={() => sendAllLedgerNoti()}>
-                SEND ALL LEDGER<PhoneAndroidIcon />
-              </Button> */}
-              <ReactToPrint
-                trigger={() => <button style={{ display: "none" }} ref={triggerRef}></button>}
-                content={() => componentRef.current}
-              />
-            </div>
-            <div className={styles.constants}>
-              <div>
-                <b>
-                  <span className={styles.fulllabel}>OPENING BALANCE: </span>
-                  <span className={styles.shortlabel}>OPN: </span>
-                  {getValues().openingAmount}
-                </b>
-              </div>
-              <div>
-                <b>
-                  <span className={styles.fulllabel}>CLOSING BALANCE: </span>
-                  <span className={styles.shortlabel}>CLS: </span>
-                  {getValues().closingAmount}
-                </b>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div className={styles.table_section}>
-          <MasterTable columns={ledgerColumns} tableData={tableData} keyArray={keyArray} customHeight={customTableHeight} />
+    <div className={`${ui.page} ${styles.widePage}`}>
+      <div className={ui.header}>
+        <div>
+          <h2 className={ui.title}>Crate Ledger</h2>
+          <p className={ui.subtitle}>
+            Crate debits and credits for a vyapari over a date range
+          </p>
         </div>
       </div>
-      <div style={{ display: "none" }}>
-        {/* <LedgerPrint ref={componentRef} tableData={[...tableData]} formData={getValues()} /> */}
-      </div>
-      <div>
-        {/* <PrintAllLedger open={showAllLedgerPrint} onClose={() => toggleState(false)} formData={getValues()} /> */}
-      </div>
-      <div>
-        {/* <DuplicateVasuli open={showDuplicateVasuli} continue={continueDuplicateVasuli} onClose={closeDuplicateVasuli} /> */}
-      </div>
-      <div>
-        <Snackbar
-          open={alertData.open}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }} // Change position
-          onClose={handleClose}
+
+      <div className={styles.layout}>
+        <form
+          className={`${ui.card} ${ui.cardPad} ${styles.sidebar}`}
+          onSubmit={(e) => e.preventDefault()}
         >
-          <Alert onClose={handleClose} severity={alertData.alertType} variant="filled" sx={{ width: "100%" }}>
-            {alertData.alertMsg}
-          </Alert>
-        </Snackbar>
+          <VyapariField
+            name="vyapari_id"
+            control={control}
+            errors={errors}
+            size="small"
+            onKeyDownFunc={onVyapariKeyDown}
+          />
+
+          <div className={styles.dates}>
+            <Controller
+              name="fromDate"
+              control={control}
+              rules={{ required: "Enter From Date" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="FROM DATE"
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  type="date"
+                  error={!!errors.fromDate}
+                  helperText={errors.fromDate?.message}
+                />
+              )}
+            />
+            <Controller
+              name="toDate"
+              control={control}
+              rules={{ required: "Enter To Date" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="TO DATE"
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  type="date"
+                  error={!!errors.toDate}
+                  helperText={errors.toDate?.message}
+                />
+              )}
+            />
+          </div>
+
+          <button
+            type="button"
+            className={`${ui.btn} ${styles.fetchBtn}`}
+            onClick={() => fetch_ledger(getValues())}
+          >
+            Fetch
+          </button>
+        </form>
+
+        <div className={styles.tableArea}>
+          {fetched && tableData.length === 0 && (
+            <div className={ui.card}>
+              <p className={ui.emptyState}>
+                No transactions found for this vyapari in the selected range.
+              </p>
+            </div>
+          )}
+          {(!fetched || tableData.length > 0) && (
+            <MasterTable
+              columns={LEDGER_COLUMNS}
+              tableData={tableData}
+              keyArray={KEY_ARRAY}
+              customHeight={customTableHeight}
+            />
+          )}
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
 export default CrateLedger;
-

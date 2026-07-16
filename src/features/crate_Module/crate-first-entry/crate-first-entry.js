@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import EditDialog from "./dialog/crate-first-edit-dialog";
 import styles from "./crate-first-entry.module.css";
-import { Edit } from '@mui/icons-material';
+import { Edit } from "@mui/icons-material";
 import { getCrateSummaryByDate } from "../../../gateway/crateModule/first-entry-api";
 
 const getTodayDate = () => {
@@ -14,32 +14,33 @@ export default function CrateManagement() {
   const [data, setData] = useState();
   const [selected, setSelected] = useState(null);
   const [summaryDate, setSummaryDate] = useState(getTodayDate);
+  const [loading, setLoading] = useState(false);
 
   const fetchData = () => {
-    const dateInput = summaryDate;
-    if (!dateInput) {
-      alert("Please select a date.");
-      return;
-    }
+    if (!summaryDate) return;
 
-    getCrateSummaryByDate(dateInput)
+    setLoading(true);
+    getCrateSummaryByDate(summaryDate)
       .then((summary) => {
         setData(summary?.responseBody || []);
       })
       .catch((error) => {
         console.error("Error fetching crate summary:", error);
-      });
-
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
-    <div className={styles.container}>
-      <h2>Summary After Mandi Completion</h2>
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <div>
+          <h2 className={styles.title}>Summary After Mandi Completion</h2>
+          <p className={styles.subtitle}>
+            Crates counted per vyapari for the selected day
+          </p>
+        </div>
 
-      {/* Date + Fetch */}
-      <div className={styles.dateContainer}>
-        <div className={styles.dateLeft}>
-          <label htmlFor="summaryDate">Date: </label>
+        <div className={styles.toolbar}>
           <input
             type="date"
             id="summaryDate"
@@ -47,68 +48,85 @@ export default function CrateManagement() {
             value={summaryDate}
             onChange={(e) => setSummaryDate(e.target.value)}
           />
+          <button
+            className={styles.fetchBtn}
+            onClick={fetchData}
+            disabled={loading || !summaryDate}
+          >
+            {loading ? "Fetching…" : "Fetch"}
+          </button>
         </div>
-
-        <button className={styles.fetchBtn} onClick={fetchData}>
-          FETCH
-        </button>
       </div>
 
-      <hr />
-
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Vyapari Name</th>
-            <th>Crate Type</th>
-            <th>Total</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {data?.map((row) => (
-            <tr key={row.vyapari_id}>
-              <td>{row.vyapari_name}</td>
-
-              <td>
-                {row.crates
-                  ?.map(
-                    (crate) =>
-                      `${crate.crate_name} (${crate.crate_count})`
-                  )
-                  .join(", ")}
-              </td>
-
-              <td>
-                {row.crates?.reduce(
-                  (sum, crate) => sum + crate.crate_count,
-                  0
-                )}
-              </td>
-
-              <td>
-                <button
-                  className={styles.editBtn}
-                  onClick={() => setSelected(row)}
-                >
-                  <Edit />
-                </button>
-              </td>
+      <div className={styles.card}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Vyapari</th>
+              <th>Crates</th>
+              <th className={styles.totalHead}>Total</th>
+              <th className={styles.actionHead} />
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {data?.map((row) => (
+              <tr key={row.vyapari_id}>
+                <td className={styles.nameCell}>{row.vyapari_name}</td>
+
+                <td>
+                  <div className={styles.chips}>
+                    {row.crates?.map((crate) => (
+                      <span className={styles.chip} key={crate.crate_id}>
+                        {crate.crate_name}
+                        <b>× {crate.crate_count}</b>
+                      </span>
+                    ))}
+                  </div>
+                </td>
+
+                <td className={styles.totalCell}>
+                  {row.crates?.reduce(
+                    (sum, crate) => sum + crate.crate_count,
+                    0
+                  )}
+                </td>
+
+                <td className={styles.actionCell}>
+                  <button
+                    className={styles.editBtn}
+                    onClick={() => setSelected(row)}
+                    aria-label={`Edit crates for ${row.vyapari_name}`}
+                  >
+                    <Edit fontSize="small" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {!data && !loading && (
+          <p className={styles.emptyState}>
+            Pick a date and press Fetch to load the day's summary.
+          </p>
+        )}
+
+        {data?.length === 0 && !loading && (
+          <p className={styles.emptyState}>
+            No crate entries found for {summaryDate}.
+          </p>
+        )}
+      </div>
 
       {selected && (
         <EditDialog
           data={selected}
+          date={summaryDate}
           onClose={() => setSelected(null)}
-          onSave={(updated) => {
-            setData((prev) =>
-              prev.map((d) => (d.id === updated.id ? updated : d))
-            );
+          onSaved={() => {
             setSelected(null);
+            fetchData();
           }}
         />
       )}
