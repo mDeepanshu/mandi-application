@@ -48,7 +48,8 @@
 /* ---------- Inputs & buttons ---------- */
 
 .input {
-  padding: 8px 12px;
+  height: 44px;
+  padding: 0 12px;
   border: 1px solid #dbe1e8;
   border-radius: 8px;
   background: #ffffff;
@@ -64,8 +65,18 @@
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
 }
 
+/* MUI size="small" fields default to ~40px; hold them to the .input height. */
+.page :global(.MuiInputBase-root.MuiInputBase-sizeSmall) {
+  min-height: 44px;
+}
+
+.page :global(.MuiInputLabel-outlined.MuiInputLabel-sizeSmall:not(.MuiInputLabel-shrink)) {
+  transform: translate(14px, 11px) scale(1);
+}
+
 .btn {
-  padding: 8px 20px;
+  height: 44px;
+  padding: 0 20px;
   border: none;
   border-radius: 8px;
   background: #16a34a;
@@ -87,7 +98,8 @@
 }
 
 .btnGhost {
-  padding: 8px 18px;
+  height: 44px;
+  padding: 0 18px;
   border: 1px solid #dbe1e8;
   border-radius: 8px;
   background: #ffffff;
