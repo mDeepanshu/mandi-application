@@ -60,6 +60,7 @@ function KisanBill() {
   const [noEntries, setNoEntries] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
   const [remaininglist, setRemainingList] = useState([]);
+  const [printRemainingStock, setPrintRemainingStock] = useState([]);
   const [addRemaininglist, setAddRemainingList] = useState([]);
   const [qtyRemaining, setRemainingQty] = useState("");
 
@@ -79,8 +80,11 @@ function KisanBill() {
   };
 
   const onPrintBtn = async (e) => {
-    const isValid = await trigger(["kisan", "date", "kaccha_total", "kharcha_total", "pakki_bikri", "mandi_kharcha", "bhada", "driver_inaam", "nagdi", "hammali", "nagar_palika_tax"]);
-    if (isValid) setFormData(getValues());
+    const isValid = await trigger(["kisan", "date", "kaccha_total", "kharcha_total", "pakki_bikri", "mandi_kharcha", "bhada", "hammali", "nagar_palika_tax"]);
+    if (isValid) {
+      setPrintRemainingStock(remaininglist);
+      setFormData(getValues());
+    }
   };
 
   const fetchBill = async () => {
@@ -190,7 +194,7 @@ function KisanBill() {
   };
 
   const saveBill = async () => {
-    const isValid = await trigger(["kisan", "date", "kaccha_total", "kharcha_total", "pakki_bikri", "mandi_kharcha", "bhada", "driver_inaam", "nagdi", "hammali", "nagar_palika_tax"]);
+    const isValid = await trigger(["kisan", "date", "kaccha_total", "kharcha_total", "pakki_bikri", "mandi_kharcha", "bhada", "hammali", "nagar_palika_tax"]);
     if (!isValid) return;
     const formValues = getValues();
     const bill = {
@@ -214,7 +218,8 @@ function KisanBill() {
     const saveRes = await saveKisanBill(bill);
     if (saveRes?.responseCode == "200") {
       setOpen(true);
-      setFormData(getValues());
+      setPrintRemainingStock(remaininglist);
+      setFormData({ ...getValues(), billId: saveRes?.responseBody?.billId });
       resetFullBill();
     }
   };
@@ -806,7 +811,7 @@ function KisanBill() {
         </Grid>
       </form>
       <div style={{ display: "none" }}>
-        <KisanBillPrint ref={componentRef} remainingStock={remaininglist} tableDataPrint={structuredClone(tableData)} restructureTable={false} formData={formData} />
+        <KisanBillPrint ref={componentRef} remainingStock={printRemainingStock} tableDataPrint={structuredClone(tableData)} restructureTable={false} formData={formData} />
       </div>
       <div>
         <Snackbar open={open} autoHideDuration={2500} onClose={handleClose}>

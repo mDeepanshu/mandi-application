@@ -4,6 +4,12 @@ const KisanBillPrint = forwardRef((props, ref) => {
   const [printTable, setPrintTable] = useState([]);
   const [localTable, setLocalTable] = useState([]);
 
+  // Show all bill numbers as whole figures (no decimals); leave non-numeric text as-is
+  const round = (v) =>
+    v === "" || v === null || v === undefined || isNaN(Number(v))
+      ? v
+      : Math.round(Number(v));
+
   useEffect(() => {
     setLocalTable(props.tableDataPrint);
   }, [props]);
@@ -66,16 +72,16 @@ const KisanBillPrint = forwardRef((props, ref) => {
         </div>
         <div className={styles.levelTwo}>
           <div className={styles.constants}>
-            <div><div>मंडी खर्चा: </div><div>{props.formData?.mandi_kharcha}</div></div>
-            <div><div>हम्माली: </div><div>{props.formData?.hammali}</div></div>
-            <div><div>न. पा. टैक्स: </div><div>{props.formData?.nagar_palika_tax}</div></div>
-            <div><div>भाड़ा: </div><div>{props.formData?.bhada}</div></div>
-            <div><div>ड्राइवर इनाम: </div><div>{props.formData?.driver_inaam}</div></div>
-            <div><div>नगद: </div><div>{props.formData?.nagdi}</div></div>
-            <div><div><b>खर्चा कुल:</b></div><div><b>{props.formData?.kharcha_total}</b></div></div>
+            <div><div>मंडी खर्चा: </div><div>{round(props.formData?.mandi_kharcha)}</div></div>
+            <div><div>हम्माली: </div><div>{round(props.formData?.hammali)}</div></div>
+            <div><div>न. पा. टैक्स: </div><div>{round(props.formData?.nagar_palika_tax)}</div></div>
+            <div><div>भाड़ा: </div><div>{round(props.formData?.bhada)}</div></div>
+            <div><div>ड्राइवर इनाम: </div><div>{round(props.formData?.driver_inaam)}</div></div>
+            <div><div>नगद: </div><div>{round(props.formData?.nagdi)}</div></div>
+            <div><div><b>खर्चा कुल:</b></div><div><b>{round(props.formData?.kharcha_total)}</b></div></div>
             {props.remainingStock?.length > 0 && <div><div><b>पुराना बकाया स्टॉक</b></div><div><b></b></div></div>}
             {props.remainingStock?.map((row,index) => (
-            <div><div>{row?.item_name}</div><div><b>{row?.quantity}</b></div></div>
+            <div><div>{row?.item_name}</div><div><b>{round(row?.quantity)}</b></div></div>
             ))}
           </div>
           <div className={styles.tableContainer}>
@@ -99,10 +105,10 @@ const KisanBillPrint = forwardRef((props, ref) => {
                     <td component="th" scope="row">
                       {row?.item_name}
                     </td>
-                    <td align="right">{row?.bag}</td>
-                    <td align="right">{row?.quantity}</td>
-                    <td align="right">{row?.rate}</td>
-                    <td align="right">{row?.item_total}</td>
+                    <td align="right">{round(row?.bag)}</td>
+                    <td align="right">{round(row?.quantity)}</td>
+                    <td align="right">{round(row?.rate)}</td>
+                    <td align="right">{round(row?.item_total)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -114,13 +120,13 @@ const KisanBillPrint = forwardRef((props, ref) => {
           </div>
           <div className={styles.totals}>
             <div>
-              <div>कुल बिक्र: </div> <div>{props.formData?.kaccha_total}</div>
+              <div>कुल बिक्र: </div> <div>{round(props.formData?.kaccha_total)}</div>
             </div>
             <div>
-              <div>खर्चा कुल: </div> <div>{props.formData?.kharcha_total}</div>
+              <div>खर्चा कुल: </div> <div>{round(props.formData?.kharcha_total)}</div>
             </div>
             <div>
-              <div> कुल: </div> <div>{props.formData?.pakki_bikri}</div>
+              <div> कुल: </div> <div>{round(props.formData?.pakki_bikri)}</div>
             </div>
           </div>
         </div>

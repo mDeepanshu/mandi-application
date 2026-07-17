@@ -88,19 +88,13 @@
             "name": "driver_inaam",
             "hidden": false,
             "label": "Driver Inaam",
-            "defaultValue": "",
-            "validation": {
-                "required": "Driver Inaam is required"
-            }
+            "defaultValue": ""
         },
         {
             "name": "nagdi",
             "hidden": false,
             "label": "Nagdi",
-            "defaultValue": "",
-            "validation": {
-                "required": "Nagdi is required"
-            }
+            "defaultValue": ""
         },
         {
             "name": "commission",
