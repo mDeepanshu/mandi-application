@@ -39,7 +39,6 @@ const remainingCrateItems = [
   { name: "crate-master", label: "Crate Master" },
   { name: "crate-vasuli-sheet", label: "Crate Vasuli Sheet" },
   { name: "crate-vasuli-list", label: "Crate Vasuli List" },
-  { name: "auction-crate-list", label: "Auction Crate List" },
   { name: "pending-crate", label: "Pending Crate" },
 ];
 
