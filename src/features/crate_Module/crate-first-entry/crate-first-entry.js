@@ -15,6 +15,18 @@ export default function CrateManagement() {
   const [selected, setSelected] = useState(null);
   const [summaryDate, setSummaryDate] = useState(getTodayDate);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+
+  const visibleData = data
+    ?.filter((row) =>
+      row.vyapari_name?.toLowerCase().includes(search.trim().toLowerCase())
+    )
+    .sort((a, b) =>
+      sortOrder === "asc"
+        ? new Date(a.created_at) - new Date(b.created_at)
+        : new Date(b.created_at) - new Date(a.created_at)
+    );
 
   const fetchData = () => {
     if (!summaryDate) return;
@@ -41,6 +53,22 @@ export default function CrateManagement() {
         </div>
 
         <div className={styles.toolbar}>
+          <input
+            type="text"
+            className={styles.searchInput}
+            placeholder="Search vyapari…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <select
+            className={styles.sortSelect}
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            aria-label="Sort by entry time"
+          >
+            <option value="asc">Oldest first</option>
+            <option value="desc">Newest first</option>
+          </select>
           <input
             type="date"
             id="summaryDate"
@@ -70,7 +98,7 @@ export default function CrateManagement() {
           </thead>
 
           <tbody>
-            {data?.map((row) => (
+            {visibleData?.map((row) => (
               <tr key={row.vyapari_id}>
                 <td className={styles.nameCell}>{row.vyapari_name}</td>
 
@@ -115,6 +143,12 @@ export default function CrateManagement() {
         {data?.length === 0 && !loading && (
           <p className={styles.emptyState}>
             No crate entries found for {summaryDate}.
+          </p>
+        )}
+
+        {data?.length > 0 && visibleData?.length === 0 && !loading && (
+          <p className={styles.emptyState}>
+            No vyapari matches "{search}".
           </p>
         )}
       </div>

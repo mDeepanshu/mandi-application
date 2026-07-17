@@ -41,7 +41,9 @@
   gap: 10px;
 }
 
-.dateInput {
+.dateInput,
+.searchInput,
+.sortSelect {
   padding: 8px 12px;
   border: 1px solid #dbe1e8;
   border-radius: 8px;
@@ -53,9 +55,23 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.dateInput:focus {
+.dateInput:focus,
+.searchInput:focus,
+.sortSelect:focus {
   border-color: #16a34a;
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.searchInput {
+  width: 180px;
+}
+
+.searchInput::placeholder {
+  color: #94a3b8;
+}
+
+.sortSelect {
+  cursor: pointer;
 }
 
 .fetchBtn {
