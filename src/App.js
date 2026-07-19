@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import "./App.css";
 import { Box } from "@mui/material";
@@ -43,15 +43,21 @@ function App({ variant }) {
           />
 
           <Box component="main" sx={{ mt: 8 }}>
-            <Outlet
-              context={{
-                snackbarChange,
-                syncComplete,
-                loading,
-                changeLoading,
-                variant,
-              }}
-            />
+            {/* Suspense must sit BELOW the NavBar: lazy pages suspend here on
+                first load, and if the boundary were above the NavBar the whole
+                tree (including the open MORE menu mid-close-transition) would
+                be hidden, leaving the menu stuck open. */}
+            <Suspense fallback={<div>Loading...</div>}>
+              <Outlet
+                context={{
+                  snackbarChange,
+                  syncComplete,
+                  loading,
+                  changeLoading,
+                  variant,
+                }}
+              />
+            </Suspense>
           </Box>
 
           <SnackbarGlobal snackbarData={snackbarData} />

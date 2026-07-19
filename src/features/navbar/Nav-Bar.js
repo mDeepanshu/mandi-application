@@ -109,20 +109,29 @@ function NavBar(props) {
   };
 
   const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
+    setMenuOpen(true);
   };
 
-  const handleClose = (event, reason) => {
-    setAnchorEl(null);
+  // anchorEl is deliberately never cleared: the MORE button stays mounted for
+  // the life of the NavBar, and clearing it while the close transition is still
+  // running makes the Popover reposition against document.body, which throws
+  // the menu into the corner of the screen.
+  const handleMenuClose = () => {
+    setMenuOpen(false);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") return;
     setAlertData({ open: false, alertType: "", alertMsg: "" });
   };
 
   const handleMenuItemClick = (path) => {
-    handleClose();
-    setTimeout(() => navigate(path), 100);
+    setMenuOpen(false);
+    navigate(path);
   };
 
   const syncPartyItem = async () => {
@@ -212,8 +221,9 @@ function NavBar(props) {
 
                 <Menu
                   anchorEl={anchorEl}
-                  open={open}
-                  onClose={handleClose}
+                  open={menuOpen}
+                  onClose={handleMenuClose}
+                  disableScrollLock
                 >
                   {showMoreMenu && remNavItems.map((item, index) => (
                     <MenuItem
@@ -225,7 +235,7 @@ function NavBar(props) {
                   ))}
                   <MenuItem
                     onClick={() => {
-                      handleClose();
+                      handleMenuClose();
                       syncPartyItem();
                     }}
                   >
@@ -269,10 +279,10 @@ function NavBar(props) {
       <Snackbar
         open={alertData.open}
         autoHideDuration={2000}
-        onClose={handleClose}
+        onClose={handleSnackbarClose}
       >
         <Alert
-          onClose={handleClose}
+          onClose={handleSnackbarClose}
           severity={alertData.alertType}
           variant="filled"
           sx={{ width: "100%" }}
