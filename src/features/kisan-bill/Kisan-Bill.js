@@ -73,6 +73,7 @@ function KisanBill() {
 
   const [itemsList, setItemsList] = useState([]);
   const [fetchedBill, setFetchedBill] = useState(false);
+  const [kisanInputValue, setKisanInputValue] = useState("");
 
   const fetchList = async () => {
     const list = await getItem("items");
@@ -116,6 +117,7 @@ function KisanBill() {
             (party) => party.partyId == billConstant.kisan_id
           );
           setValue("kisan", selectedKisan);
+          setKisanInputValue(selectedKisan?.name || "");
           setValue("billId", billConstant.kisan_bill_id, { shouldValidate: true });
           getCommisionRate(selectedKisan?.commission);
           reset({ ...getValues(), ...billConstant });
@@ -220,7 +222,8 @@ function KisanBill() {
       setOpen(true);
       setPrintRemainingStock(remaininglist);
       setFormData({ ...getValues(), billId: saveRes?.responseBody?.billId });
-      resetFullBill();
+      resetFullBill(true);
+      setTimeout(() => kisanInputRef.current?.focus(), 0);
     }
   };
 
@@ -431,14 +434,16 @@ function KisanBill() {
     setRemainingQty("");
   };
 
-  const resetFullBill = () => {
+  const resetFullBill = (preserveKisanType = false) => {
+    const currentKisanType = preserveKisanType ? getValues("kisanType") : null;
     setTableData([]);
     setAddRemainingList([]);
     setRemainingList([]);
+    setKisanInputValue("");
     reset();
     reset({
       kisan: null,
-      kisanType: null,
+      kisanType: currentKisanType,
       hammali: null,
       nagar_palika_tax: null,
       mandi_kharcha: null,
@@ -476,7 +481,16 @@ function KisanBill() {
                       key={fieldDef.name}
                       name={fieldDef.name}
                       control={control}
-                      rules={fieldDef.validation}
+                      rules={
+                        fieldDef.name === "mandi_kharcha"
+                          ? {
+                              ...fieldDef.validation,
+                              validate: (value) =>
+                                (value !== "" && value != null && Number(value) !== 0) ||
+                                "Mandi Kharcha cannot be 0 or blank",
+                            }
+                          : fieldDef.validation
+                      }
                       defaultValue=""
                       render={({ field }) => (
                         <TextField
@@ -601,6 +615,7 @@ function KisanBill() {
                     <Autocomplete
                       {...field}
                       value={field.value || null}
+                      inputValue={kisanInputValue}
                       options={kisanFilteredList}
                       getOptionLabel={(option) => option.name}
                       getOptionKey={(option) => option.partyId}
@@ -641,6 +656,7 @@ function KisanBill() {
                         itemInputRef.current?.focus();
                       }}
                       onInputChange={(event, newInputValue, reason) => {
+                        setKisanInputValue(newInputValue);
                         if (reason === "input") {
                           field.onChange({ name: newInputValue });
                         }

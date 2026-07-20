@@ -11,11 +11,32 @@ const getTodayDate = () => {
   return new Date(now.getTime() - offset * 60 * 1000).toISOString().split("T")[0];
 };
 
+// created_at comes back as UTC; some endpoints omit the zone designator, so
+// normalise before parsing.
+const toDate = (value) => {
+  if (!value) return null;
+  const withZone = /(Z|[+-]\d{2}:?\d{2})$/.test(value) ? value : `${value}Z`;
+  const parsed = new Date(withZone);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const formatTime = (value) => {
+  const parsed = toDate(value);
+  if (!parsed) return "—";
+  return parsed.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
 export default function CrateVasuliList() {
   const [date, setDate] = useState(getTodayDate);
   const [data, setData] = useState();
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [search, setSearch] = useState("");
 
   const fetchData = async (vasuliDate) => {
     if (!vasuliDate) return;
@@ -40,7 +61,17 @@ export default function CrateVasuliList() {
   const rowTotal = (row) =>
     row.crates?.reduce((sum, crate) => sum + crate.crate_count, 0) || 0;
 
-  const grandTotal = (data || []).reduce((sum, row) => sum + rowTotal(row), 0);
+  const visibleData = (data || [])
+    .filter((row) =>
+      row.vyapari_name?.toLowerCase().includes(search.trim().toLowerCase())
+    )
+    .sort((a, b) => {
+      const at = toDate(a.created_at)?.getTime() ?? 0;
+      const bt = toDate(b.created_at)?.getTime() ?? 0;
+      return sortOrder === "asc" ? at - bt : bt - at;
+    });
+
+  const grandTotal = visibleData.reduce((sum, row) => sum + rowTotal(row), 0);
 
   return (
     <div className={ui.page}>
@@ -55,6 +86,26 @@ export default function CrateVasuliList() {
             <span className={ui.statPill}>
               Returned <b>{grandTotal}</b>
             </span>
+          )}
+          {data?.length > 0 && (
+            <input
+              type="text"
+              className={ui.input}
+              placeholder="Search vyapari…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          )}
+          {data?.length > 0 && (
+            <select
+              className={ui.input}
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              aria-label="Sort by entry time"
+            >
+              <option value="asc">Oldest first</option>
+              <option value="desc">Newest first</option>
+            </select>
           )}
           <input
             type="date"
@@ -77,11 +128,16 @@ export default function CrateVasuliList() {
           <p className={ui.emptyState}>No crate vasuli recorded on {date}.</p>
         )}
 
-        {data?.length > 0 && (
+        {data?.length > 0 && visibleData.length === 0 && !loading && (
+          <p className={ui.emptyState}>No vyapari matches "{search}".</p>
+        )}
+
+        {visibleData.length > 0 && (
           <table className={ui.table}>
             <thead>
               <tr>
                 <th>Vyapari</th>
+                <th>Time</th>
                 <th>Crate Type</th>
                 <th className={ui.num}>Total</th>
                 <th className={styles.actionHead} />
@@ -89,14 +145,20 @@ export default function CrateVasuliList() {
             </thead>
 
             <tbody>
-              {data.map((row) => (
+              {visibleData.map((row) => (
                 <tr key={row.vyapari_id}>
                   <td className={styles.nameCell}>{row.vyapari_name}</td>
+
+                  <td className={styles.timeCell}>{formatTime(row.created_at)}</td>
 
                   <td>
                     <div className={styles.chips}>
                       {row.crates?.map((crate) => (
-                        <span className={styles.chip} key={crate.crate_id}>
+                        <span
+                          className={styles.chip}
+                          key={crate.crate_id}
+                          title={`Recorded ${formatTime(crate.created_at)}`}
+                        >
                           {crate.crate_name}
                           <b>× {crate.crate_count}</b>
                         </span>

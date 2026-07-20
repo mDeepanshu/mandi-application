@@ -4,6 +4,13 @@
   white-space: nowrap;
 }
 
+.timeCell {
+  color: #64748b;
+  font-size: 13px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;
