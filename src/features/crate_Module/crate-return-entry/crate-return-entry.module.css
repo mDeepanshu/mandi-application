@@ -1,66 +1,121 @@
-.fetchRow {
+.entryRow {
   display: flex;
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .vyapariField {
   flex: 1;
-  max-width: 420px;
+  min-width: 260px;
+  max-width: 380px;
 }
 
-.fetchRow button {
-  height: 40px;
+.crateField {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  max-width: 280px;
 }
 
-.nameCell {
-  font-weight: 500;
-  color: #0f172a;
+.amountField {
+  width: 150px;
 }
 
-.returnedHead,
-.returnedCell {
-  text-align: right;
-  width: 140px;
-}
-
-.returnInput {
-  width: 90px;
-  padding: 7px 10px;
+.textInput {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
   border: 1px solid #dbe1e8;
   border-radius: 8px;
   background: #ffffff;
   color: #1e293b;
   font-size: 14px;
   font-family: inherit;
-  text-align: right;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   -moz-appearance: textfield;
   appearance: textfield;
 }
 
-.returnInput::-webkit-outer-spin-button,
-.returnInput::-webkit-inner-spin-button {
+.textInput::-webkit-outer-spin-button,
+.textInput::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.returnInput:focus {
+.textInput:focus {
   border-color: #16a34a;
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
 }
 
-.returnedTotal {
-  display: inline-block;
-  width: 90px;
-  padding-right: 11px;
-  font-variant-numeric: tabular-nums;
+.textInputOk {
+  border-color: #16a34a;
+  background: #f0fdf4;
 }
 
-.saveRow {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
+/* ---------- Crate type suggestions ---------- */
+
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin-top: 4px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.suggestion {
+  padding: 9px 12px;
+  font-size: 14px;
+  color: #334155;
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  background: #f0fdf4;
+}
+
+/* ---------- Table cells ---------- */
+
+.nameCell {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.statusHead,
+.statusCell {
+  width: 120px;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.statusSaved {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.statusSaving {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+.statusFailed {
+  background: #fee2e2;
+  color: #b91c1c;
 }

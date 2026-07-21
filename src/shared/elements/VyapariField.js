@@ -5,7 +5,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { getAllPartyList } from "../../gateway/comman-apis";
 import styles from "./vyapari_field.module.css";
 import { useOutletContext } from "react-router-dom";
-const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelect = () => {} }) => {
+const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelect = () => {}, autoSelectSingleMatch = false }) => {
   const [vyapariList, setVyapariList] = useState([]);
   const vyapariRef = useRef(null); // Create a ref
   const { snackbarChange, syncComplete } = useOutletContext();
@@ -65,6 +65,18 @@ const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelec
               />
             )}
             onChange={(event, value) => field.onChange(value)}
+            onInputChange={(event, inputValue, reason) => {
+              if (!autoSelectSingleMatch || reason !== "input") return;
+              const query = inputValue.trim();
+              if (!query) return;
+              const matched = vyapariList.filter(
+                (option) =>
+                  option.name.toUpperCase().includes(query.toUpperCase()) ||
+                  option.idNo.includes(query)
+              );
+              // Only one vyapari left → lock it in (parent moves focus onward).
+              if (matched.length === 1) field.onChange(matched[0]);
+            }}
             disablePortal
             id="combo-box-demo"
             sx={{ width: "100%", paddingBottom: "10px" }}

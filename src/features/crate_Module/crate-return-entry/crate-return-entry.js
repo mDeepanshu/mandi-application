@@ -1,77 +1,162 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { getPendingCrates, saveReturnedCrates } from "../../../gateway/crateModule/return-entry-apis";
+import { saveReturnedCrates } from "../../../gateway/crateModule/return-entry-apis";
+import { getCrateMasterData } from "../../../gateway/crateModule/master-api";
 import VyapariField from "../../../shared/elements/VyapariField";
 import ui from "../crate-shared.module.css";
 import styles from "./crate-return-entry.module.css";
 
-const CrateReturnEntry = () => {
-  const [data, setData] = useState([]);
-  const [fetched, setFetched] = useState(false);
-  const [saving, setSaving] = useState(false);
+const todayDate = () => {
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  return new Date(now.getTime() - offset * 60 * 1000)
+    .toISOString()
+    .split("T")[0];
+};
 
-  const { formState: { errors }, control, getValues, trigger } = useForm({
+const CrateReturnEntry = () => {
+  const [crateTypes, setCrateTypes] = useState([]);
+  const [crateInput, setCrateInput] = useState("");
+  const [selectedCrate, setSelectedCrate] = useState(null);
+  const [amount, setAmount] = useState("");
+  const [entries, setEntries] = useState([]);
+
+  const vyapariBoxRef = useRef(null);
+  const crateInputRef = useRef(null);
+  const amountRef = useRef(null);
+
+  const {
+    formState: { errors },
+    control,
+    getValues,
+    setValue,
+    watch,
+  } = useForm({
     defaultValues: {
       vyapari_id: null,
     },
   });
 
-  const handleFetch = async () => {
-    const isValid = await trigger("vyapari_id");
-    if (!isValid) return;
+  const vyapari = watch("vyapari_id");
 
-    const vyapari = getValues("vyapari_id");
-    getPendingCrates(vyapari?.partyId)
-      .then((response) => {
-        setData(
-          (response?.responseBody || []).map((row) => ({ ...row, returned: "" }))
+  // Load crate types once for name matching.
+  useEffect(() => {
+    getCrateMasterData().then((res) => setCrateTypes(res?.responseBody || []));
+  }, []);
+
+  // When a vyapari is picked, jump straight to the crate type field.
+  useEffect(() => {
+    if (vyapari) crateInputRef.current?.focus();
+  }, [vyapari]);
+
+  const matches = crateInput.trim()
+    ? crateTypes.filter((c) =>
+        c.crate_name.toLowerCase().includes(crateInput.trim().toLowerCase())
+      )
+    : [];
+
+  const selectCrate = (crate) => {
+    setSelectedCrate(crate);
+    setCrateInput(crate.crate_name);
+    setTimeout(() => amountRef.current?.focus(), 0);
+  };
+
+  const handleCrateInput = (value) => {
+    setCrateInput(value);
+    setSelectedCrate(null);
+
+    const query = value.trim().toLowerCase();
+    if (!query) return;
+
+    const found = crateTypes.filter((c) =>
+      c.crate_name.toLowerCase().includes(query)
+    );
+    // Exactly one crate matches the typed string → lock it in and move on.
+    if (found.length === 1) selectCrate(found[0]);
+  };
+
+  const focusVyapari = () => {
+    vyapariBoxRef.current?.querySelector("input")?.focus();
+  };
+
+  const handleCrateKeyDown = (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+
+    // Empty crate + Enter → step back: clear the vyapari and refocus it.
+    if (!crateInput.trim()) {
+      setValue("vyapari_id", null);
+      setSelectedCrate(null);
+      focusVyapari();
+      return;
+    }
+
+    if (selectedCrate) {
+      amountRef.current?.focus();
+      return;
+    }
+    if (matches.length >= 1) {
+      const exact = matches.find(
+        (c) => c.crate_name.toLowerCase() === crateInput.trim().toLowerCase()
+      );
+      selectCrate(exact || matches[0]);
+    }
+  };
+
+  const saveEntry = () => {
+    const vyapariVal = getValues("vyapari_id");
+    if (!vyapariVal || !selectedCrate || !(Number(amount) > 0)) return;
+
+    const count = Number(amount);
+    const rowId = Date.now();
+
+    const newRow = {
+      id: rowId,
+      vyapari_name: vyapariVal.name,
+      crate_name: selectedCrate.crate_name,
+      count,
+      status: "saving",
+    };
+    setEntries((prev) => [newRow, ...prev]);
+
+    // Reset the crate + amount immediately so the next entry can begin right
+    // away (the vyapari stays put for consecutive returns).
+    setSelectedCrate(null);
+    setCrateInput("");
+    setAmount("");
+    setTimeout(() => crateInputRef.current?.focus(), 0);
+
+    const payload = {
+      vyapariId: vyapariVal.partyId,
+      date: todayDate(),
+      crates: [{ crate_id: selectedCrate.id, count }],
+    };
+
+    saveReturnedCrates(payload)
+      .then(() => {
+        setEntries((prev) =>
+          prev.map((r) => (r.id === rowId ? { ...r, status: "saved" } : r))
         );
-        setFetched(true);
       })
       .catch((error) => {
-        console.error("Error fetching pending crates:", error);
+        console.error("Error saving returned crates:", error);
+        setEntries((prev) =>
+          prev.map((r) => (r.id === rowId ? { ...r, status: "failed" } : r))
+        );
       });
   };
 
-  const handleChange = (index, value) => {
-    let val = value === "" ? "" : Number(value);
-    if (val < 0) return;
-    if (val > data[index].pending_count) return;
-
-    setData(
-      data.map((row, i) => (i === index ? { ...row, returned: val } : row))
-    );
+  const handleAmountKeyDown = (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    saveEntry();
   };
 
-  const totalPending = data.reduce((sum, row) => sum + row.pending_count, 0);
-  const totalReturned = data.reduce(
-    (sum, row) => sum + Number(row.returned || 0),
-    0
-  );
-  const hasValidReturn = data.some((row) => Number(row.returned) > 0);
-
-  const handleSave = async () => {
-    const payload = {
-      vyapariId: getValues("vyapari_id")?.partyId,
-      date: new Date().toISOString().split("T")[0],
-      crates: data
-        .filter((row) => Number(row.returned) > 0)
-        .map((row) => ({
-          crate_id: row.crate_id,
-          count: Number(row.returned),
-        })),
-    };
-
-    setSaving(true);
-    try {
-      await saveReturnedCrates(payload);
-      setData([]);
-      setFetched(false);
-    } catch (error) {
-      console.error("Error saving returned crates:", error);
-    } finally {
-      setSaving(false);
-    }
+  const statusLabel = { saving: "Saving…", saved: "Saved", failed: "Failed" };
+  const statusClass = {
+    saving: styles.statusSaving,
+    saved: styles.statusSaved,
+    failed: styles.statusFailed,
   };
 
   return (
@@ -80,86 +165,101 @@ const CrateReturnEntry = () => {
         <div>
           <h2 className={ui.title}>Crate Return Entry</h2>
           <p className={ui.subtitle}>
-            Record crates a vyapari has returned today
+            Enter a vyapari, then a crate type and amount — press Enter to save
           </p>
         </div>
       </div>
 
-      <div className={styles.fetchRow}>
-        <div className={styles.vyapariField}>
+      <div className={styles.entryRow}>
+        <div className={styles.vyapariField} ref={vyapariBoxRef}>
           <VyapariField
             name="vyapari_id"
             control={control}
             errors={errors}
             size="small"
+            autoSelectSingleMatch
           />
         </div>
-        <button className={ui.btn} onClick={handleFetch}>
-          Fetch
-        </button>
+
+        <div className={styles.crateField}>
+          <input
+            ref={crateInputRef}
+            type="text"
+            className={`${styles.textInput} ${
+              selectedCrate ? styles.textInputOk : ""
+            }`}
+            placeholder="Crate type"
+            value={crateInput}
+            onChange={(e) => handleCrateInput(e.target.value)}
+            onKeyDown={handleCrateKeyDown}
+            autoComplete="off"
+          />
+          {!selectedCrate && matches.length > 0 && (
+            <div className={styles.suggestions}>
+              {matches.slice(0, 10).map((c) => (
+                <div
+                  key={c.id}
+                  className={styles.suggestion}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    selectCrate(c);
+                  }}
+                >
+                  {c.crate_name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={styles.amountField}>
+          <input
+            ref={amountRef}
+            type="number"
+            min="1"
+            className={styles.textInput}
+            placeholder="Amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            onKeyDown={handleAmountKeyDown}
+          />
+        </div>
       </div>
 
       <div className={ui.card}>
-        {!fetched && (
+        {entries.length === 0 ? (
           <p className={ui.emptyState}>
-            Select a vyapari and fetch to see their pending crates.
+            No returns entered yet. Saved entries will appear here.
           </p>
-        )}
-
-        {fetched && data.length === 0 && (
-          <p className={ui.emptyState}>No pending crates for this vyapari.</p>
-        )}
-
-        {fetched && data.length > 0 && (
+        ) : (
           <table className={ui.table}>
             <thead>
               <tr>
+                <th>Vyapari</th>
                 <th>Crate Type</th>
-                <th className={ui.num}>Pending</th>
-                <th className={styles.returnedHead}>Returned</th>
+                <th className={ui.num}>Amount</th>
+                <th className={styles.statusHead}>Status</th>
               </tr>
             </thead>
             <tbody>
-              {data.map((row, index) => (
-                <tr key={row.crate_id ?? index}>
-                  <td className={styles.nameCell}>{row.crate_name}</td>
-                  <td className={ui.num}>{row.pending_count}</td>
-                  <td className={styles.returnedCell}>
-                    <input
-                      type="number"
-                      min="0"
-                      max={row.pending_count}
-                      className={styles.returnInput}
-                      value={row.returned}
-                      placeholder="0"
-                      onChange={(e) => handleChange(index, e.target.value)}
-                    />
+              {entries.map((row) => (
+                <tr key={row.id}>
+                  <td className={styles.nameCell}>{row.vyapari_name}</td>
+                  <td>{row.crate_name}</td>
+                  <td className={ui.num}>{row.count}</td>
+                  <td className={styles.statusCell}>
+                    <span
+                      className={`${styles.statusBadge} ${statusClass[row.status]}`}
+                    >
+                      {statusLabel[row.status]}
+                    </span>
                   </td>
                 </tr>
               ))}
-              <tr className={ui.totalRow}>
-                <td>Total</td>
-                <td className={ui.num}>{totalPending}</td>
-                <td className={styles.returnedCell}>
-                  <span className={styles.returnedTotal}>{totalReturned}</span>
-                </td>
-              </tr>
             </tbody>
           </table>
         )}
       </div>
-
-      {fetched && data.length > 0 && (
-        <div className={styles.saveRow}>
-          <button
-            className={ui.btn}
-            onClick={handleSave}
-            disabled={!hasValidReturn || saving}
-          >
-            {saving ? "Saving…" : "Save"}
-          </button>
-        </div>
-      )}
     </div>
   );
 };
