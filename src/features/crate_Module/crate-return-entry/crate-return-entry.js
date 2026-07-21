@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { saveReturnedCrates } from "../../../gateway/crateModule/return-entry-apis";
+import {
+  getPendingCrates,
+  saveReturnedCrates,
+} from "../../../gateway/crateModule/return-entry-apis";
 import { getCrateMasterData } from "../../../gateway/crateModule/master-api";
 import VyapariField from "../../../shared/elements/VyapariField";
 import ui from "../crate-shared.module.css";
@@ -19,6 +22,7 @@ const CrateReturnEntry = () => {
   const [crateInput, setCrateInput] = useState("");
   const [selectedCrate, setSelectedCrate] = useState(null);
   const [amount, setAmount] = useState("");
+  const [pendingCrates, setPendingCrates] = useState([]);
   const [entries, setEntries] = useState([]);
 
   const vyapariBoxRef = useRef(null);
@@ -44,9 +48,20 @@ const CrateReturnEntry = () => {
     getCrateMasterData().then((res) => setCrateTypes(res?.responseBody || []));
   }, []);
 
-  // When a vyapari is picked, jump straight to the crate type field.
+  // When a vyapari is picked, load their pending crates and jump straight to
+  // the crate type field.
   useEffect(() => {
-    if (vyapari) crateInputRef.current?.focus();
+    if (!vyapari) {
+      setPendingCrates([]);
+      return;
+    }
+    crateInputRef.current?.focus();
+    getPendingCrates(vyapari.partyId)
+      .then((res) => setPendingCrates(res?.responseBody || []))
+      .catch((error) => {
+        console.error("Error fetching pending crates:", error);
+        setPendingCrates([]);
+      });
   }, [vyapari]);
 
   const matches = crateInput.trim()
@@ -137,6 +152,14 @@ const CrateReturnEntry = () => {
         setEntries((prev) =>
           prev.map((r) => (r.id === rowId ? { ...r, status: "saved" } : r))
         );
+        // Reflect the return against the vyapari's pending counts.
+        setPendingCrates((prev) =>
+          prev.map((c) =>
+            c.crate_id === payload.crates[0].crate_id
+              ? { ...c, pending_count: c.pending_count - count }
+              : c
+          )
+        );
       })
       .catch((error) => {
         console.error("Error saving returned crates:", error);
@@ -225,6 +248,28 @@ const CrateReturnEntry = () => {
           />
         </div>
       </div>
+
+      {vyapari && (
+        <div className={styles.pendingPanel}>
+          <span className={styles.pendingLabel}>Pending crates</span>
+          {pendingCrates.length === 0 ? (
+            <span className={styles.pendingEmpty}>None outstanding</span>
+          ) : (
+            <div className={styles.pendingPills}>
+              {pendingCrates.map((c) => (
+                <span
+                  key={c.crate_id}
+                  className={`${ui.statPill} ${
+                    c.pending_count <= 0 ? styles.pendingCleared : ""
+                  }`}
+                >
+                  {c.crate_name} <b>{c.pending_count}</b>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className={ui.card}>
         {entries.length === 0 ? (

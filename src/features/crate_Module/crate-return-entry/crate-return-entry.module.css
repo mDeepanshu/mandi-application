@@ -83,6 +83,39 @@
   background: #f0fdf4;
 }
 
+/* ---------- Pending crates panel ---------- */
+
+.pendingPanel {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: -4px 0 20px;
+}
+
+.pendingLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.pendingEmpty {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.pendingPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pendingCleared {
+  opacity: 0.5;
+}
+
 /* ---------- Table cells ---------- */
 
 .nameCell {
