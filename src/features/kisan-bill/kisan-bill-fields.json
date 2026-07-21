@@ -79,10 +79,7 @@
             "name": "bhada",
             "hidden": false,
             "label": "Bhada",
-            "defaultValue": "",
-            "validation": {
-                "required": "Bhada is required"
-            }
+            "defaultValue": ""
         },
         {
             "name": "driver_inaam",

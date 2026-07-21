@@ -81,7 +81,7 @@ function KisanBill() {
   };
 
   const onPrintBtn = async (e) => {
-    const isValid = await trigger(["kisan", "date", "kaccha_total", "kharcha_total", "pakki_bikri", "mandi_kharcha", "bhada", "hammali", "nagar_palika_tax"]);
+    const isValid = await trigger(["kisan", "date", "kaccha_total", "kharcha_total", "pakki_bikri", "mandi_kharcha", "hammali", "nagar_palika_tax"]);
     if (isValid) {
       setPrintRemainingStock(remaininglist);
       setFormData(getValues());
@@ -196,7 +196,7 @@ function KisanBill() {
   };
 
   const saveBill = async () => {
-    const isValid = await trigger(["kisan", "date", "kaccha_total", "kharcha_total", "pakki_bikri", "mandi_kharcha", "bhada", "hammali", "nagar_palika_tax"]);
+    const isValid = await trigger(["kisan", "date", "kaccha_total", "kharcha_total", "pakki_bikri", "mandi_kharcha", "hammali", "nagar_palika_tax"]);
     if (!isValid) return;
     const formValues = getValues();
     const bill = {
