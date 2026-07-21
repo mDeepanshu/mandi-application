@@ -326,8 +326,6 @@ function MasterTable(props) {
                             ) : (
                               ""
                             );
-                          case "amountVasuli":
-                            return rowData["amount"] + '/-';
                           case "drCr":
                             if (rowData.date === "TOTAL") return <b>{rowData.dr}</b>;
                             if (Number(rowData.cr)) return <span className={styles.creditAmount}>{rowData.cr}</span>;

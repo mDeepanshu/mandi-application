@@ -16,7 +16,7 @@ function VasuliList() {
   const [tableData, setTableData] = useState([]);
   const [vasuliListColumns, setVasuliListColumns] = useState(["INDEX", "AMOUNT", "DATE", "NAME", "REMARK", "EDIT"]);
   const [printColumns, setPrintColumns] = useState(["INDEX","NAME","AMOUNT", "DATE",  "REMARK"]);
-  const [keyArray, setKeyArray] = useState(["index", "amountVasuli", "date", "vyapariName", "remark", "edit"]);
+  const [keyArray, setKeyArray] = useState(["index", "amount", "date", "vyapariName", "remark", "edit"]);
   const [printKeyArray, setPrintKeyArray] = useState(["vyapariName","amount", "date",  "remark"]);
 
   const currentDate = new Date().toISOString().split("T")[0];

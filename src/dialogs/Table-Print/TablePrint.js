@@ -24,6 +24,8 @@ const TablePrint = forwardRef((props, ref) => {
                 switch (key) {
                   case "date":
                     return <td key={colIndex}>{new Date(row?.date).toLocaleDateString("en-Gb")}</td>;
+                  case "amount":
+                    return <td key={colIndex}>{row[key]}/-</td>;
                   default:
                     return <td key={colIndex}>{row[key]}</td>;
                 }
