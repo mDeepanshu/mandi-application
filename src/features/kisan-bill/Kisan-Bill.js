@@ -147,6 +147,29 @@ function KisanBill() {
     }
   }, [formData]);
 
+  // Single source of truth for the two derived totals.
+  // kharcha_total = sum of all kharcha components (whatever is currently in the fields)
+  // pakki_bikri  = kaccha_total - kharcha_total
+  const recalcTotals = () => {
+    const v = getValues();
+    const kharchaTotal =
+      Number(v.mandi_kharcha || 0) +
+      Number(v.hammali || 0) +
+      Number(v.nagar_palika_tax || 0) +
+      Number(v.bhada || 0) +
+      Number(v.driver_inaam || 0) +
+      Number(v.nagdi || 0);
+    const pakkiBikri = Number(v.kaccha_total || 0) - kharchaTotal;
+    setValue("kharcha_total", kharchaTotal, { shouldValidate: true });
+    setValue("pakki_bikri", pakkiBikri, { shouldValidate: true });
+  };
+
+  // Recompute totals when a constant field is edited by hand (or bhada rate / bag count changes bhada)
+  const handleConstantChange = (name) => {
+    if (name === "bhada_rate" || name === "nagar_palika_tax") calculateBhada();
+    recalcTotals();
+  };
+
   const editKisanTable = (index) => {
     const rowToEdit = tableData[index];
     deleteFromTable(index);
@@ -159,23 +182,16 @@ function KisanBill() {
   const deleteFromTable = (index) => {
     //update constants
     const values = getValues();
-    const itemTotal = tableData[index].quantity * tableData[index].rate;
-    const updatedKacchaTotal = Number(values.kaccha_total) - itemTotal;
-    const updatedHammali = Number(values.hammali) - 5 * tableData[index].bag;
-    const updatedBhada = Number(values.bhada) - Number(values.bhada_rate) * tableData[index].bag;
-    const updatedNagarTax = Number(values.nagar_palika_tax) - tableData[index].bag;
-    const updatedCommission = Number(values.mandi_kharcha) - (Number(values.commission) * itemTotal) / 100;
-
-    const kharchaTotal =
-      updatedCommission +
-      updatedHammali +
-      updatedNagarTax +
-      updatedBhada +
-      values.driver_inaam +
-      values.nagdi +
-      0;
-
-    const pakkiBikri = updatedKacchaTotal - kharchaTotal;
+    const row = tableData[index];
+    const itemTotal = Number(row.quantity) * Number(row.rate);
+    const updatedKacchaTotal = Number(values.kaccha_total || 0) - itemTotal;
+    const updatedHammali = Number(values.hammali || 0) - 5 * Number(row.bag || 0);
+    const updatedNagarTax = Number(values.nagar_palika_tax || 0) - Number(row.bag || 0);
+    const updatedCommission = Number(values.mandi_kharcha || 0) - (Number(values.commission || 0) * itemTotal) / 100;
+    // Bhada is derived from bhada_rate * total bags; recompute it against the new bag count
+    const updatedBhada = values.bhada_rate
+      ? Number(values.bhada_rate) * updatedNagarTax
+      : Number(values.bhada || 0);
 
     reset({
       ...values,
@@ -184,9 +200,8 @@ function KisanBill() {
       bhada: updatedBhada,
       nagar_palika_tax: updatedNagarTax,
       mandi_kharcha: updatedCommission,
-      kharcha_total: kharchaTotal,
-      pakki_bikri: pakkiBikri,
     });
+    recalcTotals();
     //
 
 
@@ -261,8 +276,6 @@ function KisanBill() {
       kaccha_total,
       mandi_kharcha,
       commission,
-      driver_inaam,
-      nagdi,
     } = values;
 
     // Normalize numbers once
@@ -276,8 +289,6 @@ function KisanBill() {
     const nMandiKharcha = Number(mandi_kharcha || 0);
 
     const nCommissionRate = Number(commission);
-    const nDriverInaam = Number(driver_inaam);
-    const nNagdi = Number(nagdi);
 
     // Derived calculations
     const itemTotal = nQty * nRate;
@@ -289,14 +300,10 @@ function KisanBill() {
     const updatedCommission =
       nMandiKharcha + (nCommissionRate * itemTotal) / 100;
 
-    const kharchaTotal =
-      updatedCommission +
-      updatedHammali +
-      updatedNagarTax +
-      nDriverInaam +
-      nNagdi;
-
-    const pakkiBikri = updatedKacchaTotal - kharchaTotal;
+    // Bhada is derived from bhada_rate * total bags; keep it in sync when a rate is set
+    const updatedBhada = values.bhada_rate
+      ? Number(values.bhada_rate) * updatedNagarTax
+      : Number(values.bhada || 0);
 
     // Add row to table
     setTableData((prev) => [
@@ -310,7 +317,7 @@ function KisanBill() {
       },
     ]);
 
-    // Reset form with updated totals
+    // Reset form with updated component totals
     reset({
       ...values,
       item_name: "",
@@ -321,11 +328,11 @@ function KisanBill() {
       hammali: updatedHammali,
       mandi_kharcha: updatedCommission,
       nagar_palika_tax: updatedNagarTax,
+      bhada: updatedBhada,
     });
 
-    // Set dependent calculated fields
-    setValue("kharcha_total", kharchaTotal, { shouldValidate: true });
-    setValue("pakki_bikri", pakkiBikri, { shouldValidate: true });
+    // Derive kharcha_total + pakki_bikri from the full set of components
+    recalcTotals();
   };
 
 
@@ -383,6 +390,7 @@ function KisanBill() {
     const values = getValues();
     const newBhada = Number(values.bhada_rate) * (Number(values.nagar_palika_tax) || 0);
     setValue("bhada", newBhada, { shouldValidate: true });
+    recalcTotals();
   }
 
   const kisanTypeChange = (event) => {
@@ -495,6 +503,10 @@ function KisanBill() {
                       render={({ field }) => (
                         <TextField
                           {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            handleConstantChange(fieldDef.name);
+                          }}
                           label={fieldDef.label}
                           variant="outlined"
                           disabled={fieldDef.disable}
