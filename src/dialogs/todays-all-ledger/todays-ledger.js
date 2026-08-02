@@ -10,8 +10,8 @@ import { useReactToPrint } from "react-to-print";
 import styles from "./todays-ledger.module.css";
 
 const PrintAllLedger = (props) => {
-  const [ledgerColumns, setledgerColumns] = useState(["", "ID", "NAME","LEDGER ORDER"]);
-  const [keyArray, setKeyArray] = useState(["checkbox", "idNo", "name","ledgerOrder"]);
+  const [ledgerColumns, setledgerColumns] = useState(["", "ID", "NAME","LEDGER ORDER","OWED AMOUNT"]);
+  const [keyArray, setKeyArray] = useState(["checkbox", "idNo", "name","ledgerOrder","owedAmount"]);
   const [vyapariList, setVyapariList] = useState([]);
   const [checkedEntries, setCheckedEntries] = useState([]);
   const [dataArray, setDataArray] = useState([]);
