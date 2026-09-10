@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { Delete, Edit, ArrowForwardIos, ArrowBackIos } from "@mui/icons-material";
 import { Button } from "@mui/material";
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, FormControl, InputLabel, Select, MenuItem, FormControlLabel, Switch } from "@mui/material";
 import styles from "./masterTable.module.css";
 import Pagination from "@mui/material/Pagination";
 import { useForm, Controller } from "react-hook-form";
@@ -108,6 +108,14 @@ function MasterTable(props) {
                 defaultValue: "",
                 validation: { required: `${columns[int]} is required` },
               });
+            } else if (props.keyArray[int] == "chungi" && props.editParty) {
+              // Party-level chungi is a boolean toggle, not a required amount
+              fields.push({
+                name: props.keyArray[int],
+                label: columns[int],
+                defaultValue: false,
+                validation: {},
+              });
             } else {
               fields.push({
                 name: props.keyArray[int],
@@ -157,6 +165,8 @@ function MasterTable(props) {
         if (keyArray[int] == "vyapariName") {
           const defaultOption = vyapariList.find((option) => option.name == allTableData[editingIndex]?.vyapariName);
           setValue("vyapariName", defaultOption || null);
+        } else if (keyArray[int] == "chungi" && props.editParty) {
+          setValue("chungi", !!allTableData?.[editingIndex]?.chungi);
         } else if (keyArray[int] == "quantity" && !chungiTxn) {
           if (allTableData?.[editingIndex]?.bag == null) {
             setQty([allTableData?.[editingIndex]?.[keyArray[int]]]);
@@ -374,6 +384,8 @@ function MasterTable(props) {
                                 </Button>
                               </>
                             );
+                          case "chungi":
+                            return props.editParty ? (rowData[key] ? "YES" : "NO") : rowData[key];
                           case "daysExceded":
                             return (
                               <div className={`${styles.myClass} ${rowData[key] > 0 ? styles.daysExceded : styles.daysNotExceded}`}>
@@ -444,6 +456,27 @@ function MasterTable(props) {
                             <MenuItem value="D">Local Bill</MenuItem>
                           </Select>
                         </FormControl>
+                      )}
+                    />
+                  );
+                }
+                else if (fieldDef.name === "chungi" && props.editParty) {
+                  return (
+                    <Controller
+                      key={fieldDef.name}
+                      name="chungi"
+                      control={control}
+                      render={({ field }) => (
+                        <FormControlLabel
+                          sx={{ mb: 2.5, display: "block" }}
+                          label="CHUNGI"
+                          control={
+                            <Switch
+                              checked={!!field.value}
+                              onChange={(event) => field.onChange(event.target.checked)}
+                            />
+                          }
+                        />
                       )}
                     />
                   );
