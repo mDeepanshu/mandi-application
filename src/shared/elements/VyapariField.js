@@ -66,6 +66,42 @@ const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelec
             )}
             onChange={(event, value) => field.onChange(value)}
             disablePortal
+            // Options live in the popup Paper, so sx on the Autocomplete root can't
+            // reach them. The doubled && raises specificity above MUI's own option
+            // rules: at equal specificity CSS falls back to source order, and
+            // emotion injects styles in a different order in a prod bundle than in
+            // the dev server, which made an earlier version work locally and fail
+            // on prod.
+            slotProps={{
+              paper: {
+                sx: {
+                  "&& .MuiAutocomplete-option": {
+                    // keyboard-highlighted option (arrow keys / first match)
+                    '&.Mui-focused, &[data-focus="true"]': {
+                      backgroundColor: "#1976d2",
+                      color: "#fff",
+                    },
+                    // mouse hover
+                    "&:hover": {
+                      backgroundColor: "#1976d2",
+                      color: "#fff",
+                    },
+                    // previously selected value
+                    '&[aria-selected="true"]': {
+                      backgroundColor: "#bbdefb",
+                      color: "#0d47a1",
+                      fontWeight: 600,
+                    },
+                    // selected AND highlighted: without this the pale selected
+                    // background wins and the arrowed-onto row looks un-highlighted
+                    '&[aria-selected="true"].Mui-focused, &[aria-selected="true"][data-focus="true"], &[aria-selected="true"]:hover': {
+                      backgroundColor: "#1565c0",
+                      color: "#fff",
+                    },
+                  },
+                },
+              },
+            }}
             id="combo-box-demo"
             sx={{ width: "100%", paddingBottom: "10px" }}
             onSelect={customOnSelect}
