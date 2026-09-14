@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, lazy } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { TextField, Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { getLedger, makeVasuli, sendLedgerNotiApi, markVyapariAllowedTransactions, sendAllLedgerNotiApi } from "../../gateway/ledger-apis";
 import { syncAllLedgers, getCachedLedger, getLastSync } from "../../gateway/ledger-cache";
 import MasterTable from "../../shared/ui/master-table/master-table";
@@ -11,6 +11,7 @@ import { useMediaQuery } from "@mui/material";
 import PrintAllLedger from "../../dialogs/todays-all-ledger/todays-ledger";
 import DuplicateVasuli from "../../dialogs/duplicate-vasuli/duplicate-vasuli";
 import VyapariField from "../../shared/elements/VyapariField";
+import DateField from "../../shared/elements/DateField";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
@@ -313,13 +314,10 @@ THANK YOU
                   rules={{ required: "Enter From Date" }}
                   defaultValue=""
                   render={({ field }) => (
-                    <TextField
+                    <DateField
                       {...field}
                       label="FROM DATE"
                       size={isSmallScreen ? "small" : "medium"}
-                      fullWidth
-                      variant="outlined"
-                      type="date"
                     />
                   )}
                 />
@@ -332,13 +330,10 @@ THANK YOU
                   rules={{ required: "Enter To Date" }}
                   defaultValue=""
                   render={({ field }) => (
-                    <TextField
+                    <DateField
                       {...field}
                       label="TO DATE"
                       size={isSmallScreen ? "small" : "medium"}
-                      fullWidth
-                      variant="outlined"
-                      type="date"
                     />
                   )}
                 />
