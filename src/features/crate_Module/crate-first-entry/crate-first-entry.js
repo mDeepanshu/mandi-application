@@ -3,6 +3,7 @@ import EditDialog from "./dialog/crate-first-edit-dialog";
 import styles from "./crate-first-entry.module.css";
 import { Edit } from "@mui/icons-material";
 import { getCrateSummaryByDate } from "../../../gateway/crateModule/first-entry-api";
+import { dateTimeFormat } from "../../../constants/config";
 
 const getTodayDate = () => {
   const now = new Date();
@@ -22,10 +23,15 @@ export default function CrateManagement() {
     ?.filter((row) =>
       row.vyapari_name?.toLowerCase().includes(search.trim().toLowerCase())
     )
+    .flatMap((row) =>
+      (row.crates || []).flatMap((crate) =>
+        (crate.entries || []).map((entry) => ({ row, crate, entry }))
+      )
+    )
     .sort((a, b) =>
       sortOrder === "asc"
-        ? new Date(a.created_at) - new Date(b.created_at)
-        : new Date(b.created_at) - new Date(a.created_at)
+        ? new Date(a.entry.logged_at) - new Date(b.entry.logged_at)
+        : new Date(b.entry.logged_at) - new Date(a.entry.logged_at)
     );
 
   const fetchData = () => {
@@ -91,35 +97,22 @@ export default function CrateManagement() {
           <thead>
             <tr>
               <th>Vyapari</th>
-              <th>Crates</th>
-              <th className={styles.totalHead}>Total</th>
+              <th>Crate Type</th>
+              <th>Count</th>
+              <th>Time</th>
               <th className={styles.actionHead} />
             </tr>
           </thead>
 
           <tbody>
-            {visibleData?.map((row) => (
-              <tr key={row.vyapari_id}>
+            {visibleData?.map(({ row, crate, entry }) => (
+              <tr key={entry.log_id}>
                 <td className={styles.nameCell}>{row.vyapari_name}</td>
-
+                <td>{crate.crate_name}</td>
+                <td>{entry.count}</td>
                 <td>
-                  <div className={styles.chips}>
-                    {row.crates?.map((crate) => (
-                      <span className={styles.chip} key={crate.crate_id}>
-                        {crate.crate_name}
-                        <b>× {crate.crate_count}</b>
-                      </span>
-                    ))}
-                  </div>
+                  {new Date(entry.logged_at).toLocaleString("en-IN", dateTimeFormat)}
                 </td>
-
-                <td className={styles.totalCell}>
-                  {row.crates?.reduce(
-                    (sum, crate) => sum + crate.crate_count,
-                    0
-                  )}
-                </td>
-
                 <td className={styles.actionCell}>
                   <button
                     className={styles.editBtn}
@@ -146,7 +139,7 @@ export default function CrateManagement() {
           </p>
         )}
 
-        {data?.length > 0 && visibleData?.length === 0 && !loading && (
+        {data?.length > 0 && search.trim() && visibleData?.length === 0 && !loading && (
           <p className={styles.emptyState}>
             No vyapari matches "{search}".
           </p>

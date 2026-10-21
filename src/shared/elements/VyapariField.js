@@ -5,9 +5,17 @@ import SearchIcon from "@mui/icons-material/Search";
 import { getAllPartyList } from "../../gateway/comman-apis";
 import styles from "./vyapari_field.module.css";
 import { useOutletContext } from "react-router-dom";
+
+// How long typing must pause before a single match is auto-selected. Without
+// this, a fast typist's remaining letters spill into the next field once the
+// name becomes unique mid-word.
+const AUTO_SELECT_DELAY_MS = 300;
+
 const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelect = () => {}, autoSelectSingleMatch = false }) => {
   const [vyapariList, setVyapariList] = useState([]);
   const vyapariRef = useRef(null); // Create a ref
+  const autoSelectTimerRef = useRef(null);
+  const pendingQueryRef = useRef("");
   const { snackbarChange, syncComplete } = useOutletContext();
 
   useEffect(() => {
@@ -18,6 +26,22 @@ const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelec
     }
     getVyapariNames();
   }, [syncComplete]);
+
+  useEffect(() => () => clearTimeout(autoSelectTimerRef.current), []);
+
+  const cancelAutoSelect = () => {
+    clearTimeout(autoSelectTimerRef.current);
+    autoSelectTimerRef.current = null;
+  };
+
+  const findSingleMatch = (query) => {
+    const matched = vyapariList.filter(
+      (option) =>
+        option.name.toUpperCase().includes(query.toUpperCase()) ||
+        option.idNo.includes(query)
+    );
+    return matched.length === 1 ? matched[0] : null;
+  };
 
   const getVyapariNames = async () => {
     const allVyapari = await getAllPartyList("VYAPARI");
@@ -48,7 +72,19 @@ const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelec
               <TextField
                 {...params}
                 label="Vyapari Name"
-                onKeyDown={onKeyDownFunc}
+                onKeyDown={
+                  autoSelectSingleMatch
+                    ? (e) => {
+                        // Enter commits a pending single match without waiting.
+                        if (e.key === "Enter" && autoSelectTimerRef.current) {
+                          cancelAutoSelect();
+                          const match = findSingleMatch(pendingQueryRef.current);
+                          if (match) field.onChange(match);
+                        }
+                        onKeyDownFunc?.(e);
+                      }
+                    : onKeyDownFunc
+                }
                 error={!!errors[name]}
                 helperText={errors[name] ? errors[name].message : ""}
                 InputProps={{
@@ -64,19 +100,26 @@ const VyapariField = ({ name, control, errors, size, onKeyDownFunc,customOnSelec
                 size={size}
               />
             )}
-            onChange={(event, value) => field.onChange(value)}
-            onInputChange={(event, inputValue, reason) => {
-              if (!autoSelectSingleMatch || reason !== "input") return;
+            onChange={(event, value) => {
+              if (autoSelectSingleMatch) cancelAutoSelect();
+              field.onChange(value);
+            }}
+            // Only wired up when enabled, so other pages get Autocomplete's
+            // default input handling untouched.
+            onInputChange={autoSelectSingleMatch ? (event, inputValue, reason) => {
+              cancelAutoSelect();
+              if (reason !== "input") return;
               const query = inputValue.trim();
               if (!query) return;
-              const matched = vyapariList.filter(
-                (option) =>
-                  option.name.toUpperCase().includes(query.toUpperCase()) ||
-                  option.idNo.includes(query)
-              );
-              // Only one vyapari left → lock it in (parent moves focus onward).
-              if (matched.length === 1) field.onChange(matched[0]);
-            }}
+              pendingQueryRef.current = query;
+              // Only one vyapari left once typing pauses → lock it in (parent
+              // moves focus onward).
+              autoSelectTimerRef.current = setTimeout(() => {
+                autoSelectTimerRef.current = null;
+                const match = findSingleMatch(query);
+                if (match) field.onChange(match);
+              }, AUTO_SELECT_DELAY_MS);
+            } : undefined}
             disablePortal
             id="combo-box-demo"
             sx={{ width: "100%", paddingBottom: "10px" }}
