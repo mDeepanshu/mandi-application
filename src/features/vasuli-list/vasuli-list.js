@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
-import { getVasuliList, editVasuli, whatsAppVasuli } from "../../gateway/vasuli-list-api";
+import { getVasuliList, editVasuli, whatsAppVasuli, sendVasuliNotiApi } from "../../gateway/vasuli-list-api";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import styles from "./vasuli-list.module.css";
 import { useOutletContext } from "react-router-dom";
@@ -92,6 +92,9 @@ function VasuliList() {
         templateName: "edit_vasuli",
       };
       whatsAppVasuli(whatsappData);
+      if (finalEditGlobal.vyapariId) {
+        sendVasuliNotiApi(finalEditGlobal.vyapariId, finalEditGlobal.amount, formattedDate);
+      }
     }
   };
 

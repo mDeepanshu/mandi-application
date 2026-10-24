@@ -2,6 +2,9 @@ const config = {
   // apiBaseUrl: 'http://52.66.145.64:8080/mandi-dev/',
   apiBaseUrl: process.env.REACT_APP_API_URL,
   lambdaApiBaseUrl: process.env.REACT_APP_LAMBDA_API_URL,
+  // Push-notification server (mandi-vyapari-lambda). Must be the same deployment the Vyapari app
+  // subscribes to, because each deployment has its own subscriptions database.
+  pushNotificationApiUrl: "https://5txvte0v46.execute-api.ap-southeast-1.amazonaws.com/dev",
 };
 
 export const dateTimeFormat = {

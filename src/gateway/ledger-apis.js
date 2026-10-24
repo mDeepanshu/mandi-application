@@ -1,4 +1,5 @@
 import axiosHttp from "../interceptors/error-handling-interceptor";
+import config from "../constants/config";
 
 export const getLedger = async (vyapariId, startDate, endDate) => {
   try {
@@ -29,7 +30,7 @@ export const markVyapariAllowedTransactions = async (vyapariId, startDate, endDa
 
 export const sendLedgerNotiApi = async (vyapariId) => {
   try {
-    const response = await fetch(`https://imll8stdk8.execute-api.ap-southeast-1.amazonaws.com/prod/sendnotification/${vyapariId}`, {
+    const response = await fetch(`${config.pushNotificationApiUrl}/sendNotification/${vyapariId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

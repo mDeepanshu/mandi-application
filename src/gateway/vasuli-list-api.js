@@ -1,4 +1,5 @@
 import axiosHttp from "../interceptors/error-handling-interceptor";
+import config from "../constants/config";
 
 export const getVasuliList = async (startDate,endDate) => {
   try {
@@ -15,6 +16,21 @@ export const editVasuli = async (vasuli) => {
     return response.data;
   } catch (error) {
     console.error('Error:', error);
+  }
+};
+
+// Push notification to the trader's Vyapari app
+export const sendVasuliNotiApi = async (vyapariId, amount, date) => {
+  try {
+    await fetch(`${config.pushNotificationApiUrl}/sendNotification/${vyapariId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ amount, date }),
+    });
+  } catch (error) {
+    console.error("Error:", error);
   }
 };
 
