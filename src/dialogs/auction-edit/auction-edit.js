@@ -13,6 +13,23 @@ import { useOutletContext } from "react-router-dom";
 
 import styles from "./auction-edit.module.css";
 
+// The API returns auction dates as IST wall-clock text with no zone
+// ("2026-11-06T00:00:00"). Going through new Date(...).toISOString() turned
+// that into UTC (18:30 the day before) and glued that time onto the picked
+// date, so every lot stamped before 05:30 IST moved one day forward on each
+// edit. Keep it as text: picked date + the original IST time, no zone.
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+const istTimeOf = (value) => {
+  const text = String(value ?? "");
+  if (!text.includes("T")) return "00:00:00";
+  if (/(Z|[+-]\d{2}:?\d{2})$/i.test(text)) {
+    const ms = new Date(text).getTime();
+    if (!Number.isNaN(ms)) return new Date(ms + IST_OFFSET_MS).toISOString().slice(11, 19);
+  }
+  return text.split("T")[1] || "00:00:00";
+};
+const onPickedDate = (pickedDate, original) => `${String(pickedDate).split("T")[0]}T${istTimeOf(original)}`;
+
 const AuctionEdit = (props) => {
   const {
     control,
@@ -112,10 +129,7 @@ const AuctionEdit = (props) => {
           bag: null,
           buyItems: [],
           deviceId: buyItemsArr?.[0]?.deviceId,
-          auctionDate:
-            new Date(getValues()?.auctionSubmitDate).toISOString().split("T")[0] +
-            `T` +
-            new Date(props.auctionToEdit?.[0]?.auctionSubmitDate).toISOString().split("T")[1],
+          auctionDate: onPickedDate(getValues()?.auctionSubmitDate, props.auctionToEdit?.[0]?.auctionSubmitDate),
         },
       ],
     };
@@ -132,10 +146,7 @@ const AuctionEdit = (props) => {
           chungi: element.chungi,
           quantity: element.quantity,
           bagWiseQuantity: element.bagWiseQuantityArray,
-          auctionDate:
-            new Date(getValues().auctionSubmitDate).toISOString().split("T")[0] +
-            "T" +
-            new Date(element.auctionDate).toISOString().split("T")[1],
+          auctionDate: onPickedDate(getValues().auctionSubmitDate, element.auctionDate),
         });
       });
     const device_id = buyItemsArr[0]?.deviceId == null ? 1 : buyItemsArr[0].deviceId;
