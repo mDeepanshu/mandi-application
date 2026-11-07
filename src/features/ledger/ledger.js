@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, lazy } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { getLedger, makeVasuli, sendLedgerNotiApi, markVyapariAllowedTransactions, sendAllLedgerNotiApi } from "../../gateway/ledger-apis";
-import { syncAllLedgers, getCachedLedger, getLastSync } from "../../gateway/ledger-cache";
+import { syncAllLedgers, getCachedLedger, getLastSync, SYNC_SKIP_PARTY_IDS } from "../../gateway/ledger-cache";
 import MasterTable from "../../shared/ui/master-table/master-table";
 import LedgerPrint from "../../dialogs/ledger-print/ledger-print-dialog";
 import ReactToPrint from "react-to-print";
@@ -15,9 +15,9 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 
-// Ledger cache (offline/IndexedDB) is turned off: the toggle and SYNC button are
-// hidden and every fetch goes to the network. Flip to true to bring it back.
-const LEDGER_CACHE_ENABLED = false;
+// Ledger cache (offline/IndexedDB): shows the network/cached toggle and the SYNC
+// button. Set to false to hide them and send every fetch to the network.
+const LEDGER_CACHE_ENABLED = true;
 
 function Ledger() {
   const componentRef = useRef();
@@ -82,7 +82,9 @@ function Ledger() {
     // from cache (opening balance and older rows are missing). Serve this one
     // request from the network instead, without changing the toggle.
     const cachedMode = LEDGER_CACHE_ENABLED && dataSource === "cached";
-    const outsideCache = cachedMode && lastSync && fromDate < lastSync.fromDate;
+    // Internal vyaparis are never synced (see SYNC_SKIP_PARTY_IDS), so always go live
+    const notCached = cachedMode && SYNC_SKIP_PARTY_IDS.has(vyapari.partyId);
+    const outsideCache = cachedMode && (notCached || (lastSync && fromDate < lastSync.fromDate));
     if (cachedMode && !outsideCache) {
       ledger = await getCachedLedger(vyapari.idNo, fromDate, toDate);
       if (!ledger) {
@@ -100,7 +102,9 @@ function Ledger() {
         setAlertData({
           open: true,
           alertType: "error",
-          alertMsg: "DATE RANGE IS OLDER THAN CACHED DATA AND THE SERVER IS NOT REACHABLE.",
+          alertMsg: notCached
+            ? "THIS VYAPARI IS NOT CACHED AND THE SERVER IS NOT REACHABLE."
+            : "DATE RANGE IS OLDER THAN CACHED DATA AND THE SERVER IS NOT REACHABLE.",
         });
         setTableData([{ date: null, itemName: "", dr: "NO DATA", cr: "", remark: "" }]);
         return;

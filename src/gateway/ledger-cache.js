@@ -5,9 +5,22 @@ const DB_VERSION = 1;
 const LEDGER_STORE = "ledgers";
 const META_STORE = "meta";
 const SYNC_DAYS = 180;
-// A single ledger-list call for all active parties exceeds the 120s prod gateway
-// timeout, so request them in sequential chunks that each stay well under it
+// A ledger-list call must finish inside the vyapari Lambda timeout and return
+// under its 6MB response limit, so request parties in sequential chunks
 const BATCH_SIZE = 100;
+// Internal (his) vyaparis: the heaviest have ~70 ledger lines a day and push a
+// batch past those limits. They are not cached at all; the ledger screen
+// always fetches them live.
+export const SYNC_SKIP_PARTY_IDS = new Set([
+  "194ab93ce0a", // KARTIK N
+  "194ab950e75", // HASU N
+  "194ab963bb7", // RAJA N
+  "194ab97db42", // PAPPU N
+  "194ab9915d7", // SHAHID N
+  "194ab99a6e7", // AMIT N
+  "194ab9a6c55", // HIS
+  "194ab9b29f2", // ASIF N
+]);
 
 const openDb = () =>
   new Promise((resolve, reject) => {
@@ -48,7 +61,7 @@ export const syncAllLedgers = async () => {
     const activeParties = activeRes?.responseBody;
     if (!activeParties) return null;
 
-    const activeIds = activeParties.map((party) => party.partyId);
+    const activeIds = activeParties.map((party) => party.partyId).filter((id) => !SYNC_SKIP_PARTY_IDS.has(id));
     const ledgers = [];
     for (let i = 0; i < activeIds.length; i += BATCH_SIZE) {
       const batch = activeIds.slice(i, i + BATCH_SIZE);
@@ -65,6 +78,7 @@ export const syncAllLedgers = async () => {
     // Balance-only records for everyone else, so offline mode can still show
     // their standing balance
     parties.forEach((party) => {
+      if (SYNC_SKIP_PARTY_IDS.has(party.partyId)) return; // no misleading balance-only record
       const key = String(party.idNo);
       if (!records.has(key)) {
         const balance = Number(party.owedAmount) || 0;
