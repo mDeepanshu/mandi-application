@@ -29,7 +29,7 @@ export const markVyapariAllowedTransactions = async (vyapariId, startDate, endDa
 
 export const sendLedgerNotiApi = async (vyapariId) => {
   try {
-    const response = await fetch(`https://imll8stdk8.execute-api.ap-southeast-1.amazonaws.com/prod/sendnotification/${vyapariId}`, {
+    const response = await fetch(`https://i9iv6ybzx9.execute-api.ap-southeast-1.amazonaws.com/hmb/sendNotification/${vyapariId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
