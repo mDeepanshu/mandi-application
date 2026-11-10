@@ -1,18 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { TextField } from "@mui/material";
 import { getLedger } from "../../../gateway/crateModule/crate-ledger.api";
+import { getPendingCrates } from "../../../gateway/crateModule/return-entry-apis";
 import MasterTable from "../../../shared/ui/master-table/master-table";
 import VyapariField from "../../../shared/elements/VyapariField";
 import ui from "../crate-shared.module.css";
 import styles from "./crate-ledger.module.css";
 
-const LEDGER_COLUMNS = ["DATE", "CRATE TYPE", "DEBIT", "CREDIT", "REMARK"];
-const KEY_ARRAY = ["date", "crate_name", "dr", "cr", "remark"];
+const LEDGER_COLUMNS = ["DATE", "CRATE TYPE", "DEBIT", "CREDIT"];
+const KEY_ARRAY = ["date", "crate_name", "dr", "cr"];
 
 function CrateLedger() {
   const [tableData, setTableData] = useState([]);
   const [fetched, setFetched] = useState(false);
+  const [pendingCrates, setPendingCrates] = useState([]);
 
   const currentDate = new Date().toISOString().split("T")[0];
   const twoDaysPrior = new Date();
@@ -25,12 +27,39 @@ function CrateLedger() {
     formState: { errors },
     getValues,
     trigger,
+    watch,
   } = useForm({
     defaultValues: {
       toDate: currentDate,
       fromDate: priorDate,
     },
   });
+
+  const vyapari = watch("vyapari_id");
+
+  // Load the selected vyapari's pending crates across all crate types.
+  useEffect(() => {
+    if (!vyapari?.partyId) {
+      setPendingCrates([]);
+      return;
+    }
+    let cancelled = false;
+    getPendingCrates(vyapari.partyId)
+      .then((res) => {
+        if (!cancelled) setPendingCrates(res?.responseBody || []);
+      })
+      .catch(() => {
+        if (!cancelled) setPendingCrates([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [vyapari]);
+
+  const totalPending = pendingCrates.reduce(
+    (sum, c) => sum + (Number(c.pending_count) || 0),
+    0
+  );
 
   const fetch_ledger = async (data) => {
     const isValid = await trigger();
@@ -50,7 +79,6 @@ function CrateLedger() {
         crate_name: item.crate_name,
         dr: item.crate_count > 0 ? item.crate_count : "",
         cr: item.crate_count < 0 ? Math.abs(item.crate_count) : "",
-        remark: "",
       }));
       setTableData(insertDateWiseTotal([...formattedData]));
     } else {
@@ -81,7 +109,6 @@ function CrateLedger() {
           crate_name: "",
           dr: totalDr || "",
           cr: totalCr || "",
-          remark: "",
         });
         totalDr = nextDr;
         totalCr = nextCr;
@@ -93,7 +120,6 @@ function CrateLedger() {
       crate_name: "",
       dr: totalDr || "",
       cr: totalCr || "",
-      remark: "",
     });
     return transactions;
   };
@@ -173,6 +199,35 @@ function CrateLedger() {
           >
             Fetch
           </button>
+
+          {vyapari?.partyId && (
+            <div className={styles.pendingSection}>
+              <div className={styles.pendingHeader}>
+                <span className={styles.pendingLabel}>Pending crates</span>
+                {pendingCrates.length > 0 && (
+                  <span className={styles.pendingTotal}>
+                    Total <b>{totalPending}</b>
+                  </span>
+                )}
+              </div>
+              {pendingCrates.length === 0 ? (
+                <span className={styles.pendingEmpty}>None outstanding</span>
+              ) : (
+                <div className={styles.pendingPills}>
+                  {pendingCrates.map((c) => (
+                    <span
+                      key={c.crate_id}
+                      className={`${ui.statPill} ${
+                        c.pending_count <= 0 ? styles.pendingCleared : ""
+                      }`}
+                    >
+                      {c.crate_name} <b>{c.pending_count}</b>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </form>
 
         <div className={styles.tableArea}>

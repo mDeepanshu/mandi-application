@@ -1,30 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { getCrateMasterData } from "../../../../gateway/crateModule/master-api";
 import { updateCrateSummary } from "../../../../gateway/crateModule/first-entry-api";
 import styles from "../../crate-dialog.module.css";
 
-export default function EditDialog({ data, date, onClose, onSaved }) {
+// Edits a single log entry: its count can be re-split across crate types, but
+// the total must stay equal to that entry's count.
+export default function EditDialog({
+  data,
+  crate,
+  entry,
+  crateTypes = [],
+  date,
+  onClose,
+  onSaved,
+}) {
   const [rows, setRows] = useState([]);
-  const [crateTypes, setCrateTypes] = useState([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [showRowErrors, setShowRowErrors] = useState(false);
 
+  // initialize with the selected entry only
   useEffect(() => {
-    getCrateMasterData().then((res) => setCrateTypes(res?.responseBody || []));
-  }, []);
-
-  // initialize rows from API data
-  useEffect(() => {
-    if (data) {
-      const formatted = data.crates.map((c) => ({
-        crate_id: c.crate_id,
-        crate_name: c.crate_name,
-        crate_count: c.crate_count,
-      }));
-      setRows(formatted);
+    if (crate && entry) {
+      setRows([
+        {
+          crate_id: crate.crate_id,
+          crate_name: crate.crate_name,
+          crate_count: Number(entry.count) || 0,
+        },
+      ]);
     }
-  }, [data]);
+  }, [crate, entry]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -56,8 +61,7 @@ export default function EditDialog({ data, date, onClose, onSaved }) {
 
   const total = rows.reduce((sum, r) => sum + (r.crate_count || 0), 0);
 
-  const originalTotal =
-    data?.crates?.reduce((sum, c) => sum + c.crate_count, 0) || 0;
+  const originalTotal = Number(entry?.count) || 0;
 
   const totalMatches = total === originalTotal;
 
@@ -73,16 +77,18 @@ export default function EditDialog({ data, date, onClose, onSaved }) {
       return;
     }
 
-    // Merge duplicate crate types, then send every crate that was originally
-    // present but has since been removed with a count of 0 so the backend clears it.
+    // The API takes the vyapari's per-type totals for the day, so start from
+    // those, take this entry's count out of its type, then add the edited rows.
     const counts = new Map();
+    (data?.crates || []).forEach((c) => {
+      const id = Number(c.crate_id);
+      counts.set(id, (counts.get(id) || 0) + (Number(c.crate_count) || 0));
+    });
+    const entryCrateId = Number(crate.crate_id);
+    counts.set(entryCrateId, (counts.get(entryCrateId) || 0) - originalTotal);
     rows.forEach((r) => {
       const id = Number(r.crate_id);
       counts.set(id, (counts.get(id) || 0) + (r.crate_count || 0));
-    });
-    (data?.crates || []).forEach((c) => {
-      const id = Number(c.crate_id);
-      if (!counts.has(id)) counts.set(id, 0);
     });
 
     const payload = {
@@ -158,13 +164,14 @@ export default function EditDialog({ data, date, onClose, onSaved }) {
                 onChange={(e) => handleChange(index, "crate_id", e.target.value)}
               >
                 <option value="">Select type…</option>
-                {/* keep the row's own type selectable before the master list lands */}
-                {!crateTypes.length && row.crate_id && (
-                  <option value={row.crate_id}>{row.crate_name}</option>
-                )}
-                {crateTypes.map((crate) => (
-                  <option key={crate.id} value={crate.id}>
-                    {crate.crate_name}
+                {/* keep the row's own type selectable even if it isn't in the list */}
+                {row.crate_id &&
+                  !crateTypes.some((t) => String(t.id) === String(row.crate_id)) && (
+                    <option value={row.crate_id}>{row.crate_name}</option>
+                  )}
+                {crateTypes.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.crate_name}
                   </option>
                 ))}
               </select>

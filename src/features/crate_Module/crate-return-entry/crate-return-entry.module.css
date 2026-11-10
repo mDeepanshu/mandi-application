@@ -50,39 +50,6 @@
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
 }
 
-.textInputOk {
-  border-color: #16a34a;
-  background: #f0fdf4;
-}
-
-/* ---------- Crate type suggestions ---------- */
-
-.suggestions {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 20;
-  margin-top: 4px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1);
-  max-height: 220px;
-  overflow-y: auto;
-}
-
-.suggestion {
-  padding: 9px 12px;
-  font-size: 14px;
-  color: #334155;
-  cursor: pointer;
-}
-
-.suggestion:hover {
-  background: #f0fdf4;
-}
-
 /* ---------- Pending crates panel ---------- */
 
 .pendingPanel {

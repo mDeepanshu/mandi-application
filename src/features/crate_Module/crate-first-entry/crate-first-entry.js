@@ -30,9 +30,18 @@ export default function CrateManagement() {
     )
     .sort((a, b) =>
       sortOrder === "asc"
-        ? new Date(a.entry.logged_at) - new Date(b.entry.logged_at)
-        : new Date(b.entry.logged_at) - new Date(a.entry.logged_at)
+        ? new Date(a.entry.created_at) - new Date(b.entry.created_at)
+        : new Date(b.entry.created_at) - new Date(a.entry.created_at)
     );
+
+  // Crate types seen in the day's data, for the edit dialog's type dropdown.
+  const crateTypes = [
+    ...new Map(
+      (data || [])
+        .flatMap((row) => row.crates || [])
+        .map((c) => [String(c.crate_id), { id: c.crate_id, crate_name: c.crate_name }])
+    ).values(),
+  ];
 
   const fetchData = () => {
     if (!summaryDate) return;
@@ -106,17 +115,17 @@ export default function CrateManagement() {
 
           <tbody>
             {visibleData?.map(({ row, crate, entry }) => (
-              <tr key={entry.log_id}>
+              <tr key={entry.id}>
                 <td className={styles.nameCell}>{row.vyapari_name}</td>
                 <td>{crate.crate_name}</td>
                 <td>{entry.count}</td>
                 <td>
-                  {new Date(entry.logged_at).toLocaleString("en-IN", dateTimeFormat)}
+                  {new Date(entry.created_at).toLocaleString("en-IN", dateTimeFormat)}
                 </td>
                 <td className={styles.actionCell}>
                   <button
                     className={styles.editBtn}
-                    onClick={() => setSelected(row)}
+                    onClick={() => setSelected({ row, crate, entry })}
                     aria-label={`Edit crates for ${row.vyapari_name}`}
                   >
                     <Edit fontSize="small" />
@@ -148,7 +157,10 @@ export default function CrateManagement() {
 
       {selected && (
         <EditDialog
-          data={selected}
+          data={selected.row}
+          crate={selected.crate}
+          entry={selected.entry}
+          crateTypes={crateTypes}
           date={summaryDate}
           onClose={() => setSelected(null)}
           onSaved={() => {

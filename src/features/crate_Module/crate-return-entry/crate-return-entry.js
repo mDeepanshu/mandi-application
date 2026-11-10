@@ -6,6 +6,8 @@ import {
 } from "../../../gateway/crateModule/return-entry-apis";
 import { getCrateMasterData } from "../../../gateway/crateModule/master-api";
 import VyapariField from "../../../shared/elements/VyapariField";
+import CrateField from "../../../shared/elements/CrateField";
+import { withCrateNumbers } from "../crate-numbers";
 import ui from "../crate-shared.module.css";
 import styles from "./crate-return-entry.module.css";
 
@@ -43,9 +45,11 @@ const CrateReturnEntry = () => {
 
   const vyapari = watch("vyapari_id");
 
-  // Load crate types once for name matching.
+  // Load crate types once; each gets a frontend-assigned number.
   useEffect(() => {
-    getCrateMasterData().then((res) => setCrateTypes(res?.responseBody || []));
+    getCrateMasterData().then((res) =>
+      setCrateTypes(withCrateNumbers(res?.responseBody || []))
+    );
   }, []);
 
   // When a vyapari is picked, load their pending crates and jump straight to
@@ -64,58 +68,22 @@ const CrateReturnEntry = () => {
       });
   }, [vyapari]);
 
-  const matches = crateInput.trim()
-    ? crateTypes.filter((c) =>
-        c.crate_name.toLowerCase().includes(crateInput.trim().toLowerCase())
-      )
-    : [];
-
-  const selectCrate = (crate) => {
+  // CrateField only hands a crate over once its number or full name is typed
+  // (or a suggestion is picked) — then move on to the amount.
+  const handleCrateChange = (crate) => {
     setSelectedCrate(crate);
-    setCrateInput(crate.crate_name);
-    setTimeout(() => amountRef.current?.focus(), 0);
-  };
-
-  const handleCrateInput = (value) => {
-    setCrateInput(value);
-    setSelectedCrate(null);
-
-    const query = value.trim().toLowerCase();
-    if (!query) return;
-
-    const found = crateTypes.filter((c) =>
-      c.crate_name.toLowerCase().includes(query)
-    );
-    // Exactly one crate matches the typed string → lock it in and move on.
-    if (found.length === 1) selectCrate(found[0]);
+    if (crate) setTimeout(() => amountRef.current?.focus(), 0);
   };
 
   const focusVyapari = () => {
     vyapariBoxRef.current?.querySelector("input")?.focus();
   };
 
-  const handleCrateKeyDown = (e) => {
-    if (e.key !== "Enter") return;
-    e.preventDefault();
-
-    // Empty crate + Enter → step back: clear the vyapari and refocus it.
-    if (!crateInput.trim()) {
-      setValue("vyapari_id", null);
-      setSelectedCrate(null);
-      focusVyapari();
-      return;
-    }
-
-    if (selectedCrate) {
-      amountRef.current?.focus();
-      return;
-    }
-    if (matches.length >= 1) {
-      const exact = matches.find(
-        (c) => c.crate_name.toLowerCase() === crateInput.trim().toLowerCase()
-      );
-      selectCrate(exact || matches[0]);
-    }
+  // Empty crate + Enter → step back: clear the vyapari and refocus it.
+  const handleCrateEmptyEnter = () => {
+    setValue("vyapari_id", null);
+    setSelectedCrate(null);
+    focusVyapari();
   };
 
   const saveEntry = () => {
@@ -205,34 +173,15 @@ const CrateReturnEntry = () => {
         </div>
 
         <div className={styles.crateField}>
-          <input
-            ref={crateInputRef}
-            type="text"
-            className={`${styles.textInput} ${
-              selectedCrate ? styles.textInputOk : ""
-            }`}
-            placeholder="Crate type"
-            value={crateInput}
-            onChange={(e) => handleCrateInput(e.target.value)}
-            onKeyDown={handleCrateKeyDown}
-            autoComplete="off"
+          <CrateField
+            crates={crateTypes}
+            value={selectedCrate}
+            inputValue={crateInput}
+            onInputChange={setCrateInput}
+            onChange={handleCrateChange}
+            onEmptyEnter={handleCrateEmptyEnter}
+            inputRef={crateInputRef}
           />
-          {!selectedCrate && matches.length > 0 && (
-            <div className={styles.suggestions}>
-              {matches.slice(0, 10).map((c) => (
-                <div
-                  key={c.id}
-                  className={styles.suggestion}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    selectCrate(c);
-                  }}
-                >
-                  {c.crate_name}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         <div className={styles.amountField}>

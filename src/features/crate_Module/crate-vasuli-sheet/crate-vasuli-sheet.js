@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { getCrateVasuliSheet } from "../../../gateway/crateModule/vasuli-sheet-api";
-import { getAllPartyList } from "../../../gateway/comman-apis";
 import MasterTable from "../../../shared/ui/master-table/master-table";
 import ui from "../crate-shared.module.css";
 import styles from "./crate-vasuli-sheet.module.css";
@@ -14,7 +13,7 @@ const LEDGER_COLUMNS = [
   "CLOSING AMOUNT",
 ];
 const KEY_ARRAY = [
-  "vyapariIdNo",
+  "id_no",
   "vyapari_name",
   "opening_balance",
   "dayBill",
@@ -39,22 +38,13 @@ const CrateVasuliSheet = () => {
   const getLedgerData = async (fromDate) => {
     setLoading(true);
     try {
-      // party list is cached in localStorage by the gateway; used to map
-      // internal vyapari_id -> human idNo for the ID column and ID search
-      const [ledger, partyList] = await Promise.all([
-        getCrateVasuliSheet(fromDate),
-        getAllPartyList("VYAPARI"),
-      ]);
+      const ledger = await getCrateVasuliSheet(fromDate);
 
       if (!ledger || !ledger.responseBody?.length) {
         setTableData([]);
         setTotals({ openingAmountSum: 0, daybill: 0, closingAmountSum: 0 });
         return;
       }
-
-      const idNoByPartyId = new Map(
-        (partyList?.responseBody || []).map((p) => [String(p.partyId), p.idNo])
-      );
 
       let dayBillTotal = 0;
       let openingAmountSum = 0;
@@ -75,7 +65,6 @@ const CrateVasuliSheet = () => {
 
         return {
           ...item,
-          vyapariIdNo: idNoByPartyId.get(String(item.vyapari_id)) || "",
           ttl: total,
           dayBill,
         };
@@ -99,7 +88,7 @@ const CrateVasuliSheet = () => {
 
   const tableDataFiltered = tableData.filter((elem) => {
     const matchesId =
-      !idQuery || elem?.vyapariIdNo?.toString().includes(idQuery);
+      !idQuery || elem?.id_no?.toString().includes(idQuery);
     const matchesName =
       !nameQuery ||
       elem?.vyapari_name?.toLowerCase().includes(nameQuery.toLowerCase());
