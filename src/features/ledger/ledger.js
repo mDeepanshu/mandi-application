@@ -17,7 +17,7 @@ import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 
 // Ledger cache (offline/IndexedDB): shows the network/cached toggle and the SYNC
 // button. Set to false to hide them and send every fetch to the network.
-const LEDGER_CACHE_ENABLED = false;
+const LEDGER_CACHE_ENABLED = true;
 
 function Ledger() {
   const componentRef = useRef();
