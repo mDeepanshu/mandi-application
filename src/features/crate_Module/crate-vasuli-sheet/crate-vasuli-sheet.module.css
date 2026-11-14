@@ -21,6 +21,23 @@
   width: 200px;
 }
 
+.txnToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #334155;
+  cursor: pointer;
+  user-select: none;
+}
+
+.txnToggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: #16a34a;
+  cursor: pointer;
+}
+
 .stats {
   display: flex;
   gap: 8px;
@@ -35,4 +52,122 @@
   .searches {
     width: 100%;
   }
+}
+
+.printBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid #16a34a;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #15803d;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.printBtn:hover {
+  background: #f0fdf4;
+}
+
+.printBtn:disabled {
+  border-color: #bbf7d0;
+  color: #86efac;
+  cursor: default;
+}
+
+/* ---------- Print (A4, two columns) ---------- */
+
+.printHidden {
+  display: none;
+}
+
+.printPage {
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #000;
+  font-size: 9pt;
+  box-sizing: border-box;
+  width: 100%;
+  padding-right: 2mm; /* keeps the right column's Close off the page edge */
+}
+
+.printHeader {
+  text-align: center;
+  border-bottom: 1.5px solid #000;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+
+.printHeader h2 {
+  margin: 0 0 2px;
+  font-size: 13pt;
+}
+
+.printMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9pt;
+}
+
+.printColHeads,
+.printColumns {
+  column-count: 2;
+  column-gap: 5mm;
+  column-rule: 1px solid #999;
+}
+
+.printColHeads {
+  font-weight: 700;
+  border-bottom: 1px solid #000;
+  margin-bottom: 2px;
+}
+
+.printColHeads .printRow {
+  border-bottom: none;
+}
+
+.printRow {
+  display: grid;
+  /* ID wide enough for 6 digits; Party keeps 5x Day Bill's share.
+     minmax(0, …) stops long names from pushing the row past the column. */
+  /* O / T / C hold 3 characters each (e.g. 135, -15). */
+  grid-template-columns: 12mm minmax(0, 8fr) 3ch minmax(0, 7fr) 3ch 3ch;
+  column-gap: 1.5mm;
+  min-width: 0;
+  padding: 1.2mm 0;
+  border-bottom: 0.5px solid #ccc;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.printName {
+  font-weight: 600;
+  /* One line only: long names are cut, not wrapped. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.printDayBill {
+  overflow-wrap: anywhere;
+  font-size: 8pt;
+}
+
+.printNum {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.printLegend {
+  margin-left: 4mm;
+  font-size: 7.5pt;
+  color: #333;
+}
+
+.printClose {
+  font-weight: 700;
 }

@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
+import { Print } from "@mui/icons-material";
 import { getPendingCrateSummary } from "../../../gateway/crateModule/pending-crate-api";
 import ui from "../crate-shared.module.css";
 import styles from "./pending-crate.module.css";
@@ -16,6 +18,7 @@ const formatDate = (isoString) => {
 export default function PendingCrateSummary() {
     const [data, setData] = useState();
     const [loading, setLoading] = useState(false);
+    const printRef = useRef(null);
 
     const handleFetch = async () => {
         try {
@@ -37,6 +40,21 @@ export default function PendingCrateSummary() {
         (sum, row) => sum + (row.total_pending_crates || 0),
         0
     );
+
+    // Print copy is sorted by vyapari name so it is easy to look up on paper.
+    const printRows = [...(data || [])].sort((a, b) =>
+        (a.vyapari_name || "").localeCompare(b.vyapari_name || "", "en", {
+            sensitivity: "base",
+        })
+    );
+
+    const today = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+
+    const handlePrint = useReactToPrint({
+        content: () => printRef.current,
+        documentTitle: `Pending Crates ${today}`,
+        pageStyle: "@page { size: A4 portrait; margin: 10mm; }",
+    });
 
     return (
         <div className={ui.page}>
@@ -60,6 +78,14 @@ export default function PendingCrateSummary() {
                         disabled={loading}
                     >
                         {loading ? "Loading…" : "Refresh"}
+                    </button>
+                    <button
+                        onClick={handlePrint}
+                        className={`${ui.btnGhost} ${styles.printBtn}`}
+                        disabled={loading || printRows.length === 0}
+                    >
+                        <Print fontSize="small" />
+                        Print
                     </button>
                 </div>
             </div>
@@ -98,6 +124,43 @@ export default function PendingCrateSummary() {
                         </tbody>
                     </table>
                 )}
+            </div>
+
+            {/* Print-only layout: hidden on screen, rendered by react-to-print. */}
+            <div className={styles.printHidden}>
+                <div ref={printRef} className={styles.printPage}>
+                    <div className={styles.printHeader}>
+                        <h2>Pending Crate Summary</h2>
+                        <div className={styles.printMeta}>
+                            <span>Date: {today}</span>
+                            <span>
+                                Total pending: <b>{totalPending}</b>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className={styles.printColHeads}>
+                        {[0, 1, 2].map((i) => (
+                            <div key={i} className={styles.printRow}>
+                                <span>Vyapari</span>
+                                <span>Last Return</span>
+                                <span className={styles.printCount}>Pend.</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className={styles.printColumns}>
+                        {printRows.map((row, index) => (
+                            <div key={row.vyapari_id ?? index} className={styles.printRow}>
+                                <span className={styles.printName}>{row.vyapari_name}</span>
+                                <span>{formatDate(row.last_return_date) || "—"}</span>
+                                <span className={styles.printCount}>
+                                    {row.total_pending_crates}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );

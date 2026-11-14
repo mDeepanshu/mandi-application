@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
+import { Print } from "@mui/icons-material";
 import { getCrateVasuliSheet } from "../../../gateway/crateModule/vasuli-sheet-api";
 import MasterTable from "../../../shared/ui/master-table/master-table";
 import ui from "../crate-shared.module.css";
@@ -29,6 +31,11 @@ const CrateVasuliSheet = () => {
   const [idQuery, setIdQuery] = useState("");
   const [nameQuery, setNameQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  // Show (and print) only vyaparis with crate transactions on the fetched day.
+  const [onlyWithTxn, setOnlyWithTxn] = useState(false);
+  // Date the loaded data belongs to (the picker can change after Fetch).
+  const [fetchedDate, setFetchedDate] = useState(null);
+  const printRef = useRef(null);
   const [totals, setTotals] = useState({
     openingAmountSum: 0,
     closingAmountSum: 0,
@@ -39,6 +46,7 @@ const CrateVasuliSheet = () => {
     setLoading(true);
     try {
       const ledger = await getCrateVasuliSheet(fromDate);
+      setFetchedDate(fromDate);
 
       if (!ledger || !ledger.responseBody?.length) {
         setTableData([]);
@@ -92,8 +100,28 @@ const CrateVasuliSheet = () => {
     const matchesName =
       !nameQuery ||
       elem?.vyapari_name?.toLowerCase().includes(nameQuery.toLowerCase());
-    return matchesId && matchesName;
+    const matchesTxn = !onlyWithTxn || elem?.transactions?.length > 0;
+    return matchesId && matchesName && matchesTxn;
   });
+
+  // Print totals follow the filtered rows, so the paper matches the screen.
+  const printTotals = tableDataFiltered.reduce(
+    (acc, r) => ({
+      opening: acc.opening + (Number(r.opening_balance) || 0),
+      day: acc.day + (Number(r.ttl) || 0),
+      closing: acc.closing + (Number(r.closing_balance) || 0),
+    }),
+    { opening: 0, day: 0, closing: 0 }
+  );
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    documentTitle: `Crate Vasuli Sheet ${fetchedDate || ""}`,
+    pageStyle: "@page { size: A4 portrait; margin: 10mm; }",
+  });
+
+  const formatDisplayDate = (iso) =>
+    iso ? iso.split("-").reverse().join("-") : "";
 
   return (
     <div className={`${ui.page} ${styles.widePage}`}>
@@ -119,6 +147,14 @@ const CrateVasuliSheet = () => {
           >
             {loading ? "Fetching…" : "Fetch"}
           </button>
+          <button
+            className={styles.printBtn}
+            onClick={handlePrint}
+            disabled={loading || tableDataFiltered.length === 0}
+          >
+            <Print fontSize="small" />
+            Print
+          </button>
         </div>
       </div>
 
@@ -139,6 +175,14 @@ const CrateVasuliSheet = () => {
             value={nameQuery}
             onChange={(e) => setNameQuery(e.target.value)}
           />
+          <label className={styles.txnToggle}>
+            <input
+              type="checkbox"
+              checked={onlyWithTxn}
+              onChange={(e) => setOnlyWithTxn(e.target.checked)}
+            />
+            Only with day's transactions
+          </label>
         </div>
 
         <div className={styles.stats}>
@@ -159,6 +203,55 @@ const CrateVasuliSheet = () => {
         tableData={tableDataFiltered}
         keyArray={KEY_ARRAY}
       />
+
+      {/* Print-only layout: hidden on screen, rendered by react-to-print. */}
+      <div className={styles.printHidden}>
+        <div ref={printRef} className={styles.printPage}>
+          <div className={styles.printHeader}>
+            <h2>Crate Vasuli Sheet</h2>
+            <div className={styles.printMeta}>
+              <span>
+                Date: {formatDisplayDate(fetchedDate)}
+                <span className={styles.printLegend}>
+                  O = Open · T = TTL · C = Close
+                </span>
+              </span>
+              <span>
+                Opening <b>{printTotals.opening}</b> · Day{" "}
+                <b>{printTotals.day}</b> · Closing <b>{printTotals.closing}</b>
+              </span>
+            </div>
+          </div>
+
+          <div className={styles.printColHeads}>
+            {[0, 1].map((i) => (
+              <div key={i} className={styles.printRow}>
+                <span>ID</span>
+                <span>Party</span>
+                <span className={styles.printNum}>O</span>
+                <span>DB</span>
+                <span className={styles.printNum}>T</span>
+                <span className={styles.printNum}>C</span>
+              </div>
+            ))}
+          </div>
+
+          <div className={styles.printColumns}>
+            {tableDataFiltered.map((r, idx) => (
+              <div key={`${r.id_no}|${idx}`} className={styles.printRow}>
+                <span>{r.id_no}</span>
+                <span className={styles.printName}>{r.vyapari_name}</span>
+                <span className={styles.printNum}>{r.opening_balance}</span>
+                <span className={styles.printDayBill}>{r.dayBill}</span>
+                <span className={styles.printNum}>{r.ttl}</span>
+                <span className={`${styles.printNum} ${styles.printClose}`}>
+                  {r.closing_balance}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

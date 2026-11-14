@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
+import { getCrateMasterData } from "../../../gateway/crateModule/master-api";
 import EditDialog from "./dialog/crate-first-edit-dialog";
 import styles from "./crate-first-entry.module.css";
-import { Edit } from "@mui/icons-material";
+import { Edit, Print } from "@mui/icons-material";
 import { getCrateSummaryByDate } from "../../../gateway/crateModule/first-entry-api";
 import { dateTimeFormat } from "../../../constants/config";
 
@@ -18,6 +20,10 @@ export default function CrateManagement() {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [crateTypes, setCrateTypes] = useState([]);
+  // Date the loaded data belongs to (the picker can change after Fetch).
+  const [fetchedDate, setFetchedDate] = useState(null);
+  const printRef = useRef(null);
 
   const visibleData = data
     ?.filter((row) =>
@@ -34,14 +40,37 @@ export default function CrateManagement() {
         : new Date(b.entry.created_at) - new Date(a.entry.created_at)
     );
 
-  // Crate types seen in the day's data, for the edit dialog's type dropdown.
-  const crateTypes = [
-    ...new Map(
-      (data || [])
-        .flatMap((row) => row.crates || [])
-        .map((c) => [String(c.crate_id), { id: c.crate_id, crate_name: c.crate_name }])
-    ).values(),
-  ];
+  // Print rows: one line per vyapari + crate type with counts summed,
+  // sorted by vyapari name so the paper copy is easy to look up.
+  const printRows = Object.values(
+    (visibleData || []).reduce((acc, { row, crate, entry }) => {
+      const key = `${row.vyapari_name}|${crate.crate_name}`;
+      if (!acc[key]) {
+        acc[key] = { name: row.vyapari_name, crate: crate.crate_name, count: 0 };
+      }
+      acc[key].count += Number(entry.count) || 0;
+      return acc;
+    }, {})
+  ).sort(
+    (a, b) =>
+      (a.name || "").localeCompare(b.name || "", "en", { sensitivity: "base" }) ||
+      (a.crate || "").localeCompare(b.crate || "")
+  );
+
+  const printTotal = printRows.reduce((sum, r) => sum + r.count, 0);
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    documentTitle: `Crate Summary ${fetchedDate || ""}`,
+    pageStyle: "@page { size: A4 portrait; margin: 10mm; }",
+  });
+
+  const formatDisplayDate = (iso) => (iso ? iso.split("-").reverse().join("-") : "");
+
+  // All crate types from the master, for the edit dialog's type dropdown.
+  useEffect(() => {
+    getCrateMasterData().then((res) => setCrateTypes(res?.responseBody || []));
+  }, []);
 
   const fetchData = () => {
     if (!summaryDate) return;
@@ -50,6 +79,7 @@ export default function CrateManagement() {
     getCrateSummaryByDate(summaryDate)
       .then((summary) => {
         setData(summary?.responseBody || []);
+        setFetchedDate(summaryDate);
       })
       .catch((error) => {
         console.error("Error fetching crate summary:", error);
@@ -97,6 +127,14 @@ export default function CrateManagement() {
             disabled={loading || !summaryDate}
           >
             {loading ? "Fetching…" : "Fetch"}
+          </button>
+          <button
+            className={styles.printBtn}
+            onClick={handlePrint}
+            disabled={loading || printRows.length === 0}
+          >
+            <Print fontSize="small" />
+            Print
           </button>
         </div>
       </div>
@@ -153,6 +191,41 @@ export default function CrateManagement() {
             No vyapari matches "{search}".
           </p>
         )}
+      </div>
+
+      {/* Print-only layout: hidden on screen, rendered by react-to-print. */}
+      <div className={styles.printHidden}>
+        <div ref={printRef} className={styles.printPage}>
+          <div className={styles.printHeader}>
+            <h2>Summary After Mandi Completion</h2>
+            <div className={styles.printMeta}>
+              <span>Date: {formatDisplayDate(fetchedDate)}</span>
+              <span>
+                Total crates: <b>{printTotal}</b>
+              </span>
+            </div>
+          </div>
+
+          <div className={styles.printColHeads}>
+            {[0, 1, 2].map((i) => (
+              <div key={i} className={styles.printRow}>
+                <span>Vyapari</span>
+                <span>Crate</span>
+                <span className={styles.printCount}>Count</span>
+              </div>
+            ))}
+          </div>
+
+          <div className={styles.printColumns}>
+            {printRows.map((r) => (
+              <div key={`${r.name}|${r.crate}`} className={styles.printRow}>
+                <span className={styles.printName}>{r.name}</span>
+                <span>{r.crate}</span>
+                <span className={styles.printCount}>{r.count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {selected && (
